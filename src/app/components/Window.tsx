@@ -18,8 +18,8 @@ export default function Window({
       icon: (
         <FaRegWindowClose
           className="w-8 h-8 text-white hover:scale-110 hover:cursor-pointer transition duration-300"
-          onClick={() => {
-            console.log(window);
+          onClick={(event) => {
+            event.stopPropagation();
             setWindows(windows.filter((w) => w.id !== window.id));
           }}
         />
@@ -30,8 +30,16 @@ export default function Window({
       icon: (
         <FaRegMinusSquare
           className="w-8 h-8 text-white hover:scale-110 hover:cursor-pointer transition duration-300"
-          onClick={() => {
-            window.isOpen = !window.isOpen;
+          onClick={(event) => {
+            event.stopPropagation();
+            setWindows(
+              windows.map((w) => {
+                if (w.id === window.id) {
+                  return { ...w, isOpen: !w.isOpen };
+                }
+                return w;
+              })
+            );
           }}
         />
       ),
@@ -39,22 +47,44 @@ export default function Window({
     {
       name: "Maximize",
       icon: (
-        <BsArrowsFullscreen className="w-7 h-7 text-white hover:scale-110 hover:cursor-pointer transition duration-300" 
-          onClick={() => {
-            if (!window.fullscreen) {
-              window.x = (document.body.clientWidth - document.body.clientWidth / 1.05) / 2;
-              window.y = document.body.clientHeight >= 1100 ? 40 : 10;
-              window.width = document.body.clientWidth / 1.05;
-              window.height = document.body.clientHeight >= 1100 ? document.body.clientHeight / 1.3 : document.body.clientHeight / 1.4;
-              window.fullscreen = true;
-            } else {
-              window.x = 100;
-              window.y = 100;
-              window.width = window.minWidth;
-              window.height = window.minHeight;
-              window.fullscreen = false;
-            }
-          }}/>
+        <BsArrowsFullscreen
+          className="w-7 h-7 text-white hover:scale-110 hover:cursor-pointer transition duration-300"
+          onClick={(event) => {
+            event.stopPropagation();
+            setWindows(
+              windows.map((w) => {
+                if (w.id === window.id) {
+                  if (!w.fullscreen) {
+                    return {
+                      ...w,
+                      x:
+                        (document.body.clientWidth -
+                          document.body.clientWidth / 1.05) /
+                        2,
+                      y: document.body.clientHeight >= 1100 ? 40 : 10,
+                      width: document.body.clientWidth / 1.05,
+                      height:
+                        document.body.clientHeight >= 1100
+                          ? document.body.clientHeight / 1.3
+                          : document.body.clientHeight / 1.4,
+                      fullscreen: true,
+                    };
+                  } else {
+                    return {
+                      ...w,
+                      x: 100,
+                      y: 100,
+                      width: w.minWidth,
+                      height: w.minHeight,
+                      fullscreen: false,
+                    };
+                  }
+                }
+                return w;
+              })
+            );
+          }}
+        />
       ),
     },
   ];
@@ -112,8 +142,14 @@ export default function Window({
           if (w.id === window.id) {
             return {
               ...w,
-              width: Math.min(Math.max(newWidth, window.minWidth), document.body.clientWidth / 1.05),
-              height: Math.min(Math.max(newHeight, window.minHeight), document.body.clientHeight / 1.2),
+              width: Math.min(
+                Math.max(newWidth, window.minWidth),
+                document.body.clientWidth / 1.05
+              ),
+              height: Math.min(
+                Math.max(newHeight, window.minHeight),
+                document.body.clientHeight / 1.2
+              ),
             };
           }
           return w;
@@ -140,17 +176,25 @@ export default function Window({
           top: `${window.y}px`,
           left: `${window.x}px`,
         }}
-        className={`absolute bg-white bg-opacity-30 backdrop-blur-md border-2 rounded-lg shadow-2xl p-2 ${mouseDown ? "select-none pointer-events-none" : ""}`}
+        className={`absolute bg-white bg-opacity-30 backdrop-blur-md border-2 rounded-lg shadow-2xl p-2 ${
+          mouseDown ? "select-none pointer-events-none" : ""
+        }`}
         onMouseDown={handleMouseDown}
       >
-        <div
-          className="w-full flex flex-row justify-between items-center border-b-2 border-dotted"
-        >
+        <div className="w-full flex flex-row justify-between items-center border-b-2 border-dotted">
           <div className="w-full text-end py-2 px-4">
             <h1
               className="cursor-pointer select-auto pointer-events-auto"
-              onClick={() => {
-                window.isOpen = !window.isOpen;
+              onClick={(event) => {
+                event.stopPropagation();
+                setWindows(
+                  windows.map((w) => {
+                    if (w.id === window.id) {
+                      return { ...w, isOpen: !w.isOpen };
+                    }
+                    return w;
+                  })
+                );
               }}
             >
               {window.title}
@@ -170,26 +214,23 @@ export default function Window({
         left: `${window.x}px`,
         zIndex: window.layer,
       }}
-      className={`${
-        window.isOpen ? "block" : "hidden"
-      } absolute bg-white bg-opacity-30 backdrop-blur-md border-2 rounded-lg shadow-2xl`}
-      onClick={() => {
+      className={`absolute bg-white bg-opacity-30 backdrop-blur-md border-2 rounded-lg shadow-2xl`}
+      onMouseDown={() => {
         setWindows(
           windows.map((w) => {
             if (w.id !== window.id) {
               return {
                 ...w,
-                layer: Math.max(0, w.layer - 1), // ограничение минимального значения layer
+                layer: Math.max(0, w.layer - 1),
               };
             }
             return {
               ...w,
-              layer: Math.max(...windows.map((w2) => w2.layer)),
+              layer: Math.max(...windows.map((w2) => w2.layer)) + 1,
             };
           })
         );
       }}
-      
     >
       <div
         className="w-full flex flex-row justify-between items-center border-b-2 border-dotted cursor-move"
@@ -204,7 +245,6 @@ export default function Window({
       </div>
       {window.content}
 
-      {/* Resize Handle (Bottom-right corner) */}
       <div
         className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize"
         onMouseDown={handleResizeStart}
