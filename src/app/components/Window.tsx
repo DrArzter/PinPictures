@@ -176,9 +176,8 @@ export default function Window({
           top: `${window.y}px`,
           left: `${window.x}px`,
         }}
-        className={`absolute bg-white bg-opacity-30 backdrop-blur-md border-2 rounded-lg shadow-2xl p-2 ${
-          mouseDown ? "select-none pointer-events-none" : ""
-        }`}
+        className={`absolute bg-white bg-opacity-30 backdrop-blur-md border-2 rounded-lg shadow-2xl p-2 ${mouseDown ? "select-none pointer-events-none" : ""
+          }`}
         onMouseDown={handleMouseDown}
       >
         <div className="w-full flex flex-row justify-between items-center border-b-2 border-dotted">
