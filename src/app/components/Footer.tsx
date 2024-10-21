@@ -10,7 +10,6 @@ import { SlMagnifier } from "react-icons/sl";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useWindowContext } from "@/app/contexts/WindowContext";
 
-import Authentication from "@/app/pages/Authentication/page";
 
 interface FooterProps {
   windows: Window[];
@@ -21,15 +20,22 @@ interface FooterProps {
 
 export default function Footer() {
 
-  const { windows, addWindow, openTrustedWindow } = useWindowContext();
+  const { openWindowByPath } = useWindowContext();
 
   const iconList = [
     { name: "Bell", icon: <FaBell className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
       onClick={() => {handleButtonClicksex();}} /> },
     { name: "Add", icon: <CiSquarePlus className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" /> },
     { name: "Message", icon: <AiOutlineMessage className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" /> },
-    { name: "Authentication", icon: <RiLoginBoxFill className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" 
-    onClick={() => {openTrustedWindow("/authentication");/*handleCreateNewWindow("Authentication", "\/authentication", "Authentication", 250, 250, 545, 700, 545, 700, windows.length + 1, <Authentication />);*/}}/>},
+    {
+      name: "Authentication",
+      icon: (
+        <RiLoginBoxFill
+          className="w-8 h-8 text-white hover:scale-110 hover:cursor-pointer transition duration-300"
+          onClick={() => openWindowByPath("/authentication")}
+        />
+      ),
+    },
     { name: "Search", icon: <SlMagnifier className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" /> },
   ];
   const { addNotification } = useNotificationContext();

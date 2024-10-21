@@ -1,34 +1,24 @@
-import Authentication from "@/app/pages/Authentication/page";
+import { componentRegistry } from "./componentRegistry";
+import { createWindow } from "./windowFactory";
+import React from "react";
 
-export function getComponentByPath(path: string, windowId: number) {
-  const trustedComponents = new Map<string, () => Window>([
-    [
-      "/authentication",
-      () => ({
-        id: windowId,
-        title: "Authentication",
-        path: "/authentication",
-        type: "Authentication",
-        isOpen: true,
-        fullscreen: false,
-        x: 250,
-        y: 250,
-        width: 545,
-        height: 700,
-        minWidth: 545,
-        minHeight: 700,
-        layer: windowId,
-        content: <Authentication />,
-      }),
-    ],
-  ]);
+export function getComponentByPath(path, windowId, existingWindowsCount) {
+  const registryEntry = componentRegistry[path];
+  if (registryEntry) {
+    const { component, defaultProps } = registryEntry;
+    const Component = component; // Ensure uppercase
 
-  const componentFactory = trustedComponents.get(path);
-  if (componentFactory) {
-    return componentFactory();
+    return createWindow({
+      id: windowId,
+      title: component.name || "Untitled Window",
+      path,
+      type: component.name || "Component",
+      content: <Component />,
+      existingWindowsCount,
+      ...defaultProps,
+    });
+  } else {
+    console.warn(`No component found for path: ${path}`);
+    return null;
   }
-  
-
-  console.warn(`No trusted component found for path: ${path}`);
-  return null;
 }
