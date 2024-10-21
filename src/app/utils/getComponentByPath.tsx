@@ -1,3 +1,4 @@
+// getComponentByPath.js
 import { componentRegistry } from "./componentRegistry";
 import { createWindow } from "./windowFactory";
 import React from "react";
@@ -18,7 +19,22 @@ export function getComponentByPath(path, windowId, existingWindowsCount) {
       ...defaultProps,
     });
   } else {
-    console.warn(`No component found for path: ${path}`);
-    return null;
+    const notFoundEntry = componentRegistry["*"];
+    if (notFoundEntry) {
+      const { component, defaultProps } = notFoundEntry;
+      const Component = component;
+      return createWindow({
+        id: windowId,
+        title: "Not Found",
+        path,
+        type: "NotFound",
+        content: <Component />,
+        existingWindowsCount,
+        ...defaultProps,
+      });
+    } else {
+      console.warn(`No component found for path: ${path}, and no NotFound handler.`);
+      return null;
+    }
   }
 }

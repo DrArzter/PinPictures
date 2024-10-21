@@ -1,20 +1,20 @@
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import  { useWindowContext }  from "@/app/contexts/WindowContext";
+import React from "react";
+import { useWindowContext } from "@/app/contexts/WindowContext";
 import Window from "./Window";
 
-
-
 export default function Windows({ mouseDown, mousePosition }) {
-  const { windows, addWindow, removeWindow } = useWindowContext();
-
-  
+  const { windows } = useWindowContext();
 
   return (
     <>
-    {windows.map((window: Window) => (
-      <Window key={window.id} window={window} mouseDown={mouseDown} mousePosition={mousePosition}  />
-    ))}
+      {windows.map((window) => (
+        <Window
+          key={window.id}
+          windowData={window}
+          mouseDown={mouseDown}
+          mousePosition={mousePosition}
+        />
+      ))}
     </>
   );
 }

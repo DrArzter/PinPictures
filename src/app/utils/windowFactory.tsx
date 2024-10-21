@@ -16,6 +16,20 @@ export function createWindow({
   content,
 }) {
   const offset = (existingWindowsCount * offsetStep) % maxOffset;
+
+  let xPosition = initialX + offset;
+  let yPosition = initialY + offset;
+
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  if (xPosition + width > viewportWidth) {
+    xPosition = viewportWidth - width - 20;
+  }
+  if (yPosition + height > viewportHeight) {
+    yPosition = viewportHeight - height - 20;
+  }
+
   return {
     id,
     title,
@@ -23,8 +37,8 @@ export function createWindow({
     type,
     isOpen: true,
     fullscreen: false,
-    x: initialX + offset,
-    y: initialY + offset,
+    x: offset,
+    y: offset,
     width,
     height,
     minWidth,
