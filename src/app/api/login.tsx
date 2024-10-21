@@ -1,10 +1,9 @@
-import axios from "axios";
-import config from './config';
+import api from './axiosApi';
 
 export default async function login(username: string, password: string) {
   try {
-    const response = await axios.post(
-      `${config.apiUrl}/user/login`,
+    const response = await api.post(
+      `/user/login`,
       {
         email: username,
         password: password

@@ -5,7 +5,7 @@ import { useWindowContext } from "@/app/contexts/WindowContext";
 export default function Notification() {
   const { notifications, removeNotification } = useNotificationContext();
 
-  const { openTrustedWindow } = useWindowContext();
+  const { openWindowByPath } = useWindowContext();
 
   useEffect(() => {
     const timers = notifications.map((notification, index) =>
@@ -34,7 +34,7 @@ export default function Notification() {
         <div
           key={index}
           className={`${getNotificationClassName(notification.status, notification.clickable)} backdrop-blur-md bg-opacity-30 rounded-md border-2  text-center py-4 shadow-lg`}
-          onClick={notification.clickable ? () => openTrustedWindow(notification.link_to) : null}
+          onClick={notification.clickable ? () => openWindowByPath(notification.link_to) : null}
         >
           <p className="text-white">{notification.message}</p>
         </div>

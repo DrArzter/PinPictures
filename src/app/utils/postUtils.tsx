@@ -12,3 +12,13 @@ export const fetchPosts = async (page: number) => {
     return [];
   }
 };
+
+export const createPost = async (post: Post) => {
+  try {
+    const createdPost = await api.createPost(post);
+    return createdPost;
+  } catch (error) {
+    console.error("Error creating post:", error);
+    return null;
+  }
+}

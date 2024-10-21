@@ -1,10 +1,10 @@
-import axios from "axios";
-import config from './config';
+import api from './axiosApi';
+
 
 export default async function registration(username: string, email: string, password: string) {
 
   try {
-    const response = await axios.post(`${config.apiUrl}/user/registration`, {
+    const response = await api.post(`/user/registration`, {
       name: username,
       email: email,
       password: password

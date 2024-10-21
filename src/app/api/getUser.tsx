@@ -1,10 +1,10 @@
-import axios from 'axios';
-import config from "./config";
+import api from './axiosApi';
+
 
 export default async function getUser() {
   try {
-    const response = await axios.get(
-      `${config.apiUrl}/user`,
+    const response = await api.get(
+      `/user`,
       {
         withCredentials: true
       }
