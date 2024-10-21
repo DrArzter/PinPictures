@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: true, // Enables React's Strict Mode
-  };
-  
-  export default nextConfig;
-  
+  reactStrictMode: true,  // Optionally enable strict mode for development,
+};
+
+export default nextConfig;
