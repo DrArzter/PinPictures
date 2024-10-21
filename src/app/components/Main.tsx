@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
-import Window from "./Window";
+import Windows from "./Windows";
 
-export default function Main({ windows, setWindows }) {
+export default function Main() {
   const [mouseDown, setMouseDown] = React.useState(false);
   const [mousePosition, setMousePosition] = React.useState(false);
   const [mouseClickTarget, setMouseClickTarget] = React.useState(false);
@@ -20,17 +20,7 @@ export default function Main({ windows, setWindows }) {
       onMouseDown={() => setMouseDown(true)}
       onMouseUp={() => setMouseDown(false)}
     >
-      {windows.map((window: any) => (
-        <Window
-          key={window.id}
-          window={window}
-          windows={windows}
-          setWindows={setWindows}
-          mouseDown={mouseDown}
-          mousePosition={mousePosition}
-          mouseClickTarget={mouseClickTarget}
-        />
-      ))}
+      <Windows mouseDown={mouseDown} mousePosition={mousePosition} />
     </main>
   );
 }

@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaGear } from "react-icons/fa6";
 import { CiBookmarkPlus } from "react-icons/ci";
 import { RiLogoutBoxFill } from "react-icons/ri";
+import { useUserContext } from "@/app/contexts/userContext";
 import Link from "next/link";
 
-export default function DropdownMenu({ isDropdownOpen, user, toggleDropdown }) {
+
+export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
+  const { user, userLoading, setUserLoading } = useUserContext();
+  const [showVideo, setShowVideo] = useState(0);
   const dropdownRef = useRef(null);
 
   // Закрытие по клику вне меню
@@ -36,7 +40,7 @@ export default function DropdownMenu({ isDropdownOpen, user, toggleDropdown }) {
   }, [isDropdownOpen, toggleDropdown]);
 
   // Упрощенный класс без темной темы
-  const dropdownClassName = `absolute z-[999] right-0 top-16 lg:w-[10vw] w-32 rounded-md shadow-lg transform transition-all duration-300 ease-in-out 
+  const dropdownClassName = `absolute z-[999] w-48 top-24 rounded-md shadow-lg transform transition-all duration-300 ease-in-out 
     ${isDropdownOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"} bg-white`;
 
   const menuItemsClassName = `p-4 flex flex-col gap-4 w-full text-black transition-colors`;
@@ -48,6 +52,35 @@ export default function DropdownMenu({ isDropdownOpen, user, toggleDropdown }) {
     console.log("Logout clicked");
     toggleDropdown(); // Закрываем меню после выхода
   };
+
+  const handleDvoechkuVEblet = () => {
+    setShowVideo(1);
+  };
+
+  if (showVideo === 1) {
+    return (
+      <div>
+          {showVideo && (
+              <div style={{ marginTop: '20px' }}>
+                  <iframe
+                      width="560"
+                      height="315"
+                      src="https://www.youtube.com/embed/kNEfmCgL4e4?autoplay=1&mute=1" // Set mute=1 for autoplay to work
+                      title="YouTube video player"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                  ></iframe>
+              </div>
+          )}
+      </div>
+  );
+  } else if (showVideo === 2) {
+    return (
+        <div className="fixed top-0 left-0 w-full h-full bg-black opacity-100">
+        </div>
+    );
+  }
 
   return (
     <div ref={dropdownRef} className={dropdownClassName}>
@@ -84,6 +117,15 @@ export default function DropdownMenu({ isDropdownOpen, user, toggleDropdown }) {
         >
           <RiLogoutBoxFill className={iconClassName} />
           <span>Logout</span>
+        </div>
+
+        {/* ShutDown ebalo */}
+        <div
+          className="flex items-center gap-2 cursor-pointer hover:scale-105 transition duration-300"
+          onClick={handleDvoechkuVEblet}
+        >
+          <RiLogoutBoxFill className={iconClassName} />
+          <span>ShutDown</span>
         </div>
       </div>
     </div>

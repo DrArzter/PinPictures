@@ -1,46 +1,36 @@
-"use client";
-
-import { useRouter } from 'next/navigation';
-
-import SearchBar from './SearchBar';
-import UserCard from './UserCard';
+import SearchBar from "./SearchBar";
+import UserCard from "./UserCard";
 import DropdownMenu from "./DropdownMenu";
 
-import { Logo } from "../resources/Logo";
-
-import { useState } from 'react';
+import { useState } from "react";
 
 export default function Header() {
-    const router = useRouter();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-    const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+  const headerClassName =
+    "header py-3 shadow-lg mx-auto items-center flex flex-row justify-between w-3/4 transition-colors duration-300";
+  const searchBarContainerClassName = "flex-1 flex justify-center";
 
-    const [user, setUser] = useState({});
+  return (
+    <header className={headerClassName}>
+      {/* Контейнер с SearchBar в центре */}
+      <div className={searchBarContainerClassName}>
+        <SearchBar />
+      </div>
 
-    const headerClassName = "header py-3 shadow-lg mx-auto items-center flex flex-row justify-between w-3/4 transition-colors duration-300";
-    const searchBarContainerClassName = "flex-1 flex justify-center";
-
-    return (
-        <header className={headerClassName}>
-
-            {/* Контейнер с SearchBar в центре */}
-            <div className={searchBarContainerClassName}>
-                <SearchBar />
-            </div>
-
-            {/* UserCard сдвинут ещё правее */}
-            <div className="flex items-center" onClick={toggleDropdown}>
-                <UserCard />
-            </div>
-
-            {/* DropdownMenu справа */}
-            {isDropdownOpen && (
-                <DropdownMenu isDropdownOpen={isDropdownOpen} user={user} setUser={setUser} toggleDropdown={toggleDropdown} />
-            )}
-
-
-        </header>
-    );
+      {/* UserCard сдвинут ещё правее */}
+      <div className="px-2" onClick={toggleDropdown}>
+        <UserCard />
+        {/* DropdownMenu справа */}
+        {isDropdownOpen && (
+          <DropdownMenu
+            isDropdownOpen={isDropdownOpen}
+            toggleDropdown={toggleDropdown}
+          />
+        )}
+      </div>
+    </header>
+  );
 }

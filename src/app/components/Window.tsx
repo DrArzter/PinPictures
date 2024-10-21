@@ -2,16 +2,17 @@ import React, { useEffect, useState } from "react";
 import { FaRegWindowClose, FaRegMinusSquare } from "react-icons/fa";
 import { BsArrowsFullscreen } from "react-icons/bs";
 import { RiDraggable } from "react-icons/ri";
+import { useWindowContext } from "@/app/contexts/WindowContext";
 
 import IconList from "./IconList";
 
 export default function Window({
   window,
-  windows,
-  setWindows,
   mouseDown,
   mousePosition,
 }) {
+
+  const { windows, setWindows, addWindow, removeWindow } = useWindowContext();
   const iconList = [
     {
       name: "Close",
@@ -20,7 +21,7 @@ export default function Window({
           className="w-8 h-8 text-white hover:scale-110 hover:cursor-pointer transition duration-300"
           onClick={(event) => {
             event.stopPropagation();
-            setWindows(windows.filter((w) => w.id !== window.id));
+            removeWindow(window.id);
           }}
         />
       ),
@@ -238,7 +239,10 @@ export default function Window({
         <div className="p-2 flex justify-start">
           <IconList iconList={iconList} />
         </div>
-        <div className="w-3/4 text-end py-2 px-4">
+        <div className="flex flex-row text-end py-1 px-4 bg-gray-200 rounded bg-opacity-30 ">
+        <h1>{window.path}</h1>
+        </div>
+        <div className="text-end py-2 px-4">
           <h1>{window.title}</h1>
         </div>
       </div>
