@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 
 import Notification from "./components/Notifications";
 import Header from "./components/Header";
@@ -10,20 +10,18 @@ import { NotificationProvider } from "./contexts/NotificationContext";
 import { WindowProvider } from "./contexts/WindowContext";
 import { UserProvider } from "./contexts/userContext";
 
-
-
 export default function Home() {
   return (
     <div className="items-center justify-center min-h-screen">
       <UserProvider>
-      <WindowProvider>
+        <WindowProvider>
           <NotificationProvider>
             <Header />
             <Notification />
             <Main />
             <Footer />
           </NotificationProvider>
-      </WindowProvider>
+        </WindowProvider>
       </UserProvider>
     </div>
   );
