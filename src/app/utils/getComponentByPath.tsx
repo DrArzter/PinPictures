@@ -1,20 +1,20 @@
-// getComponentByPath.js
+// getComponentByPath.ts
 import { componentRegistry } from "./componentRegistry";
 import { createWindow } from "./windowFactory";
-import React from "react";
 
 export function getComponentByPath(path, windowId, existingWindowsCount) {
   const registryEntry = componentRegistry[path];
   if (registryEntry) {
     const { component, defaultProps } = registryEntry;
-    const Component = component; // Ensure uppercase
+    const Component = component;
 
     return createWindow({
       id: windowId,
       title: component.name || "Untitled Window",
       path,
       type: component.name || "Component",
-      content: <Component />,
+      componentType: Component,
+      componentProps: defaultProps,
       existingWindowsCount,
       ...defaultProps,
     });
@@ -28,7 +28,8 @@ export function getComponentByPath(path, windowId, existingWindowsCount) {
         title: "Not Found",
         path,
         type: "NotFound",
-        content: <Component />,
+        componentType: Component,
+        componentProps: defaultProps,
         existingWindowsCount,
         ...defaultProps,
       });

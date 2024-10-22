@@ -1,3 +1,4 @@
+// Posts.js
 import React, { useEffect, useState, useCallback } from "react";
 
 import PostList from "@/app/components/PostList";
@@ -6,7 +7,6 @@ import NoPostsFound from "@/app/components/NoPostsFound";
 
 import * as postUtils from "@/app/utils/postUtils";
 
-// Дебаунс с очисткой таймера
 const debounce = (func, wait) => {
   let timeout;
   return (...args) => {
@@ -26,7 +26,7 @@ const LoadMoreButton = ({ onClick }) => (
   </div>
 );
 
-export default function Posts() {
+export default function Posts({ windowHeight, windowWidth }) {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [posts, setPosts] = useState([]);
@@ -37,12 +37,12 @@ export default function Posts() {
     const fetchPosts = async () => {
       if (hasMorePosts) {
         setLoading(true);
-        setError(null); // Сбрасываем ошибку перед новым запросом
+        setError(null);
 
         try {
           const newPosts = await postUtils.fetchPosts(page);
           if (newPosts.length === 0) {
-            setHasMorePosts(false); // Если больше нет постов
+            setHasMorePosts(false);
           } else {
             setPosts((prevPosts) =>
               page === 1 ? newPosts : [...prevPosts, ...newPosts]
@@ -52,7 +52,7 @@ export default function Posts() {
           console.error("Error fetching posts:", err);
           setError("Failed to load posts, please try again later.");
         } finally {
-          setLoading(false); // Всегда отключаем индикатор загрузки
+          setLoading(false);
         }
       }
     };
@@ -64,11 +64,11 @@ export default function Posts() {
     debounce(() => {
       if (
         window.scrollY + window.innerHeight >=
-          document.body.scrollHeight - 100 && // Примерно 100px до конца страницы
+          document.body.scrollHeight - 100 &&
         !loading &&
         hasMorePosts
       ) {
-        setPage((prevPage) => prevPage + 1); // Увеличиваем страницу
+        setPage((prevPage) => prevPage + 1);
       }
     }, 200),
     [loading, hasMorePosts]
@@ -76,27 +76,33 @@ export default function Posts() {
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll); // Чистим обработчик скролла при размонтировании
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
   const handleLoadMore = () => {
-    setHasMorePosts(true); // Если нужно снова пробовать загружать
-    setPage(1); // Можно сбросить на первую страницу, если требуется полный перезагруз
+    setHasMorePosts(true);
+    setPage(1);
   };
 
-  const postsContainerClassName = "w-full p-[14px] animate-slide-up absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full";
+  const postsContainerStyle = {
+    width: windowWidth-10,
+    height: windowHeight-60,
+    overflowY: "scroll",
+    scrollbarWidth: "none",
+    msOverflowStyle: "none",
+  };
 
   return (
     <>
-      {loading && page === 1 ? ( // Показываем индикатор при первой загрузке
+      {loading && page === 1 ? (
         <LoadingIndicator />
       ) : (
-        <div id="posts" className={postsContainerClassName}>
+        <div id="posts" style={postsContainerStyle}>
           {error && <div className="text-red-500">{error}</div>}
           {posts.length > 0 ? (
-            <PostList posts={posts} />
+            <PostList posts={posts} windowHeight={windowHeight} windowWidth={windowWidth}/>
           ) : (
-            !loading && <NoPostsFound /> // Показываем если нет постов и загрузка завершена
+            !loading && <NoPostsFound />
           )}
           {loading && hasMorePosts && <LoadingIndicator />}
           {!hasMorePosts && <LoadMoreButton onClick={handleLoadMore} />}

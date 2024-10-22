@@ -1,3 +1,4 @@
+// Window.tsx
 import React, { useEffect, useState } from "react";
 import { FaRegWindowClose, FaRegMinusSquare } from "react-icons/fa";
 import { BsArrowsFullscreen } from "react-icons/bs";
@@ -11,13 +12,14 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
   const { windows, setWindows, removeWindow } = useWindowContext();
 
   const getWindowDimensions = () => {
+    
     if (typeof window !== "undefined") {
       const width = document.documentElement.clientWidth;
       const height = document.documentElement.clientHeight;
-      return { width: width, height: height - 200}; // Subtracting 2px to account for borders
+      return { width: width, height: height - 200 };
     }
     return { width: 800, height: 600 };
-  };  
+  };
 
   const iconList = [
     {
@@ -88,7 +90,7 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
           }}
         />
       ),
-    }, 
+    },
   ];
 
   const [isDragging, setIsDragging] = useState(false);
@@ -133,7 +135,8 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
           if (w.id === windowData.id) {
             return {
               ...w,
-              content: updatedWindow.content,
+              componentType: updatedWindow.componentType,
+              componentProps: updatedWindow.componentProps,
               width: updatedWindow.width,
               height: updatedWindow.height,
               minWidth: updatedWindow.minWidth,
@@ -181,22 +184,16 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
     } else if (isResizing && mouseDown) {
       const newWidth = resizeStart.width + (mousePosition.clientX - resizeStart.x);
       const newHeight = resizeStart.height + (mousePosition.clientY - resizeStart.y);
-  
+
       const { width: maxWidth, height: maxHeight } = getWindowDimensions();
-  
+
       setWindows(
         windows.map((w) => {
           if (w.id === windowData.id) {
             return {
               ...w,
-              width: Math.min(
-                Math.max(newWidth, w.minWidth),
-                maxWidth
-              ),
-              height: Math.min(
-                Math.max(newHeight, w.minHeight),
-                maxHeight
-              ),
+              width: Math.min(Math.max(newWidth, w.minWidth), maxWidth),
+              height: Math.min(Math.max(newHeight, w.minHeight), maxHeight),
             };
           }
           return w;
@@ -204,9 +201,7 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
       );
     }
   }, [mousePosition]);
-  
 
-  // Handle resizing
   const handleResizeStart = (event) => {
     setIsResizing(true);
     setResizeStart({
@@ -252,6 +247,8 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
       </div>
     );
   }
+
+  const ContentComponent = windowData.componentType;
 
   return (
     <div
@@ -300,7 +297,14 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
           <h1>{windowData.title}</h1>
         </div>
       </div>
-      {windowData.content}
+
+      {ContentComponent && (
+        <ContentComponent
+          {...windowData.componentProps}
+          windowHeight={windowData.height}
+          windowWidth={windowData.width}
+        />
+      )}
 
       <div
         className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize"

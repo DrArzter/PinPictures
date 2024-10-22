@@ -1,3 +1,4 @@
+// windowFactory.tsx
 export function createWindow({
   id,
   title,
@@ -12,7 +13,8 @@ export function createWindow({
   height = 400,
   minWidth = 300,
   minHeight = 200,
-  content,
+  componentType,
+  componentProps,
 }) {
   const offset = (existingWindowsCount * offsetStep) % maxOffset;
 
@@ -36,13 +38,14 @@ export function createWindow({
     type,
     isOpen: true,
     fullscreen: false,
-    x: offset,
-    y: offset,
+    x: xPosition,
+    y: yPosition,
     width,
     height,
     minWidth,
     minHeight,
     layer: id,
-    content,
+    componentType,
+    componentProps,
   };
 }
