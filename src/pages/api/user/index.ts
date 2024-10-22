@@ -10,21 +10,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
     authMiddleware(req, res, async () => {
         try {
-            const userId = req.user.userId;
-
-            const user = await prisma.user.findUnique({
-                where: {
-                    id: userId
-                }
-            });
-
+            const user = req.user;
             if (!user) {
                 return res.status(404).json({status: 'error', message: 'User not found' });
             }
 
-            const { password, bananaLevel, ...userWithoutSensitiveInfo } = user;
-
-            res.status(200).json({status: 'success', message: 'User retrieved successfully', data: userWithoutSensitiveInfo});
+            res.status(200).json({status: 'success', message: 'User retrieved successfully', data: user});
         } catch (error) {
             return res.status(500).json({status: 'error', message: 'Internal server error' });
         }

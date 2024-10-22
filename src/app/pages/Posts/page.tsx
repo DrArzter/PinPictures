@@ -84,7 +84,7 @@ export default function Posts() {
     setPage(1); // Можно сбросить на первую страницу, если требуется полный перезагруз
   };
 
-  const postsContainerClassName = "w-full p-[14px] animate-slide-up";
+  const postsContainerClassName = "w-full p-[14px] animate-slide-up absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full";
 
   return (
     <>

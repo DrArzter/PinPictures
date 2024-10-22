@@ -1,5 +1,6 @@
 import { verifyToken } from '@/utils/jwt';
 import { NextApiRequest, NextApiResponse } from 'next';
+import  { prisma }  from '@/utils/prisma';
 
 interface DecodedToken {
   userId: string;
@@ -7,7 +8,7 @@ interface DecodedToken {
   exp: number;
 }
 
-export function authMiddleware(req: any, res: NextApiResponse, next: () => void) {
+export async function authMiddleware(req: any, res: NextApiResponse, next: () => void) {
 
   const cookieStore = req.cookies;
   const token = cookieStore.token;
@@ -18,7 +19,17 @@ export function authMiddleware(req: any, res: NextApiResponse, next: () => void)
 
   try {
     const decoded = verifyToken(token) as DecodedToken;
-    req.user = decoded;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: decoded.userId
+      }
+    });
+
+    
+    const { password, bananaLevel, ...userWithoutSensitiveInfo } = user;
+
+    req.user = userWithoutSensitiveInfo;
     next();
   } catch (err) {
     return res.status(401).json({ status: 'error', message: 'Server error' });

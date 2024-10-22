@@ -16,7 +16,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const posts = await prisma.post.findMany({
             skip: offset,
             take: limit,
+            include: {
+                images: true,
+                likes: true,
+                comments: true,
+            },
         });
+        
+
+        
 
         const totalPosts = await prisma.post.count();
 

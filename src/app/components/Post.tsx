@@ -21,6 +21,8 @@ export default function Post({ post }) {
 
   const hasMultipleImages = post.images && post.images.length > 1;
 
+  console.log("post", post);
+
 
   return (
     <div key={post.id} className={postContainerClassName}>
