@@ -8,27 +8,27 @@ datasource db {
 }
 
 model User {
-  id           Int               @id @default(autoincrement())
-  name         String            @unique
-  bananaLevel  Int               @default(0)
-  email        String            @unique
-  password     String
-  picpath      String            @default("uploads/users/default_avatar.jpg")
-  bgpicpath    String            @default("uploads/users/default_background.jpg")
-  uiBgPicPath  String            @default("https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg")
-  createdAt    DateTime          @default(now())
-  lastLoginAt  DateTime          @default(now())
-  banned       Boolean           @default(false)
-  settings     Json              @default("{\"bgColor\": \"#FFFFFF\"}")
+  id            Int               @id @default(autoincrement())
+  name          String            @unique
+  bananaLevel   Int               @default(0)
+  email         String            @unique
+  password      String
+  avatar        String            @default("uploads/users/default_avatar.jpg")
+  background    String            @default("uploads/users/default_background.jpg")
+  uiBackground  String            @default("https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg")
+  createdAt     DateTime          @default(now())
+  lastLoginAt   DateTime          @default(now())
+  banned        Boolean           @default(false)
+  settings      Json              @default("{\"bgColor\": \"#FFFFFF\"}")
 
 
-  comments     Comments[]
-  friendships  Friendships[]     @relation("User1Friendship")
-  friendships2 Friendships[]     @relation("User2Friendship")
-  likes        Likes[]
-  messages     MessagesInChats[]
-  posts        Post[]
-  usersinchats UsersInChats[]
+  comments      Comments[]
+  friendships   Friendships[]     @relation("User1Friendship")
+  friendships2  Friendships[]     @relation("User2Friendship")
+  likes         Likes[]
+  messages      MessagesInChats[]
+  posts         Post[]
+  usersinchats  UsersInChats[]
 }
 
 model Post {

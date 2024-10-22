@@ -11,6 +11,7 @@ export const UserProvider = ({ children }) => {
     const fetchUser = async () => {
       try {
         const response = await api.getUser();
+        console.log(response);
         if (response) {
           setUser(response);
         } else {
@@ -30,7 +31,7 @@ export const UserProvider = ({ children }) => {
     <UserContext.Provider value={{ user, setUser, setUserLoading, userLoading }}>
       <div
         style={{
-          backgroundImage: user?.uiBgPicPath ? `url(${user.uiBgPicPath})` : "none",
+          backgroundImage: user?.uiBackground ? `url(${user.uiBackground})` : "none",
         }}>
         {children}
       </div>

@@ -20,7 +20,7 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
 
   // Закрытие по клику вне меню
   const handleClickOutside = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    if (false && dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       toggleDropdown();
     }
   };
@@ -62,39 +62,44 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
     setShowVideo(1);
   };
 
-  if (showVideo === 1) {
-    return (
-      <div>
+  useEffect(() => {
+
+    if (showVideo === 1) {
+      return (
+        <div>
           {showVideo && (
-              <div style={{ marginTop: '20px' }}>
-                  <iframe
-                      width="560"
-                      height="315"
-                      src="https://www.youtube.com/embed/kNEfmCgL4e4?autoplay=1&mute=1" // Set mute=1 for autoplay to work
-                      title="YouTube video player"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                  ></iframe>
-              </div>
+            <div style={{ marginTop: '20px' }}>
+              <iframe
+                width="560"
+                height="315"
+                src="https://www.youtube.com/embed/kNEfmCgL4e4?autoplay=1&mute=1" // Set mute=1 for autoplay to work
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
           )}
-      </div>
-  );
-  } else if (showVideo === 2) {
-    return (
+        </div>
+      );
+    } else if (showVideo === 2) {
+      return (
         <div className="fixed top-0 left-0 w-full h-full bg-black opacity-100">
         </div>
-    );
-  }
+      );
+    }
+  }, [showVideo]);
+
+
 
   return (
     <div ref={dropdownRef} className={dropdownClassName}>
       <Link href={`/profile/${user.name}`}>
         <img
           src={
-            user.picpath.startsWith("https://ui-avatars.com/")
-              ? user.picpath
-              : `${config.apiUrl.replace("/api", "/")}${user.picpath}`
+            user.avatar.startsWith("https://ui-avatars.com/")
+              ? user.avatar
+              : `${config.apiUrl.replace("/api", "/")}${user.avatar}`
           }
           alt="Profile"
           className="w-full h-24 object-cover rounded-t-md hover:scale-105 cursor-pointer transition duration-300"
@@ -105,7 +110,7 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
         {/* Упрощаем, убираем ChangeTheme */}
         <div className="flex items-center justify-between gap-4">
           <FaGear className={iconClassName}
-          onClick={() => {openWindowByPath("/settings");}} />
+            onClick={() => { openWindowByPath("/settings"); }} />
         </div>
 
         {/* Закладка */}

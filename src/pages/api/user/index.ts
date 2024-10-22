@@ -63,7 +63,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
                             return res.status(500).json({ error: 'Server error during renaming' });
                         }
 
-                        const url = user.uiBgPicPath;
+                        const url = user.uiBackground;
                         const extractedPath = url.split('pinpictures/')[1];
 
                         if (!extractedPath.includes("otherImages/background2")) {

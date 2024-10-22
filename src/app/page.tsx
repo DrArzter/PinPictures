@@ -10,12 +10,12 @@ export default function Home() {
 
 
   return (
+    <NotificationProvider>
       <UserProvider>
         <WindowProvider>
-          <NotificationProvider>
             <Main />
-          </NotificationProvider>
         </WindowProvider>
       </UserProvider>
+    </NotificationProvider>
   );
 }

@@ -39,7 +39,7 @@ export default function Settings({ windowHeight, windowWidth }) {
         console.log(response);
         if (response) {
             setUser(response.user);
-            setSelectedImage(response.user.uiBgPicPath);
+            setSelectedImage(response.user.uiBackground);
         }
     };
 

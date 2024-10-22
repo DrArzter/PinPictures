@@ -11,9 +11,9 @@ import { useUserContext } from "./contexts/userContext";
 export default function Home() {
     const { user } = useUserContext();
 
-    const backgroundImage = user && user.settings?.uiBgPicPath 
-        ? `url(${user.settings.uiBgPicPath})` 
-        : "url(/images/background.jpeg)";
+    const backgroundImage = user && user.uiBackground 
+        ? `url(${user.uiBackground})` 
+        : "url(/images/background2.jpeg)";
 
     return (
         <div

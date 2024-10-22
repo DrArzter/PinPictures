@@ -4,6 +4,7 @@ import { signToken } from '@/utils/jwt';
 import { hashPassword } from '@/utils/hashPassword';
 
 import { z } from 'zod';
+import { stat } from 'fs';
 
 const registrationSchema = z.object({
     email: z.string().email('Invalid email format'),
@@ -27,8 +28,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 email,
                 name,
                 password: await hashPassword(password),
-                picpath: `https://ui-avatars.com/api/?name=${name}&background=ACACAC&color=fff`,
-                bgpicpath: `https://ui-avatars.com/api/?name=${name}&background=ACACAC&color=fff`
+                avatar: `https://ui-avatars.com/api/?name=${name}&background=ACACAC&color=fff`,
+                background: `https://ui-avatars.com/api/?name=${name}&background=ACACAC&color=fff`
             }
         });
 
@@ -41,16 +42,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             (process.env.NODE_ENV === 'production' ? ' Secure;' : '')
         ]);
         
-        return res.status(200).json({ type: 'success', message: 'Registration successful', token: token });
+        return res.status(200).json({ status: 'success', message: 'Registration successful', token: token });
         
     } catch (error: any) {
         let PozjilayaStringa = "";
-        if (error.issues[0].message == "Required") {
+
+        console.log(error);
+
+        if (error?.issues[0].message == "Required") {
             PozjilayaStringa = "Required fields: " + error.issues[0].path.join(", ");
         } else {
             PozjilayaStringa = error.issues[0].message;
         }
-        return res.status(401).json({ type: 'error', message: PozjilayaStringa });
+        return res.status(401).json({ status: 'error', message: PozjilayaStringa });
     }
 
 }

@@ -6,6 +6,9 @@ import * as api from "../../api";
 import Login from "../../components/Login";
 import Registration from "../../components/Registration";
 
+import { useNotificationContext } from '@/app/contexts/NotificationContext';
+import { stat } from "fs";
+
 export default function Authentication({ }) {
   const [registration, setRegistration] = useState(true);
   const [forgotPassword, setForgotPassword] = useState(false);
@@ -16,19 +19,33 @@ export default function Authentication({ }) {
 
   const [user, setUser] = useState(null);
 
+  const { addNotification } = useNotificationContext();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      let userData;
       if (registration) {
-        userData = await api.registration(username, email, password);
-        setRegistration(false);
+        const response = await api.registration(username, email, password);
+        console.log(response);
+        if (response.status === "success") {
+          setRegistration(false);
+        }
+        addNotification({
+          status: response.status,
+          message: response.message,
+        });
+
+
       } else if (forgotPassword) {
         setForgotPassword(false);
       } else {
-        userData = await api.login(username, password);
+        const response = await api.login(username, password);
+        addNotification({
+          status: response.status,
+          message: response.message,
+        });
+
       }
-      setUser(userData);
     } catch (error) {
       console.error("Error during authentication:", error);
     }

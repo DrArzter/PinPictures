@@ -13,7 +13,7 @@ export default async function registration(username: string, email: string, pass
         withCredentials: true
       }
     );
-    return response.data.user;
+    return response.data;
   } catch (error) {
     console.error('Error during registration:', error);
     alert('Error during registration. Please try again.');

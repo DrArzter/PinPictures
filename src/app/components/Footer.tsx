@@ -25,7 +25,7 @@ export default function Footer() {
 
   const { openWindowByPath } = useWindowContext();
 
-  const backgroundColor = user && user.settings?.bgColor ? `rgba(${user.settings.bgColor})` : 'rgba(0,0,0,0.3)';
+  const backgroundColor = user && user.settings?.bgColor ? `rgba(${user.settings.bgColor})` : 'rgba(255,255,255,0.3)';
 
   const iconList = [
     { name: "Post", icon: <BsFillFileEarmarkPostFill className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" onClick={() => {openWindowByPath("/posts");}} />  },
@@ -35,7 +35,19 @@ export default function Footer() {
       icon: (
         <CiSquarePlus 
         className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" 
-        onClick={() => openWindowByPath("/post/create")}/> 
+        onClick={() => {
+          if (!user) {
+            addNotification({
+              message: `Сначала авторизуйтесь`,
+              status: "info",
+              time: 5000,
+              clickable: true,
+              link_to: "/authentication",
+            });
+            return
+          }
+          openWindowByPath("/post/create");
+        }}/> 
       )
     },
     { name: "Message", icon: <AiOutlineMessage className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" /> },

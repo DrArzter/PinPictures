@@ -16,9 +16,9 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
   const getWindowDimensions = () => {
     
     if (typeof window !== "undefined") {
-      const width = document.documentElement.clientWidth;
-      const height = document.documentElement.clientHeight;
-      return { width: width, height: height - 200 };
+      const width = document.documentElement.clientWidth*0.95;
+      const height = document.documentElement.clientHeight*0.8;
+      return { width: width, height: height };
     }
     return { width: 800, height: 600 };
   };
@@ -69,8 +69,8 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
                   if (!w.fullscreen) {
                     return {
                       ...w,
-                      x: 0,
-                      y: 0,
+                      x: (document.documentElement.clientWidth-windowWidth)/2,
+                      y: (document.documentElement.clientHeight-windowHeight)/2,
                       width: windowWidth,
                       height: windowHeight,
                       fullscreen: true,
@@ -215,13 +215,15 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
     });
   };
 
+  const backgroundColor = user && user.settings?.bgColor ? `rgba(${user.settings.bgColor})` : 'rgba(255,255,255,0.3)';
+
   if (!windowData.isOpen) {
     return (
       <div
         style={{
           top: `${windowData.y}px`,
           left: `${windowData.x}px`,
-          backgroundColor: `rgba(${user?.settings.bgColor})`,
+          backgroundColor: backgroundColor,
         }}
         className={`absolute bg-white bg-opacity-30 backdrop-blur-md border-2 rounded-lg shadow-2xl p-2 ${
           mouseDown ? "select-none pointer-events-none" : ""
@@ -262,7 +264,7 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
         top: `${windowData.y}px`,
         left: `${windowData.x}px`,
         zIndex: windowData.layer,
-        backgroundColor: `rgba(${user?.settings.bgColor})`,
+        backgroundColor: backgroundColor,
       }}
       className={`absolute bg-white bg-opacity-30 backdrop-blur-md border-2 rounded-lg shadow-2xl`}
       onMouseDown={() => {
