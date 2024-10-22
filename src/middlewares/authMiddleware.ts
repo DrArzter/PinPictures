@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import { verifyToken } from '@/utils/jwt';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 interface DecodedToken {
@@ -8,17 +8,19 @@ interface DecodedToken {
 }
 
 export function authMiddleware(req: any, res: NextApiResponse, next: () => void) {
-  const token = req.headers.authorization?.split(' ')[1];
+
+  const cookieStore = req.cookies;
+  const token = cookieStore.token;
 
   if (!token) {
-    return res.status(401).json({ message: 'Токен не предоставлен' });
+    return res.status(401).json({ status: 'error', message: 'No token provided' });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
+    const decoded = verifyToken(token) as DecodedToken;
     req.user = decoded;
     next();
   } catch (err) {
-    return res.status(401).json({ message: 'Неверный токен' });
+    return res.status(401).json({ status: 'error', message: 'Server error' });
   }
 }
