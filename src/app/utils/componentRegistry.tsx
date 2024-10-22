@@ -3,6 +3,7 @@ import Authentication from "@/app/pages/Authentication/page";
 import NotFound from "@/app/pages/NotFound/page";
 import Posts from "@/app/pages/Posts/page";
 import CreatePost from "@/app/pages/CreatePost/page";
+import Settings from "@/app/pages/Settings/page";
 
 export const componentRegistry = {
   "/authentication": {
@@ -29,6 +30,17 @@ export const componentRegistry = {
   },
   "/post/create": {
     component: CreatePost,
+    defaultProps: {
+      width: 800,
+      height: 980,
+      minWidth: 770,
+      minHeight: 980,
+      initialX: 200,
+      initialY: 200,
+    },
+  },
+  "/settings": {
+    component: Settings,
     defaultProps: {
       width: 800,
       height: 980,

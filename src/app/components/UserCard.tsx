@@ -10,14 +10,22 @@ export default function UserCard() {
 
     if (userLoading) {
         return(
-         <div className="p-2 w-48 justify-center flex-row backdrop-blur-md bg-white bg-opacity-30 border-2 rounded-lg shadow-2xl rounded-md cursor-pointer items-center">
+         <div 
+         style={{ 
+           backgroundColor: `rgba(${user?.settings.bgColor})`
+          }}
+          className="p-2 w-48 justify-center flex-row backdrop-blur-md bg-opacity-30 border-2 rounded-lg shadow-2xl rounded-md cursor-pointer items-center">
             <LoadingIndicator />
         </div>
         )
     }
 
     return (
-        <div className="flex w-48 justify-center flex-row p-2 gap-4 backdrop-blur-md bg-white bg-opacity-30 border-2 rounded-lg shadow-2xl rounded-md cursor-pointer items-center">
+        <div 
+        style={{ 
+          backgroundColor: `rgba(${user?.settings.bgColor})`
+         }}
+         className="flex w-48 justify-center flex-row p-2 gap-4 backdrop-blur-md bg-opacity-30 border-2 rounded-lg shadow-2xl rounded-md cursor-pointer items-center">
             {user? (
                 <><img
                     src={user.picpath.startsWith("https://ui-avatars.com/")

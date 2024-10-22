@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, use } from "react";
 
 import IconList from "./IconList";
 
@@ -11,6 +11,7 @@ import { BsFillFileEarmarkPostFill } from "react-icons/bs";
 
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useWindowContext } from "@/app/contexts/WindowContext";
+import { useUserContext } from "@/app/contexts/userContext";
 
 
 interface FooterProps {
@@ -21,6 +22,7 @@ interface FooterProps {
 
 
 export default function Footer() {
+  const { user, userLoading } = useUserContext();
 
   const { openWindowByPath } = useWindowContext();
 
@@ -50,6 +52,12 @@ export default function Footer() {
 
   const { addNotification } = useNotificationContext();
 
+
+  useEffect(() => {
+    console.log(`rgba(${user?.settings.bgColor})`);
+  }, [user]);
+
+
   const handleButtonClicksex = () => {
     addNotification({
       message: `Сначала авторизуйтесь`,
@@ -61,7 +69,13 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-white backdrop-blur-md rounded-lg bg-opacity-30 border-2 md:mb-4 md:w-1/2 mx-auto text-center py-4 fixed bottom-0 left-0 right-0 shadow-lg">
+    (userLoading) ? <div></div> :
+    <footer 
+    style={{ 
+      backgroundColor: `rgba(${user?.settings.bgColor})`
+     }}
+    className={`backdrop-blur-md rounded-lg
+    bg-opacity-30 border-2 md:mb-4 md:w-1/2 mx-auto text-center py-4 fixed bottom-0 left-0 right-0 shadow-lg`}>
       <IconList iconList={iconList} />
     </footer>
   );

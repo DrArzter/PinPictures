@@ -5,10 +5,12 @@ import { BsArrowsFullscreen } from "react-icons/bs";
 import { RiDraggable } from "react-icons/ri";
 import { useWindowContext } from "@/app/contexts/WindowContext";
 import { getComponentByPath } from "@/app/utils/getComponentByPath";
+import { useUserContext } from "../contexts/userContext";
 
 import IconList from "./IconList";
 
 export default function Window({ windowData, mouseDown, mousePosition }) {
+  const { user } = useUserContext();
   const { windows, setWindows, removeWindow } = useWindowContext();
 
   const getWindowDimensions = () => {
@@ -120,6 +122,7 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
     setWindows(
       windows.map((w) => {
         if (w.id === windowId) {
+          console.log(w);
           return { ...w, path: newPath };
         }
         return w;
@@ -137,8 +140,8 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
               ...w,
               componentType: updatedWindow.componentType,
               componentProps: updatedWindow.componentProps,
-              width: updatedWindow.width,
-              height: updatedWindow.height,
+              width: windowData.fullscreen ? windowData.width : updatedWindow.width,
+              height: windowData.fullscreen ? windowData.height : updatedWindow.height,
               minWidth: updatedWindow.minWidth,
               minHeight: updatedWindow.minHeight,
               title: updatedWindow.title,
@@ -218,6 +221,7 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
         style={{
           top: `${windowData.y}px`,
           left: `${windowData.x}px`,
+          backgroundColor: `rgba(${user?.settings.bgColor})`,
         }}
         className={`absolute bg-white bg-opacity-30 backdrop-blur-md border-2 rounded-lg shadow-2xl p-2 ${
           mouseDown ? "select-none pointer-events-none" : ""
@@ -258,6 +262,7 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
         top: `${windowData.y}px`,
         left: `${windowData.x}px`,
         zIndex: windowData.layer,
+        backgroundColor: `rgba(${user?.settings.bgColor})`,
       }}
       className={`absolute bg-white bg-opacity-30 backdrop-blur-md border-2 rounded-lg shadow-2xl`}
       onMouseDown={() => {

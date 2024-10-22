@@ -7,12 +7,14 @@ import { CiBookmarkPlus } from "react-icons/ci";
 import { RiLogoutBoxFill } from "react-icons/ri";
 
 import { useUserContext } from "@/app/contexts/userContext";
+import { useWindowContext } from "@/app/contexts/WindowContext";
 
 import Link from "next/link";
 
 
 export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
   const { user, userLoading, setUserLoading } = useUserContext();
+  const { openWindowByPath } = useWindowContext();
   const [showVideo, setShowVideo] = useState(0);
   const dropdownRef = useRef(null);
 
@@ -102,9 +104,8 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
       <div className={menuItemsClassName}>
         {/* Упрощаем, убираем ChangeTheme */}
         <div className="flex items-center justify-between gap-4">
-          <Link href="/Settings" className="cursor-pointer hover:scale-105 transition duration-300">
-            <FaGear className={iconClassName} />
-          </Link>
+          <FaGear className={iconClassName}
+          onClick={() => {openWindowByPath("/settings");}} />
         </div>
 
         {/* Закладка */}

@@ -26,10 +26,14 @@ export const UserProvider = ({ children }) => {
     fetchUser();
   }, []);
 
-  // Передаем все нужные значения в контекст
   return (
     <UserContext.Provider value={{ user, setUser, setUserLoading, userLoading }}>
-      {children}
+      <div
+        style={{
+          backgroundImage: user?.uiBgPicPath ? `url(${user.uiBgPicPath})` : "none",
+        }}>
+        {children}
+      </div>
     </UserContext.Provider>
   );
 };
