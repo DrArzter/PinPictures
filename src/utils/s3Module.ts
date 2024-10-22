@@ -33,7 +33,6 @@ const deleteFiles = function deleteFiles(paths) {
             Key: path
         };
 
-        console.log(deleteParams);
         s3.deleteObject(deleteParams, function(err, data) {
             if (err) {
             } else {

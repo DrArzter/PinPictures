@@ -2,7 +2,6 @@ import api from './axiosApi';
 
 export default async function createPost(Post: Post) {
   try {
-    console.log('page', Post);
     
     const formData = new FormData();
 

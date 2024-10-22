@@ -1,4 +1,3 @@
-// windowFactory.js
 export function createWindow({
   id,
   title,
