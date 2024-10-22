@@ -1,21 +1,24 @@
 "use client";
-import React, { useContext } from "react";
+import React from "react";
 
 import Notification from "./components/Notifications";
 import Header from "./components/Header";
 import Main from "./components/Main";
 import Footer from "./components/Footer";
 
-
 import { useUserContext } from "./contexts/userContext";
 
 export default function Home() {
     const { user } = useUserContext();
 
+    const backgroundImage = user && user.settings?.uiBgPicPath 
+        ? `url(${user.settings.uiBgPicPath})` 
+        : "url(/images/background.jpeg)";
+
     return (
         <div
             style={{
-                backgroundImage: user?.uiBgPicPath ? `url(${user.uiBgPicPath})` : "none",
+                backgroundImage: backgroundImage,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
