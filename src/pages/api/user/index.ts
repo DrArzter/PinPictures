@@ -82,7 +82,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
                                 id: user.id
                             },
                             data: {
-                                uiBgPicPath: uploadResult[0].Location
+                                uiBackground: uploadResult[0].Location
                             }
                         });
                         
@@ -102,8 +102,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
                             data: {
                                 ...user,
                                 settings: {
-                                    ...user.settings, // Spread existing settings
-                                    bgColor: `${r}, ${g}, ${b}, ${a}` // Update only bgColor
+                                    ...user.settings,
+                                    bgColor: `${r}, ${g}, ${b}, ${a}`
                                 }
                             }
                         });
