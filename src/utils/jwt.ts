@@ -9,5 +9,9 @@ export const signToken = (user: any) => {
 };
 
 export const verifyToken = (token: string) => {
-  return jwt.verify(token, secret!);
+  try {
+    return jwt.verify(token, secret!);
+  } catch (error) {
+    return null;
+  }
 };

@@ -28,9 +28,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 password: await hashPassword(password),
                 avatar: `https://ui-avatars.com/api/?name=${name}&background=ACACAC&color=fff`,
                 background: `https://ui-avatars.com/api/?name=${name}&background=ACACAC&color=fff`,
-                settings: {
-                    bcColor: "#FFFFFF",
-                }
             }
         });
 

@@ -20,6 +20,10 @@ export async function authMiddleware(req: any, res: NextApiResponse, next: () =>
   try {
     const decoded = verifyToken(token) as DecodedToken;
 
+    if (!decoded) {
+      return res.status(401).json({ status: 'error', message: 'Invalid token' });
+    }
+
     const user = await prisma.user.findUnique({
       where: {
         id: decoded.userId
