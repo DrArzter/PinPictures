@@ -1,19 +1,17 @@
 "use client";
 import React from "react";
 
-import Main from "./main";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { WindowProvider } from "./contexts/WindowContext";
 import { UserProvider } from "./contexts/userContext";
+import ContentLoader from "@/app/components/ContentLoader";
 
-export default function Home() {
-
-
+export default function page() {
   return (
     <NotificationProvider>
       <UserProvider>
         <WindowProvider>
-            <Main />
+          <ContentLoader /> 
         </WindowProvider>
       </UserProvider>
     </NotificationProvider>
