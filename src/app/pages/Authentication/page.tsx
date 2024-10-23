@@ -1,66 +1,77 @@
 'use client';
 import React, { useState, useContext } from "react";
 
-import * as api from "../../api";
+import * as api from "@/app/api";
 
 import Login from "../../components/Login";
 import Registration from "../../components/Registration";
 
 import { useNotificationContext } from '@/app/contexts/NotificationContext';
-import { stat } from "fs";
+import { useUserContext } from '@/app/contexts/userContext';
 
-export default function Authentication({ }) {
-  const [registration, setRegistration] = useState(true);
-  const [forgotPassword, setForgotPassword] = useState(false);
+export default function Authentication() {
 
+  const [isRegistration, setIsRegistration] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+
+  const { setUser } = useUserContext();
+
+  // Состояния для ввода данных пользователя
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [user, setUser] = useState(null);
-
   const { addNotification } = useNotificationContext();
 
+  // Обработчик отправки формы
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
-      if (registration) {
-        const response = await api.registration(username, email, password);
-        console.log(response);
+      let response;
+      
+      if (isRegistration) {
+        // Регистрация пользователя
+        response = await api.registration(username, email, password);
         if (response.status === "success") {
-          setRegistration(false);
+          setIsRegistration(false);
+          setUser(response.user);
         }
-        addNotification({
-          status: response.status,
-          message: response.message,
-        });
-
-
-      } else if (forgotPassword) {
-        setForgotPassword(false);
+      } else if (isForgotPassword) {
+        // Логика для восстановления пароля (может быть изменена в зависимости от API)
+        response = await api.forgotPassword(email);
+        if (response.status === "success") {
+          setIsForgotPassword(false);
+        }
       } else {
-        const response = await api.login(username, password);
-        addNotification({
-          status: response.status,
-          message: response.message,
-        });
-
+        // Логин пользователя
+        response = await api.login(username, password);
+        if (response.status === "success") {
+          const userData = await api.getUser();
+          setUser(userData);
+        }
       }
+
+      addNotification({
+        status: response.status,
+        message: response.message,
+      });
     } catch (error) {
       console.error("Error during authentication:", error);
     }
   };
 
   const toggleRegistration = () => {
-    setRegistration(!registration);
-    setForgotPassword(false);
+    setIsRegistration(!isRegistration);
+    setIsForgotPassword(false);
     setUsername("");
     setPassword("");
   };
 
+  // Функция переключения на восстановление пароля
   const toggleForgotPassword = () => {
-    setForgotPassword(!forgotPassword);
-    setRegistration(false);
+    setIsForgotPassword(!isForgotPassword);
+    setIsRegistration(false);
     setUsername("");
     setPassword("");
   };
@@ -69,7 +80,7 @@ export default function Authentication({ }) {
 
   return (
     <div className={containerClassName}>
-      {registration ? (
+      {isRegistration ? (
         <Registration
           username={username}
           setUsername={setUsername}
@@ -80,9 +91,19 @@ export default function Authentication({ }) {
           handleSubmit={handleSubmit}
           toggleRegistration={toggleRegistration}
         />
-      ) : forgotPassword ? (
+      ) : isForgotPassword ? (
         <div>
-          <p>Forgot Password</p>
+          <p>Enter your email to reset password</p>
+          <form onSubmit={handleSubmit}>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              required
+            />
+            <button type="submit">Reset Password</button>
+          </form>
         </div>
       ) : (
         <Login
