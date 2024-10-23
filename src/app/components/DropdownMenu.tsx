@@ -11,9 +11,11 @@ import { useWindowContext } from "@/app/contexts/WindowContext";
 
 import Link from "next/link";
 
+import * as api from "@/app/api";
+
 
 export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
-  const { user, userLoading, setUserLoading } = useUserContext();
+  const { user, setUser, userLoading, setUserLoading } = useUserContext();
   const { openWindowByPath } = useWindowContext();
   const [showVideo, setShowVideo] = useState(0);
   const dropdownRef = useRef(null);
@@ -54,8 +56,8 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
 
   // Пример заглушки для выхода
   const handleLogout = () => {
-    console.log("Logout clicked");
-    toggleDropdown(); // Закрываем меню после выхода
+    api.logout(setUser);
+    toggleDropdown();
   };
 
   const handleDvoechkuVEblet = () => {
@@ -74,7 +76,6 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
                 height="315"
                 src="https://www.youtube.com/embed/kNEfmCgL4e4?autoplay=1&mute=1" // Set mute=1 for autoplay to work
                 title="YouTube video player"
-                frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               ></iframe>
@@ -96,11 +97,7 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
     <div ref={dropdownRef} className={dropdownClassName}>
       <Link href={`/profile/${user.name}`}>
         <img
-          src={
-            user.avatar.startsWith("https://ui-avatars.com/")
-              ? user.avatar
-              : `${config.apiUrl.replace("/api", "/")}${user.avatar}`
-          }
+          src={user.avatar}
           alt="Profile"
           className="w-full h-24 object-cover rounded-t-md hover:scale-105 cursor-pointer transition duration-300"
         />
