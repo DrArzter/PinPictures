@@ -29,29 +29,25 @@ export default function Footer() {
 
   const iconList = [
     { name: "Post", icon: <BsFillFileEarmarkPostFill className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" onClick={() => {openWindowByPath("/posts");}} />  },
+    
     { name: "Bell", icon: <FaBell className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
       onClick={() => {handleButtonClicksex();}} /> },
-    { name: "Add",
+        
+    // Элемент отображается только если пользователь авторизован
+    user ? { name: "Add",
       icon: (
-        <CiSquarePlus 
-        className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" 
-        onClick={() => {
-          if (!user) {
-            addNotification({
-              message: `Сначала авторизуйтесь`,
-              status: "info",
-              time: 5000,
-              clickable: true,
-              link_to: "/authentication",
-            });
-            return
-          }
-          openWindowByPath("/post/create");
-        }}/> 
+        <CiSquarePlus
+          className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
+          onClick={() => {
+            openWindowByPath("/post/create");
+          }}/> 
       )
-    },
+    } : null, // Если пользователь не авторизован, возвращаем null, чтобы элемент не рендерился
+    
     { name: "Message", icon: <AiOutlineMessage className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" /> },
-    {
+    
+    // Иконка "Authentication" отображается только для неавторизованных пользователей
+    !user && {
       name: "Authentication",
       icon: (
         <RiLoginBoxFill
@@ -60,8 +56,9 @@ export default function Footer() {
         />
       ),
     },
+    
     { name: "Search", icon: <SlMagnifier className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" /> },
-  ];
+  ].filter(Boolean);
 
   const { addNotification } = useNotificationContext();
 

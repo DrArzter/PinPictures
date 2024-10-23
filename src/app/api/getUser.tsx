@@ -14,7 +14,6 @@ export default async function getUser() {
       console.log('User is not authenticated, no token provided.');
       return null;
     } else {
-      // Логируем остальные ошибки
       console.error('Error fetching user:', error);
       return null;
     }

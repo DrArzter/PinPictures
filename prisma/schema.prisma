@@ -8,27 +8,25 @@ datasource db {
 }
 
 model User {
-  id            Int               @id @default(autoincrement())
-  name          String            @unique
-  bananaLevel   Int               @default(0)
-  email         String            @unique
-  password      String
-  avatar        String
-  background    String
-  uiBackground  String            @default("https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg")
-  createdAt     DateTime          @default(now())
-  lastLoginAt   DateTime          @default(now())
-  banned        Boolean           @default(false)
-  settings      Json              @default("{\"bgColor\": \"#FFFFFF\"}")
-
-
-  comments      Comments[]
-  friendships   Friendships[]     @relation("User1Friendship")
-  friendships2  Friendships[]     @relation("User2Friendship")
-  likes         Likes[]
-  messages      MessagesInChats[]
-  posts         Post[]
-  usersinchats  UsersInChats[]
+  id           Int               @id @default(autoincrement())
+  name         String            @unique
+  bananaLevel  Int               @default(0)
+  email        String            @unique
+  password     String
+  avatar       String
+  background   String
+  uiBackground String            @default("https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg")
+  createdAt    DateTime          @default(now())
+  lastLoginAt  DateTime          @default(now())
+  banned       Boolean           @default(false)
+  settings     Json
+  comments     Comments[]
+  friendships  Friendships[]     @relation("User1Friendship")
+  friendships2 Friendships[]     @relation("User2Friendship")
+  likes        Likes[]
+  messages     MessagesInChats[]
+  posts        Post[]
+  usersinchats UsersInChats[]
 }
 
 model Post {

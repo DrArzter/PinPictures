@@ -3,8 +3,6 @@ import { RxAvatar } from "react-icons/rx";
 import { useUserContext } from "@/app/contexts/userContext";
 import LoadingIndicator from "./LoadingIndicator";
 
-import config from "@/app/api/config";
-
 export default function UserCard() {
     const { user, userLoading } = useUserContext();
 
@@ -30,9 +28,7 @@ export default function UserCard() {
          className="flex w-48 justify-center flex-row p-2 gap-4 backdrop-blur-md bg-opacity-30 border-2 rounded-lg shadow-2xl rounded-md cursor-pointer items-center">
             {user? (
                 <><img
-                    src={user.avatar.startsWith("https://ui-avatars.com/")
-                        ? user.avatar
-                        : config.apiUrl.replace("/api", "/") + user.avatar}
+                    src={user.avatar}
                     alt="Profile"
                     loading="lazy"
                     style={{ objectFit: "cover" }}
