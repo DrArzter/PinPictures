@@ -27,7 +27,7 @@ export default function Header() {
   //TODO: Отцентровать SearchBar и сделать его responsive
 
   const headerClassName =
-    "header absolute top-0 backdrop-blur-xl left-0 right-0 py-3 mt-4 shadow-lg mx-auto items-center flex flex-row justify-between w-3/4 transition-colors duration-300 border-2 border-gray-300 rounded-lg z-[100000]";
+    "absolute top-0 backdrop-blur-xl left-0 right-0 py-2 mt-2 shadow-lg mx-auto items-center flex flex-row justify-between w-5/6 border-2 rounded-lg z-[999]";
   
     const searchBarContainerClassName = "justify-center";
 

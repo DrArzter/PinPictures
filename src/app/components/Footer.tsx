@@ -77,8 +77,7 @@ export default function Footer() {
     style={{ 
       backgroundColor: backgroundColor
      }}
-    className={`backdrop-blur-xl rounded-lg
-    bg-opacity-30 border-2 md:mb-4 md:w-1/2 mx-auto text-center py-4 fixed bottom-0 left-0 right-0 shadow-lg`}>
+    className={`backdrop-blur-xl rounded-lg bg-opacity-30 border-2 md:mb-2 md:w-1/2 mx-auto text-center py-2 absolute bottom-0 left-0 right-0 shadow-lg`}>
       <IconList iconList={iconList} />
     </footer>
   );

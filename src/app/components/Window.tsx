@@ -16,8 +16,8 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
   const getWindowDimensions = () => {
     
     if (typeof window !== "undefined") {
-      const width = document.documentElement.clientWidth*0.95;
-      const height = document.documentElement.clientHeight*0.8;
+      const width = document.documentElement.clientWidth*0.995;
+      const height = document.documentElement.clientHeight*0.85;
       return { width: width, height: height };
     }
     return { width: 800, height: 600 };

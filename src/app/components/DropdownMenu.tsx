@@ -47,7 +47,7 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
   }, [isDropdownOpen, toggleDropdown]);
 
   // Упрощенный класс без темной темы
-  const dropdownClassName = `absolute z-[999] w-48 top-24 rounded-md shadow-lg transform transition-all duration-300 ease-in-out 
+  const dropdownClassName = `absolute z-[999] w-36 top-24 rounded-md shadow-lg transform transition-all duration-300 ease-in-out 
     ${isDropdownOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"} bg-white`;
 
   const menuItemsClassName = `p-4 flex flex-col gap-4 w-full text-black transition-colors`;
