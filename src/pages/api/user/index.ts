@@ -4,7 +4,7 @@ import { uploadFiles, deleteFiles } from '@/utils/s3Module';
 import { authMiddleware } from '@/middlewares/authMiddleware';
 import formidable from 'formidable';
 import fs from 'fs/promises';
-
+import { handleError } from '@/utils/errorHandler'; // Импорт обработчика ошибок
 
 export const config = {
     api: {
@@ -14,11 +14,11 @@ export const config = {
 };
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-
     if (req.method !== 'GET' && req.method !== 'PATCH') {
         return res.status(405).json({ status: 'error', message: 'Unsupported method' });
     }
-    if (req.method == "GET") {
+
+    if (req.method === "GET") {
         authMiddleware(req, res, async () => {
             try {
                 const user = req.user;
@@ -28,7 +28,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
                 res.status(200).json({ status: 'success', message: 'User retrieved successfully', data: user });
             } catch (error) {
-                return res.status(500).json({ status: 'error', message: 'Internal server error' });
+                return handleError(res, error);
             }
         });
     }
@@ -67,11 +67,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
                         const extractedPath = url.split('pinpictures/')[1];
 
                         if (!extractedPath.includes("otherImages/background2")) {
-
-                            const deletedUiBg = await deleteFiles([extractedPath]);
-                            
+                            const deletedUiBg = await deleteFiles([extractedPath]);   
                         }
-
 
                         const fileContent = await fs.readFile(newPath);
                         const uploadResult = await uploadFiles([{
@@ -110,17 +107,14 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
                                 }
                             }
                         });
-                        
-                        
                         return res.status(200).json({ status: 'success', message: 'User updated successfully', user: updatedUser });
                     }
-
                     if (err) {
-                        return res.status(500).json({ status: 'error', message: 'Error in file upload' });
+                        return handleError(res, err);
                     }
                 });
             } catch (error) {
-                return res.status(500).json({ status: 'error', message: 'Internal server error' });
+                return handleError(res, error);
             }
         });
 

@@ -1,24 +1,18 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/utils/prisma';
 import { signToken } from '@/utils/jwt';
-import { verifyPassword } from '@/utils/verifyPassword';
-import { cookies } from 'next/headers'
 import bcrypt from 'bcryptjs';
-import cookie from 'cookie';
-
 import { z } from 'zod';
-
+import { handleError } from '@/utils/errorHandler'; // Импорт функции для обработки ошибок
 
 const loginSchema = z.object({
     email: z.string().email('Invalid email format'),
     password: z.string().min(1, 'Password is required'),
 });
 
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    
-    if (req.method == '!POST') {
-        return res.status(405).json({ message: 'Unsupported method' });
+    if (req.method !== 'POST') {
+        return res.status(405).json({ status: 'error', message: 'Unsupported method' });
     }
 
     try {
@@ -49,14 +43,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             (process.env.NODE_ENV === 'production' ? ' Secure;' : '')
         ]);
 
-
         return res.status(200).json({ status: 'success', message: 'Login successful', token: token });
 
-    } catch (error: any) {
-        console.log(error)
-        if (error.issues) {
-            return res.status(401).json({ status: 'error', message: error.issues[0].message });
-        }
+    } catch (error) {
+        return handleError(res, error); // Используем обработку ошибок
     }
-
 }

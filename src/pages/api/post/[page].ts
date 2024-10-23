@@ -1,9 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/utils/prisma';
+import { handleError } from '@/utils/errorHandler'; // Импорт функции для обработки ошибок
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'GET') {
-        return res.status(405).json({ message: 'Unsupported method' });
+        return res.status(405).json({ status: 'error', message: 'Unsupported method' });
     }
 
     const { page } = req.query;
@@ -12,7 +13,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const offset = (pageNumber - 1) * limit;
 
     try {
-
         const posts = await prisma.post.findMany({
             skip: offset,
             take: limit,
@@ -22,9 +22,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 comments: true,
             },
         });
-        
-
-        
 
         const totalPosts = await prisma.post.count();
 
@@ -40,6 +37,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             message: 'Posts retrieved successfully',
         });
     } catch (err) {
-        return res.status(500).json({ message: 'Error retrieving posts', error: err });
+        return handleError(res, err);
     }
 }
