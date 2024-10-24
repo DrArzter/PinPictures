@@ -9,7 +9,7 @@ export default function SearchBar() {
 
     const handleSearch = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, searchTerm: string) => {
         if (!searchTerm) return;
-        
+
         setSearchTerm("");
     };
 
@@ -22,10 +22,10 @@ export default function SearchBar() {
     return (
         <div className={searchBarClassName}>
             <input className={searchInputClassName}
-            value={searchTerm} 
-            onChange={(e) => setSearchTerm(e.target.value)} 
-            type="text" 
-            placeholder="Search..." />
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                type="text"
+                placeholder="Search..." />
             <div className={searchIconContainerClassName}
                 onClick={(e) => handleSearch(e, searchTerm)}>
                 <SlMagnifier size={24} />

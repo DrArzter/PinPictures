@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         form.parse(req, async (err, fields, files) => {
             if (err) {
-                return handleError(res, err); // Обработка ошибки формы
+                return handleError(res, err);
             }
 
             try {
@@ -62,7 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         try {
                             await fs.rename(tempPath, newPath);
                         } catch (error) {
-                            return handleError(res, error); // Обработка ошибки переименования файла
+                            return handleError(res, error);
                         }
 
                         const fileContent = await fs.readFile(newPath);
@@ -95,7 +95,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                 res.status(201).json({ status: 'success', message: 'Post created successfully', newPost });
             } catch (error) {
-                return handleError(res, error); // Обработка ошибок загрузки или создания поста
+                return handleError(res, error);
             }
         });
     });

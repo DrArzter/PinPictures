@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import "./globals.css";
 import React from "react";
 
-// Импорт локальных шрифтов
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -15,7 +14,6 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-// Метаданные для страницы
 export const metadata: Metadata = {
   title: "Pin OS",
   description: "Pin OS",

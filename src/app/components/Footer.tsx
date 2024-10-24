@@ -28,35 +28,31 @@ export default function Footer() {
   const backgroundColor = user && user.settings?.bgColor ? `rgba(${user.settings.bgColor})` : 'rgba(255,255,255,0.3)';
 
   const iconList = [
-    { name: "Post", icon: <BsFillFileEarmarkPostFill className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" onClick={() => {openWindowByPath("/posts");}} />  },
-    
-    { name: "Bell", icon: <FaBell className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
-      onClick={() => {handleButtonClicksex();}} /> },
-        
-    // Элемент отображается только если пользователь авторизован
-    user ? { name: "Add",
-      icon: (
-        <CiSquarePlus
-          className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
-          onClick={() => {
-            openWindowByPath("/post/create");
-          }}/> 
+    {
+      name: "Post", icon: <BsFillFileEarmarkPostFill className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
+        onClick={() => { openWindowByPath("/posts"); }} />
+    },
+
+    {
+      name: "Bell", icon: <FaBell className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
+        onClick={() => { handleButtonClicksex(); }} />
+    },
+
+    user ? {
+      name: "Add", icon: (<CiSquarePlus className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
+        onClick={() => { openWindowByPath("/post/create"); }} />
       )
-    } : null, // Если пользователь не авторизован, возвращаем null, чтобы элемент не рендерился
-    
+    } : null,
+
     { name: "Message", icon: <AiOutlineMessage className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" /> },
-    
-    // Иконка "Authentication" отображается только для неавторизованных пользователей
+
     !user && {
       name: "Authentication",
-      icon: (
-        <RiLoginBoxFill
-          className="w-8 h-8 text-white hover:scale-110 hover:cursor-pointer transition duration-300"
-          onClick={() => openWindowByPath("/authentication")}
-        />
+      icon: (<RiLoginBoxFill className="w-8 h-8 text-white hover:scale-110 hover:cursor-pointer transition duration-300"
+        onClick={() => openWindowByPath("/authentication")} />
       ),
     },
-    
+
     { name: "Search", icon: <SlMagnifier className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" /> },
   ].filter(Boolean);
 
@@ -73,11 +69,11 @@ export default function Footer() {
   };
 
   return (
-    <footer 
-    style={{ 
-      backgroundColor: backgroundColor
-     }}
-    className={`backdrop-blur-xl rounded-lg bg-opacity-30 border-2 md:mb-2 md:w-1/2 mx-auto text-center py-2 absolute bottom-0 left-0 right-0 shadow-lg`}>
+    <footer
+      style={{
+        backgroundColor: backgroundColor
+      }}
+      className={`backdrop-blur-xl rounded-lg bg-opacity-30 border-2 md:w-1/2 mx-auto text-center py-2 absolute bottom-2 left-0 right-0 shadow-lg`}>
       <IconList iconList={iconList} />
     </footer>
   );

@@ -28,26 +28,23 @@ export default function Header() {
 
   const headerClassName =
     "absolute top-0 backdrop-blur-xl left-0 right-0 py-2 mt-2 shadow-lg mx-auto items-center flex flex-row justify-between w-5/6 border-2 rounded-lg z-[999]";
-  
-    const searchBarContainerClassName = "justify-center";
 
-    const backgroundColor = user && user.settings?.bgColor ? `rgba(${user.settings.bgColor})` : 'rgba(255,255,255,0.3)';
+  const searchBarContainerClassName = "justify-center";
+
+  const backgroundColor = user && user.settings?.bgColor ? `rgba(${user.settings.bgColor})` : 'rgba(255,255,255,0.3)';
 
   return (
     <header
-    style={{ 
-      backgroundColor: backgroundColor,
-     }}
-     className={headerClassName}>
-      {/* Контейнер с SearchBar в центре */}
+      style={{
+        backgroundColor: backgroundColor,
+      }}
+      className={headerClassName}>
       <div className={searchBarContainerClassName}>
         <SearchBar />
       </div>
 
-      {/* UserCard сдвинут ещё правее */}
       <div className="px-2" onClick={toggleDropdown}>
         <UserCard />
-        {/* DropdownMenu справа */}
         {isDropdownOpen && user && (
           <DropdownMenu
             isDropdownOpen={isDropdownOpen}

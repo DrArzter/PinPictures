@@ -16,35 +16,30 @@ export default function Authentication() {
 
   const { setUser } = useUserContext();
 
-  // Состояния для ввода данных пользователя
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const { addNotification } = useNotificationContext();
 
-  // Обработчик отправки формы
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       let response;
-      
+
       if (isRegistration) {
-        // Регистрация пользователя
         response = await api.registration(username, email, password);
         if (response.status === "success") {
           setIsRegistration(false);
           setUser(response.user);
         }
       } else if (isForgotPassword) {
-        // Логика для восстановления пароля (может быть изменена в зависимости от API)
         response = await api.forgotPassword(email);
         if (response.status === "success") {
           setIsForgotPassword(false);
         }
       } else {
-        // Логин пользователя
         response = await api.login(username, password);
         if (response.status === "success") {
           const userData = await api.getUser();

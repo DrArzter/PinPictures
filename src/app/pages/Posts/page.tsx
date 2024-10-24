@@ -64,7 +64,7 @@ export default function Posts({ windowHeight, windowWidth }) {
     debounce(() => {
       if (
         window.scrollY + window.innerHeight >=
-          document.body.scrollHeight - 100 &&
+        document.body.scrollHeight - 100 &&
         !loading &&
         hasMorePosts
       ) {
@@ -85,8 +85,8 @@ export default function Posts({ windowHeight, windowWidth }) {
   };
 
   const postsContainerStyle = {
-    width: windowWidth-10,
-    height: windowHeight-60,
+    width: windowWidth - 10,
+    height: windowHeight - 60,
     overflowY: "scroll",
     scrollbarWidth: "none",
     msOverflowStyle: "none",
@@ -100,7 +100,7 @@ export default function Posts({ windowHeight, windowWidth }) {
         <div id="posts" style={postsContainerStyle}>
           {error && <div className="text-red-500">{error}</div>}
           {posts.length > 0 ? (
-            <PostList posts={posts} windowHeight={windowHeight} windowWidth={windowWidth}/>
+            <PostList posts={posts} windowHeight={windowHeight} windowWidth={windowWidth} />
           ) : (
             !loading && <NoPostsFound />
           )}

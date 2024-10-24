@@ -18,18 +18,17 @@ export default function Notification() {
   }, [notifications, removeNotification]);
 
   const getNotificationClassName = (status, clickable) =>
-    `notification p-4 rounded-2xl shadow-2xl mt-2 ${clickable ? "cursor-pointer" : ""} ${
-      status === "success"
-        ? "bg-green-500"
-        : status === "error"
+    `notification p-4 rounded-2xl shadow-2xl mt-2 ${clickable ? "cursor-pointer" : ""} ${status === "success"
+      ? "bg-green-500"
+      : status === "error"
         ? "bg-red-500"
         : status === "info"
-        ? "bg-white"
-        : "bg-yellow-500"
+          ? "bg-white"
+          : "bg-yellow-500"
     }`;
 
   return (
-    <div id="notification-container" className={`fixed bottom-4 right-4 z-[999] space-y-2 w-1/6`}>
+    <div id="notification-container" className={`fixed bottom-2 right-4 z-[999] space-y-2 w-1/6`}>
       {notifications.slice(0, 6).map((notification, index) => (
         <div
           key={index}

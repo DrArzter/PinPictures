@@ -1,6 +1,6 @@
 import { verifyToken } from '@/utils/jwt';
 import { NextApiRequest, NextApiResponse } from 'next';
-import  { prisma }  from '@/utils/prisma';
+import { prisma } from '@/utils/prisma';
 
 interface DecodedToken {
   userId: string;
@@ -30,7 +30,6 @@ export async function authMiddleware(req: any, res: NextApiResponse, next: () =>
       }
     });
 
-    
     const { password, bananaLevel, ...userWithoutSensitiveInfo } = user;
 
     req.user = userWithoutSensitiveInfo;

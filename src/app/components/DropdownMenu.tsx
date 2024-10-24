@@ -13,21 +13,18 @@ import Link from "next/link";
 
 import * as api from "@/app/api";
 
-
 export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
   const { user, setUser, userLoading, setUserLoading } = useUserContext();
   const { openWindowByPath } = useWindowContext();
   const [showVideo, setShowVideo] = useState(0);
   const dropdownRef = useRef(null);
 
-  // Закрытие по клику вне меню
   const handleClickOutside = (event) => {
     if (false && dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       toggleDropdown();
     }
   };
 
-  // Закрытие по нажатию "Escape"
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
@@ -46,15 +43,13 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
     };
   }, [isDropdownOpen, toggleDropdown]);
 
-  // Упрощенный класс без темной темы
-  const dropdownClassName = `absolute z-[999] w-36 top-24 rounded-md shadow-lg transform transition-all duration-300 ease-in-out 
+  const dropdownClassName = `absolute z-[999] w-[10vw] bottom-[6vh] left-1 rounded-md shadow-lg transform transition-all duration-300 ease-in-out 
     ${isDropdownOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"} bg-white`;
 
   const menuItemsClassName = `p-4 flex flex-col gap-4 w-full text-black transition-colors`;
 
   const iconClassName = "text-black";
 
-  // Пример заглушки для выхода
   const handleLogout = () => {
     api.logout(setUser);
     toggleDropdown();
@@ -74,7 +69,7 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
               <iframe
                 width="560"
                 height="315"
-                src="https://www.youtube.com/embed/kNEfmCgL4e4?autoplay=1&mute=1" // Set mute=1 for autoplay to work
+                src="https://www.youtube.com/embed/kNEfmCgL4e4?autoplay=1&mute=1"
                 title="YouTube video player"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -91,8 +86,6 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
     }
   }, [showVideo]);
 
-
-
   return (
     <div ref={dropdownRef} className={dropdownClassName}>
       <Link href={`/profile/${user.name}`}>
@@ -104,19 +97,17 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
       </Link>
 
       <div className={menuItemsClassName}>
-        {/* Упрощаем, убираем ChangeTheme */}
+
         <div className="flex items-center justify-between gap-4">
           <FaGear className={iconClassName}
             onClick={() => { openWindowByPath("/settings"); }} />
         </div>
 
-        {/* Закладка */}
         <div className="flex items-center gap-2 cursor-pointer hover:scale-105 transition duration-300">
           <CiBookmarkPlus className={iconClassName} />
           <span>Bookmark</span>
         </div>
 
-        {/* Logout */}
         <div
           className="flex items-center gap-2 cursor-pointer hover:scale-105 transition duration-300"
           onClick={handleLogout}
@@ -125,7 +116,6 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
           <span>Logout</span>
         </div>
 
-        {/* ShutDown ebalo */}
         <div
           className="flex items-center gap-2 cursor-pointer hover:scale-105 transition duration-300"
           onClick={handleDvoechkuVEblet}

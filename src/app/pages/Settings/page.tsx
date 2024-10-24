@@ -16,10 +16,10 @@ export default function Settings({ windowHeight, windowWidth }) {
     const [color, setColor] = useState('#ffffff');
     const [colorPickerVisible, setColorPickerVisible] = useState(false);
     const [changeUiBGVisible, setChangeUiBGVisible] = useState(false);
-  
+
     const handleChangeComplete = (color) => {
-      setColor(color.rgb);
-      console.log(color);
+        setColor(color.rgb);
+        console.log(color);
     };
 
     useEffect(() => {
@@ -62,7 +62,7 @@ export default function Settings({ windowHeight, windowWidth }) {
         if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                setSelectedImage(e.target?.result as string); // Set the selected image as base64 URL
+                setSelectedImage(e.target?.result as string);
             };
             reader.readAsDataURL(file);
         }
@@ -97,7 +97,7 @@ export default function Settings({ windowHeight, windowWidth }) {
 
                     {
                         changeUiBGVisible && (<form className="flex flex-row items-center justify-center gap-2 w-full" onSubmit={handleSubmitUIBGChange}>
-    
+
                             <input
                                 id="fileInput"
                                 type="file"
@@ -105,7 +105,7 @@ export default function Settings({ windowHeight, windowWidth }) {
                                 onChange={handleImageChange}
                                 className="hidden"
                             />
-    
+
                             <div
                                 onClick={triggerFileSelect}
                                 className="w-64 h-40 border-2 border-dashed border-gray-400 flex justify-center items-center cursor-pointer"
@@ -120,7 +120,7 @@ export default function Settings({ windowHeight, windowWidth }) {
                                     <span className="text-gray-500">Click to select an image</span>
                                 )}
                             </div>
-    
+
                             <button
                                 type="submit"
                                 className="w-24 py-2 rounded-3xl bg-lime-500 "
@@ -129,16 +129,16 @@ export default function Settings({ windowHeight, windowWidth }) {
                             </button>
                         </form>)
                     }
-                    
+
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-row gap-4 items-center">
-                            <button 
-                            className="border-2 border-dashed border-gray-400 px-4 py-2 rounded-3xl"
-                            onClick={() => setColorPickerVisible(!colorPickerVisible)}>Select background color</button>
+                            <button
+                                className="border-2 border-dashed border-gray-400 px-4 py-2 rounded-3xl"
+                                onClick={() => setColorPickerVisible(!colorPickerVisible)}>Select background color</button>
                             {colorPickerVisible && <button className="w-24 py-2 rounded-3xl bg-lime-500"
-                            onClick={handleSubmitColorChange}>Save</button>} 
+                                onClick={handleSubmitColorChange}>Save</button>}
                         </div>
-                        {colorPickerVisible &&  <TwitterPicker color={color} onChangeComplete={handleChangeComplete} className="ml-4" />}
+                        {colorPickerVisible && <TwitterPicker color={color} onChangeComplete={handleChangeComplete} className="ml-4" />}
                     </div>
 
                 </div>

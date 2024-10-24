@@ -6,12 +6,13 @@ import Notification from "./components/Notifications";
 import Header from "./components/Header";
 import Main from "./components/Main";
 import Footer from "./components/Footer";
+import UserCard from "./components/UserCard";
 
 export default function Home() {
   return (
     <>
-      <Header />
       <Notification />
+      <UserCard />
       <Main />
       <Footer />
     </>

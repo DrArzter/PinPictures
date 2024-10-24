@@ -5,7 +5,7 @@ import * as api from "@/app/api";
 const UserContext = React.createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
 
   const fetchUser = async () => {
@@ -35,5 +35,4 @@ export const UserProvider = ({ children }) => {
   );
 };
 
-// Хук для использования контекста пользователя
 export const useUserContext = () => useContext(UserContext);

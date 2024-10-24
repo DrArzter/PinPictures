@@ -12,8 +12,7 @@ export default function ContentLoader() {
   const { user, userLoading } = useUserContext();
 
   useEffect(() => {
-    const imageSrc = user && user.uiBackground ? user.uiBackground : "/images/background2.jpeg"; // Если нет пользователя, используем стандартное изображение
-    
+    const imageSrc = user && user.uiBackground ? user.uiBackground : "/images/background2.jpeg";
     const img = new Image();
     img.src = imageSrc;
     img.onload = () => {
@@ -25,41 +24,36 @@ export default function ContentLoader() {
   const backgroundStyle = {
     backgroundImage: backgroundLoaded
       ? `url(${user?.uiBackground || "/images/background2.jpeg"})`
-      : "none", // Используем фон пользователя или стандартный фон
+      : "none",
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
     backgroundColor: "white",
-    opacity: showContent ? 1 : 0, // Плавный переход для отображения контента
+    opacity: showContent ? 1 : 0,
     transition: "opacity 0.5s ease-in-out",
     minHeight: "100vh",
   };
 
-  // Стиль для размытого фона на экране загрузки
   const loadingBackgroundStyle = {
-    backgroundImage: `url(/images/background2.jpeg)`, // Фон по умолчанию для экрана загрузки
+    backgroundImage: `url(/images/background2.jpeg)`,
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
-    filter: "blur(10px)", // Размытие фона
-    WebkitFilter: "blur(10px)", // Поддержка для WebKit браузеров
+    filter: "blur(10px)",
+    WebkitFilter: "blur(10px)",
     minHeight: "100vh",
-    position: "absolute", // Абсолютное позиционирование для наложения фона
+    position: "absolute",
     top: 0,
     left: 0,
     width: "100%",
     height: "100%",
-    zIndex: -1, // Помещаем фон под индикатор загрузки
+    zIndex: -1,
   };
 
-  // Если идет загрузка пользователя или фона, показываем экран загрузки
   if (userLoading || !backgroundLoaded) {
     return (
       <div style={{ position: "relative", minHeight: "100vh" }}>
-        {/* Размытый фон */}
         <div style={loadingBackgroundStyle} />
-
-        {/* Индикатор загрузки на фоне */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <LoadingIndicator />
         </div>

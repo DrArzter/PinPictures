@@ -14,10 +14,10 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
   const { windows, setWindows, removeWindow } = useWindowContext();
 
   const getWindowDimensions = () => {
-    
+
     if (typeof window !== "undefined") {
-      const width = document.documentElement.clientWidth*0.995;
-      const height = document.documentElement.clientHeight*0.85;
+      const width = document.documentElement.clientWidth * 0.995;
+      const height = document.documentElement.clientHeight * 0.9;
       return { width: width, height: height };
     }
     return { width: 800, height: 600 };
@@ -69,8 +69,8 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
                   if (!w.fullscreen) {
                     return {
                       ...w,
-                      x: (document.documentElement.clientWidth-windowWidth)/2,
-                      y: (document.documentElement.clientHeight-windowHeight)/2,
+                      x: (document.documentElement.clientWidth - windowWidth) / 2,
+                      y: (document.documentElement.clientHeight - windowHeight) / 2.75,
                       width: windowWidth,
                       height: windowHeight,
                       fullscreen: true,
@@ -225,13 +225,12 @@ export default function Window({ windowData, mouseDown, mousePosition }) {
           left: `${windowData.x}px`,
           backgroundColor: backgroundColor,
         }}
-        className={`absolute bg-white bg-opacity-30 backdrop-blur-md border-2 rounded-lg shadow-2xl p-2 ${
-          mouseDown ? "select-none pointer-events-none" : ""
-        }`}
+        className={`absolute bg-white bg-opacity-30 backdrop-blur-md border-2 rounded-lg shadow-2xl ${mouseDown ? "select-none pointer-events-none" : ""
+          }`}
         onMouseDown={handleMouseDown}
       >
         <div className="w-full flex flex-row justify-between items-center border-b-2 border-dotted">
-          <div className="w-full text-end py-2 px-4">
+          <div className="w-full text-end">
             <h1
               className="cursor-pointer select-auto pointer-events-auto"
               onClick={(event) => {

@@ -1,15 +1,14 @@
 import React, { useContext } from "react";
 import { FiLayers } from "react-icons/fi";
 
-import  ThemeContext  from "@/app/contexts/ThemeContext";
+import ThemeContext from "@/app/contexts/ThemeContext";
 
 export default function Post({ post }) {
 
   const { isDarkMode } = useContext(ThemeContext);
 
-  const postContainerClassName = `hover:scale-105 border-2 rounded-xl focus:scale-105 transition-transform duration-300 ${
-    isDarkMode ? "border-darkModeSecondaryBackground" : "border-lightModeSecondaryBackground"
-  }`;
+  const postContainerClassName = `hover:scale-105 border-2 rounded-xl focus:scale-105 transition-transform duration-300 ${isDarkMode ? "border-darkModeSecondaryBackground" : "border-lightModeSecondaryBackground"
+    }`;
 
   const imageContainerClassName = "w-full overflow-hidden rounded-lg";
 
@@ -29,11 +28,11 @@ export default function Post({ post }) {
             <>
               <div className={imageContainerClassName}>
                 {hasMultipleImages && <FiLayers className={layersIconClassName} />}
-                  <img
-                    src={post.images[0].picpath} 
-                    alt={post.name}
-                    className="w-full object-cover max-h-[512px]"
-                  />
+                <img
+                  src={post.images[0].picpath}
+                  alt={post.name}
+                  className="w-full object-cover max-h-[512px]"
+                />
                 <div className="mt-[5px] p-[5px]">
                   <p className="text-[16px]">{post.name}</p>
                   <p className={postDescriptionClassName}>{post.description}</p>
