@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import Post from "./Post";
 
 export default function PostList({ posts, windowHeight, windowWidth }) {
-
   const minColumnWidth = 300;
   const maxColumns = 4;
 
@@ -14,15 +13,12 @@ export default function PostList({ posts, windowHeight, windowWidth }) {
     gap: '16px',
     height: windowHeight,
     overflowY: 'scroll',
-    scrollbarWidth: 'none',
-    msOverflowStyle: 'none',
     padding: '16px',
   };
 
-  // Мемоизируем список постов для оптимизации
   const postItems = useMemo(() => (
-    posts.map((post) => <Post key={post.id} post={post} />)
-  ), [posts]);
+    posts.map((post) => <Post key={post.id} post={post} windowHeight={windowHeight} />) // Pass windowHeight to Post
+  ), [posts, windowHeight]);
 
   return (
     <div
