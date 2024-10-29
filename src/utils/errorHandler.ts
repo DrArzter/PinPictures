@@ -1,3 +1,6 @@
+import { NextApiResponse } from "next";
+import { z } from "zod";
+
 export const handleError = (res: NextApiResponse, error: any) => {
     console.error(error);
 

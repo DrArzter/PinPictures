@@ -1,4 +1,5 @@
 const aws = require('aws-sdk');
+require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 const { env } = require('process');
 
 const s3 = new aws.S3({
