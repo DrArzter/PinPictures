@@ -1,5 +1,5 @@
 // Posts.js
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 
 import PostList from "@/app/components/PostList";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
@@ -32,6 +32,14 @@ export default function Posts({ windowHeight, windowWidth }) {
   const [posts, setPosts] = useState([]);
   const [hasMorePosts, setHasMorePosts] = useState(true);
   const [error, setError] = useState(null);
+
+  const postsContainerStyle = useMemo(() => ({
+    width: windowWidth - 10,
+    height: windowHeight - 60,
+    overflowY: "scroll",
+    scrollbarWidth: "none",
+    msOverflowStyle: "none",
+  }), [windowWidth, windowHeight]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -84,13 +92,9 @@ export default function Posts({ windowHeight, windowWidth }) {
     setPage(1);
   };
 
-  const postsContainerStyle = {
-    width: windowWidth - 10,
-    height: windowHeight - 60,
-    overflowY: "scroll",
-    scrollbarWidth: "none",
-    msOverflowStyle: "none",
-  };
+  const postList = useMemo(() => (
+    <PostList posts={posts} windowHeight={windowHeight} windowWidth={windowWidth} />
+  ), [posts, windowHeight, windowWidth]);
 
   return (
     <>
@@ -100,7 +104,7 @@ export default function Posts({ windowHeight, windowWidth }) {
         <div id="posts" style={postsContainerStyle}>
           {error && <div className="text-red-500">{error}</div>}
           {posts.length > 0 ? (
-            <PostList posts={posts} windowHeight={windowHeight} windowWidth={windowWidth} />
+            postList
           ) : (
             !loading && <NoPostsFound />
           )}
