@@ -30,7 +30,7 @@ export default function UserCard() {
                 style={{
                     backgroundColor: backgroundColor
                 }}
-                className="p-2 w-48 justify-center flex-row backdrop-blur-md bg-opacity-30 border-2 rounded-lg shadow-2xl cursor-pointer items-center">
+                className=" w-48 justify-center flex-row backdrop-blur-md bg-opacity-30 border-2 rounded-lg shadow-2xl cursor-pointer items-center">
                 <LoadingIndicator />
             </div>
         )

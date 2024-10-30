@@ -99,7 +99,9 @@ export default function Posts({ windowHeight, windowWidth }) {
   return (
     <>
       {loading && page === 1 ? (
-        <LoadingIndicator />
+        <div className="absolute top-1/2 left-1/2">
+          <LoadingIndicator />
+        </div>
       ) : (
         <div id="posts" style={postsContainerStyle}>
           {error && <div className="text-red-500">{error}</div>}

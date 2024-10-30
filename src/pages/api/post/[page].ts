@@ -17,11 +17,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             skip: offset,
             take: limit,
             include: {
+                author: {
+                    select: {
+                        name: true,
+                        avatar: true,
+                    },
+                },
                 images: true,
                 likes: true,
-                comments: true,
+                _count: {
+                    select: { comments: true }, // count of comments
+                }
             },
         });
+        
 
         const totalPosts = await prisma.post.count();
 

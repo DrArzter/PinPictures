@@ -1,8 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  FaRegWindowClose,
-  FaRegMinusSquare,
-} from "react-icons/fa";
+import { FaRegWindowClose, FaRegMinusSquare } from "react-icons/fa";
 import { BsArrowsFullscreen } from "react-icons/bs";
 import { RiDraggable } from "react-icons/ri";
 
@@ -22,8 +19,7 @@ export default function Window({
   const { windows, setWindows, removeWindow } = useWindowContext();
 
   const windowData =
-    windows.find((w) => w.id === initialWindowData.id) ||
-    initialWindowData;
+    windows.find((w) => w.id === initialWindowData.id) || initialWindowData;
 
   const [pathInput, setPathInput] = useState(windowData.path);
   const [suggestions, setSuggestions] = useState([]);
@@ -43,9 +39,7 @@ export default function Window({
 
   const updateWindowPath = (windowId, newPath) => {
     setWindows(
-      windows.map((w) =>
-        w.id === windowId ? { ...w, path: newPath } : w
-      )
+      windows.map((w) => (w.id === windowId ? { ...w, path: newPath } : w))
     );
   };
 
@@ -118,8 +112,7 @@ export default function Window({
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -133,19 +126,19 @@ export default function Window({
         windows.map((w) =>
           w.id === windowData.id
             ? {
-                ...w,
-                componentType: updatedWindow.componentType,
-                componentProps: updatedWindow.componentProps,
-                width: windowData.fullscreen
-                  ? windowData.width
-                  : updatedWindow.width,
-                height: windowData.fullscreen
-                  ? windowData.height
-                  : updatedWindow.height,
-                minWidth: updatedWindow.minWidth,
-                minHeight: updatedWindow.minHeight,
-                title: updatedWindow.title,
-              }
+              ...w,
+              componentType: updatedWindow.componentType,
+              componentProps: updatedWindow.componentProps,
+              width: windowData.fullscreen
+                ? windowData.width
+                : updatedWindow.width,
+              height: windowData.fullscreen
+                ? windowData.height
+                : updatedWindow.height,
+              minWidth: updatedWindow.minWidth,
+              minHeight: updatedWindow.minHeight,
+              title: updatedWindow.title,
+            }
             : w
         )
       );
@@ -165,10 +158,10 @@ export default function Window({
         windows.map((w) =>
           w.id === windowData.id
             ? {
-                ...w,
-                x: mousePosition.clientX - startPosition.x,
-                y: mousePosition.clientY - startPosition.y,
-              }
+              ...w,
+              x: mousePosition.clientX - startPosition.x,
+              y: mousePosition.clientY - startPosition.y,
+            }
             : w
         )
       );
@@ -184,16 +177,10 @@ export default function Window({
         windows.map((w) =>
           w.id === windowData.id
             ? {
-                ...w,
-                width: Math.min(
-                  Math.max(newWidth, w.minWidth),
-                  maxWidth
-                ),
-                height: Math.min(
-                  Math.max(newHeight, w.minHeight),
-                  maxHeight
-                ),
-              }
+              ...w,
+              width: Math.min(Math.max(newWidth, w.minWidth), maxWidth),
+              height: Math.min(Math.max(newHeight, w.minHeight), maxHeight),
+            }
             : w
         )
       );
@@ -222,9 +209,7 @@ export default function Window({
             event.stopPropagation();
             setWindows(
               windows.map((w) =>
-                w.id === windowData.id
-                  ? { ...w, isOpen: !w.isOpen }
-                  : w
+                w.id === windowData.id ? { ...w, isOpen: !w.isOpen } : w
               )
             );
           }}
@@ -245,27 +230,25 @@ export default function Window({
                 w.id === windowData.id
                   ? w.fullscreen
                     ? {
-                        ...w,
-                        x: 100,
-                        y: 100,
-                        width: w.minWidth,
-                        height: w.minHeight,
-                        fullscreen: false,
-                      }
+                      ...w,
+                      x: 100,
+                      y: 100,
+                      width: w.minWidth,
+                      height: w.minHeight,
+                      fullscreen: false,
+                    }
                     : {
-                        ...w,
-                        x:
-                          (document.documentElement.clientWidth -
-                            windowWidth) /
-                          2,
-                        y:
-                          (document.documentElement.clientHeight -
-                            windowHeight) /
-                          2.75,
-                        width: windowWidth,
-                        height: windowHeight,
-                        fullscreen: true,
-                      }
+                      ...w,
+                      x:
+                        (document.documentElement.clientWidth - windowWidth) /
+                        2,
+                      y:
+                        (document.documentElement.clientHeight -
+                          windowHeight) * 0.05,
+                      width: windowWidth,
+                      height: windowHeight,
+                      fullscreen: true,
+                    }
                   : w
               )
             );
@@ -288,9 +271,8 @@ export default function Window({
           left: `${windowData.x}px`,
           backgroundColor,
         }}
-        className={`absolute bg-white bg-opacity-30 backdrop-blur-md border-2 rounded-lg shadow-2xl ${
-          mouseDown ? "select-none pointer-events-none" : ""
-        }`}
+        className={`absolute bg-white bg-opacity-30 backdrop-blur-xl border-2 rounded-lg shadow-2xl ${mouseDown ? "select-none pointer-events-none" : ""
+          }`}
         onMouseDown={handleMouseDown}
       >
         <div className="w-full flex flex-row justify-between items-center border-b-2 border-dotted">
@@ -301,9 +283,7 @@ export default function Window({
                 event.stopPropagation();
                 setWindows(
                   windows.map((w) =>
-                    w.id === windowData.id
-                      ? { ...w, isOpen: !w.isOpen }
-                      : w
+                    w.id === windowData.id ? { ...w, isOpen: !w.isOpen } : w
                   )
                 );
               }}
@@ -328,17 +308,16 @@ export default function Window({
         zIndex: windowData.layer,
         backgroundColor,
       }}
-      className="absolute bg-white bg-opacity-30 backdrop-blur-md border-2 rounded-lg shadow-2xl"
+      className="absolute bg-white bg-opacity-30 backdrop-blur-2xl border-2 rounded-lg shadow-2xl"
       onMouseDown={() => {
         setWindows(
           windows.map((w) =>
             w.id !== windowData.id
               ? { ...w, layer: Math.max(0, w.layer - 1) }
               : {
-                  ...w,
-                  layer:
-                    Math.max(...windows.map((w2) => w2.layer)) + 1,
-                }
+                ...w,
+                layer: Math.max(...windows.map((w2) => w2.layer)) + 1,
+              }
           )
         );
       }}
@@ -374,7 +353,7 @@ export default function Window({
               {suggestions.map((suggestion, index) => (
                 <li
                   key={index}
-                  className="px-4 py-2 hover:bg-gray-700 hover:text-white cursor-pointer text-white"
+                  className="px-4 py-2 hover:text-white cursor-pointer text-white"
                   onClick={() => handleSuggestionClick(suggestion)}
                 >
                   {suggestion}
