@@ -1,6 +1,7 @@
 // WindowContext.js
 import React, { useContext, useState } from "react";
 import { getComponentByPath } from "@/app/utils/getComponentByPath";
+import { get } from "http";
 
 const WindowContext = React.createContext();
 
@@ -21,6 +22,14 @@ export const WindowProvider = ({ children }) => {
     }
   };
 
+  const updateWindowPath = (windowId, newPath) => {
+    setWindows((prevWindows) =>
+      prevWindows.map((w) =>
+        w.id === windowId ? { ...w, path: newPath } : w
+      )
+    );
+  };
+
   const removeWindow = (id) => {
     setWindows((prevWindows) => prevWindows.filter((w) => w.id !== id));
   };
@@ -33,6 +42,7 @@ export const WindowProvider = ({ children }) => {
         addWindow,
         removeWindow,
         openWindowByPath,
+        updateWindowPath,
       }}
     >
       {children}

@@ -26,7 +26,7 @@ const LoadMoreButton = ({ onClick }) => (
   </div>
 );
 
-export default function Posts({ windowHeight, windowWidth }) {
+export default function Posts({ windowHeight, windowWidth, windowId }) {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [posts, setPosts] = useState([]);
@@ -93,7 +93,7 @@ export default function Posts({ windowHeight, windowWidth }) {
   };
 
   const postList = useMemo(() => (
-    <PostList posts={posts} windowHeight={windowHeight} windowWidth={windowWidth} />
+    <PostList posts={posts} windowHeight={windowHeight} windowWidth={windowWidth} windowId={windowId} />
   ), [posts, windowHeight, windowWidth]);
 
   return (

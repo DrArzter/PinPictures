@@ -1,11 +1,11 @@
 import api from './axiosApi';
 
-export default async function getPosts(page: number) {
+export default async function getPost(id: number) {
   try {
     const response = await api.get(
-      `/post/page/${page}`,
+      `/post/id/${id}`,
     );
-    return response.data.posts;
+    return response.data.post;
   } catch (error) {
     console.error('Error fetching posts:', error);
     throw error;

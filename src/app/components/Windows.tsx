@@ -1,20 +1,21 @@
-import React from "react";
-import { useWindowContext } from "@/app/contexts/WindowContext";
-import Window from "./Window";
+// Windows.tsx
+import React from 'react';
+import Window from './Window';
+import { useWindowContext } from '@/app/contexts/WindowContext';
 
 export default function Windows({ mouseDown, mousePosition }) {
   const { windows } = useWindowContext();
 
   return (
-    <>
-      {windows.map((window) => (
+    <div>
+      {windows.map((win) => (
         <Window
-          key={window.id}
-          windowData={window}
+          key={win.id}
+          windowData={win}
           mouseDown={mouseDown}
           mousePosition={mousePosition}
         />
       ))}
-    </>
+    </div>
   );
 }

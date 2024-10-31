@@ -2,9 +2,11 @@ import React, { useContext } from "react";
 import { FiLayers } from "react-icons/fi";
 import { BsHeart, BsHeartFill, BsChatDots } from "react-icons/bs";
 import ThemeContext from "@/app/contexts/ThemeContext";
+import { useWindowContext } from "@/app/contexts/WindowContext";
 
-export default function Post({ post, windowHeight }) {
+export default function Post({ post, windowHeight, windowId }) {
   const { isDarkMode } = useContext(ThemeContext);
+  const { updateWindowPath, openWindowByPath } = useWindowContext();
 
   const postHeight = windowHeight * 0.4;
 
@@ -13,6 +15,16 @@ export default function Post({ post, windowHeight }) {
       ? "border-gray-700 bg-gray-800 text-white"
       : "border-gray-300 bg-white text-gray-900"
   }`;
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    console.log("Post clicked, updating path to:", `/post/${post.id}`);
+    updateWindowPath(windowId, `/post/${post.id}`); // Передаем windowId первым аргументом
+  };
+
+  const handleChildClick = (e) => {
+    e.stopPropagation();
+  };
 
   const imageContainerClassName = "w-full flex-1 overflow-hidden relative";
 
@@ -25,19 +37,24 @@ export default function Post({ post, windowHeight }) {
   const hasMultipleImages = post.images && post.images.length > 1;
 
   const postActionsClassName = "flex flex-row items-center space-x-4 mt-2";
-  const likeButtonClassName = "flex items-center space-x-1 hover:text-yellow-500";
-  const commentButtonClassName = "flex items-center space-x-1 hover:text-yellow-500";
+  const likeButtonClassName =
+    "flex items-center space-x-1 hover:text-yellow-500";
+  const commentButtonClassName =
+    "flex items-center space-x-1 hover:text-yellow-500";
 
   return (
     <div
       key={post.id}
       className={postContainerClassName}
       style={{ height: `${postHeight}px` }}
+      onClick={handleClick}
     >
       <div className="flex flex-col h-full">
         {post.images && (
           <div className={imageContainerClassName}>
-            {hasMultipleImages && <FiLayers className={layersIconClassName} />}
+            {hasMultipleImages && (
+              <FiLayers className={layersIconClassName} />
+            )}
             <img
               src={post.images[0].picpath}
               alt={post.name}
@@ -57,18 +74,28 @@ export default function Post({ post, windowHeight }) {
           </div>
         )}
 
-        <div className={`${isDarkMode ? "bg-gray-700" : "bg-gray-300"} h-[1px] w-full`} />
+        <div
+          className={`${
+            isDarkMode ? "bg-gray-700" : "bg-gray-300"
+          } h-[1px] w-full`}
+        />
 
-        <div className={postContentClassName}>
+        <div className={postContentClassName} onClick={handleChildClick}>
           <p className={postDescriptionClassName}>{post.description}</p>
           <div className={postActionsClassName}>
-            <button className={likeButtonClassName}>
+            <button
+              className={likeButtonClassName}
+              onClick={handleChildClick}
+            >
               <BsHeart size={20} />
-              <span>{ 0 }</span>
+              <span>{0}</span>
             </button>
-            <div className={commentButtonClassName}>
+            <div
+              className={commentButtonClassName}
+              onClick={handleChildClick}
+            >
               <BsChatDots size={20} />
-              <span>{ 0 }</span>
+              <span>{0}</span>
             </div>
           </div>
         </div>

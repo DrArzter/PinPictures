@@ -18,6 +18,8 @@ export default function Window({
   const { user } = useUserContext();
   const { windows, setWindows, removeWindow } = useWindowContext();
 
+
+
   const windowData =
     windows.find((w) => w.id === initialWindowData.id) || initialWindowData;
 
@@ -308,7 +310,7 @@ export default function Window({
         zIndex: windowData.layer,
         backgroundColor,
       }}
-      className="absolute bg-white bg-opacity-30 backdrop-blur-2xl border-2 rounded-lg shadow-2xl"
+      className="absolute bg-white bg-opacity-30 backdrop-blur-3xl border-2 rounded-lg shadow-2xl"
       onMouseDown={() => {
         setWindows(
           windows.map((w) =>
@@ -370,9 +372,11 @@ export default function Window({
 
       {ContentComponent && (
         <ContentComponent
-          {...windowData.componentProps}
+        {...windowData.componentProps}
           windowHeight={windowData.height}
           windowWidth={windowData.width}
+          windowId={windowData.id}
+ 
         />
       )}
 

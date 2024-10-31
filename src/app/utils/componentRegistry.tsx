@@ -3,6 +3,7 @@ import Authentication from "@/app/pages/Authentication/page";
 import NotFound from "@/app/pages/NotFound/page";
 import Posts from "@/app/pages/Posts/page";
 import CreatePost from "@/app/pages/CreatePost/page";
+import Post from "@/app/pages/Post/page"; // Import the single post component
 import Settings from "@/app/pages/Settings/page";
 
 export const componentRegistry = {
@@ -46,6 +47,17 @@ export const componentRegistry = {
       height: 980,
       minWidth: 770,
       minHeight: 980,
+      initialX: 200,
+      initialY: 200,
+    },
+  },
+  "/post/[id]": {
+    component: Post,
+    defaultProps: {
+      width: 600,
+      height: 800,
+      minWidth: 600,
+      minHeight: 800,
       initialX: 200,
       initialY: 200,
     },
