@@ -18,8 +18,7 @@ export default function Post({ post, windowHeight, windowId }) {
 
   const handleClick = (e) => {
     e.preventDefault();
-    console.log("Post clicked, updating path to:", `/post/${post.id}`);
-    updateWindowPath(windowId, `/post/${post.id}`); // Передаем windowId первым аргументом
+    openWindowByPath(`/post/${post.id}`); // Передаем windowId первым аргументом
   };
 
   const handleChildClick = (e) => {

@@ -4,7 +4,7 @@ import { uploadFiles, deleteFiles } from '@/utils/s3Module';
 import { authMiddleware } from '@/middlewares/authMiddleware';
 import formidable from 'formidable';
 import fs from 'fs/promises';
-import { handleError } from '@/utils/errorHandler'; // Импорт обработчика ошибок
+import { handleError } from '@/utils/errorHandler';
 
 export const config = {
     api: {
@@ -32,15 +32,21 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             }
         });
     }
-    if (req.method == 'PATCH') {
+
+    if (req.method === 'PATCH') {
         authMiddleware(req, res, async () => {
-            try {
-                const form = formidable({ multiples: true });
-                const user = req.user;
+            const form = formidable({ multiples: true });
+            const user = req.user;
 
-                form.parse(req, async (err: any, fields: any, files: any) => {
-                    const type = fields.type[0];
+            form.parse(req, async (err: any, fields: any, files: any) => {
+                if (err) return handleError(res, err);
 
+                const type = fields.type ? fields.type[0] : null;
+                if (!type) {
+                    return res.status(400).json({ status: 'error', message: 'Missing type field' });
+                }
+
+                try {
                     if (type === "uiBgUpdate") {
                         const image = files.image[0];
                         const fileTypes = /jpeg|jpg|png|gif|webp/;
@@ -56,18 +62,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
                         const randomString = Math.random().toString(36).substr(2, 10);
                         const newPath = `${tempPath}.${fileExt}`;
 
-                        try {
-                            await fs.rename(tempPath, newPath);
-                        } catch (error) {
-                            console.error(`Error renaming file: ${tempPath}`, error);
-                            return res.status(500).json({ error: 'Server error during renaming' });
-                        }
+                        await fs.rename(tempPath, newPath);
 
                         const url = user.uiBackground;
                         const extractedPath = url.split('pinpictures/')[1];
-
                         if (!extractedPath.includes("otherImages/background2")) {
-                            const deletedUiBg = await deleteFiles([extractedPath]);   
+                            await deleteFiles([extractedPath]);
                         }
 
                         const fileContent = await fs.readFile(newPath);
@@ -78,47 +78,32 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
                         }]);
 
                         const updatedUser = await prisma.user.update({
-                            where: {
-                                id: user.id
-                            },
-                            data: {
-                                uiBackground: uploadResult[0].Location
-                            }
+                            where: { id: user.id },
+                            data: { uiBackground: uploadResult[0].Location }
                         });
-                        
-                        return res.status(200).json({ status: 'success', message: 'User updated successfully', user: updatedUser });
-                    }
 
-                    if (type === "uiColorUpdate") {
-                        const r = fields.r[0];
-                        const g = fields.g[0];
-                        const b = fields.b[0];
-                        const a = fields.a[0];
+                        return res.status(200).json({ status: 'success', message: 'User updated successfully', user: updatedUser });
+                    } else if (type === "uiColorUpdate") {
+                        const { r, g, b, a } = fields;
 
                         const updatedUser = await prisma.user.update({
-                            where: {
-                                id: user.id
-                            },
+                            where: { id: user.id },
                             data: {
-                                ...user,
                                 settings: {
                                     ...user.settings,
-                                    bgColor: `${r}, ${g}, ${b}, ${a}`
+                                    bgColor: `${r[0]}, ${g[0]}, ${b[0]}, ${a[0]}`
                                 }
                             }
                         });
+
                         return res.status(200).json({ status: 'success', message: 'User updated successfully', user: updatedUser });
+                    } else {
+                        return res.status(400).json({ status: 'error', message: 'Invalid type field' });
                     }
-                    if (err) {
-                        return handleError(res, err);
-                    }
-                });
-            } catch (error) {
-                return handleError(res, error);
-            }
+                } catch (error) {
+                    return handleError(res, error);
+                }
+            });
         });
-
     }
-
 }
-
