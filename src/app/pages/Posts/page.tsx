@@ -36,7 +36,7 @@ export default function Posts({ windowHeight, windowWidth, windowId }) {
   const postsContainerStyle = useMemo(() => ({
     width: windowWidth - 10,
     height: windowHeight - 60,
-    overflowY: "scroll",
+    overflowY: "auto",
     scrollbarWidth: "none",
     msOverflowStyle: "none",
   }), [windowWidth, windowHeight]);
