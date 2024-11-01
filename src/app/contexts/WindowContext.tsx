@@ -9,6 +9,7 @@ export const WindowProvider = ({ children }) => {
   const [windows, setWindows] = useState([]);
 
   const addWindow = (window) => {
+    window.layer = windows.length + 1;
     setWindows((prevWindows) => [...prevWindows, window]);
   };
 
@@ -16,7 +17,8 @@ export const WindowProvider = ({ children }) => {
     const windowId = windows.length + 1;
     const existingWindowsCount = windows.length;
 
-    const newWindow = getComponentByPath(path, windowId, existingWindowsCount);
+    let newWindow = getComponentByPath(path, windowId, existingWindowsCount);
+    newWindow.layer = windows.length + 1;
     if (newWindow) {
       addWindow(newWindow);
     }
