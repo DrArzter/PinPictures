@@ -53,7 +53,8 @@ export default function Footer() {
       ),
     },
 
-    { name: "Search", icon: <SlMagnifier className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" /> },
+    { name: "Search", icon: <SlMagnifier className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
+      onClick={() => { openWindowByPath("/search"); }} /> },
   ].filter(Boolean);
 
   const { addNotification } = useNotificationContext();

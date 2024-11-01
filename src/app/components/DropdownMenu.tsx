@@ -19,7 +19,7 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
   const dropdownRef = useRef(null);
 
   const handleClickOutside = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target) && event.target.id !== "user-card") {
       toggleDropdown();
     }
   };  
@@ -42,7 +42,7 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
     };
   }, [isDropdownOpen, toggleDropdown]);
 
-  const dropdownClassName = `absolute h-[30vh] w-[20vw] z-[999] bottom-[6vh] left-1 rounded-md shadow-lg transform transition-all duration-300 ease-in-out 
+  const dropdownClassName = `absolute h-[20vh] w-[10vw] z-[999] bottom-[6vh] left-1 rounded-md shadow-lg transform transition-all duration-300 ease-in-out 
     ${isDropdownOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"} bg-white`;
 
   const menuItemsClassName = `flex flex-col gap-4 p-4 h-[calc(100%-10vh)] transition-colors text-black`;

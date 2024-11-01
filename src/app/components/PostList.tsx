@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import Post from "./Post";
+import { motion } from "framer-motion";
 
 export default function PostList({ posts, windowHeight, windowWidth, windowId }) {
   const minColumnWidth = 300;
@@ -16,15 +17,23 @@ export default function PostList({ posts, windowHeight, windowWidth, windowId })
     padding: '16px',
   };
 
-  const postItems = useMemo(() => (
-    posts.map((post) => <Post key={post.id} post={post} windowHeight={windowHeight} windowId={windowId} />) // Pass windowHeight to Post
-  ), [posts, windowHeight]);
+  const postItems = useMemo(
+    () =>
+      posts.map((post, index) => (
+        <motion.div
+          key={post.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+        >
+          <Post post={post} windowHeight={windowHeight} windowId={windowId} />
+        </motion.div>
+      )),
+    [posts, windowHeight, windowId]
+  );
 
   return (
-    <div
-      className="overflow-hidden"
-      style={postListStyle}
-    >
+    <div className="scrlBar overflow-hidden max-h-full" style={postListStyle}>
       {postItems}
     </div>
   );
