@@ -44,7 +44,7 @@ export function createWindow({
     height,
     minWidth,
     minHeight,
-    layer: id,
+    layer: 0,
     componentType,
     componentProps,
   };

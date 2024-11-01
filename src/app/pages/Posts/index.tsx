@@ -36,9 +36,6 @@ export default function Posts({ windowHeight, windowWidth, windowId }) {
   const postsContainerStyle = useMemo(() => ({
     width: windowWidth - 10,
     height: windowHeight - 60,
-    overflowY: "auto",
-    scrollbarWidth: "none",
-    msOverflowStyle: "none",
   }), [windowWidth, windowHeight]);
 
   useEffect(() => {
@@ -93,7 +90,7 @@ export default function Posts({ windowHeight, windowWidth, windowId }) {
   };
 
   const postList = useMemo(() => (
-    <PostList posts={posts} windowHeight={windowHeight} windowWidth={windowWidth} windowId={windowId} />
+    <PostList posts={posts} windowHeight={windowHeight} windowWidth={windowWidth} windowId={windowId}/>
   ), [posts, windowHeight, windowWidth]);
 
   return (

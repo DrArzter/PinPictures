@@ -7,12 +7,15 @@ import Login from "../../components/Login";
 import Registration from "../../components/Registration";
 
 import { useNotificationContext } from '@/app/contexts/NotificationContext';
-import { useUserContext } from '@/app/contexts/userContext';
+import { useUserContext } from '@/app/contexts/UserContext';
+import { useWindowContext } from '@/app/contexts/WindowContext';
 
-export default function Authentication() {
+export default function Authentication({windowId}) {
 
   const [isRegistration, setIsRegistration] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+
+  const { removeWindow } = useWindowContext();
 
   const { setUser } = useUserContext();
 
@@ -33,6 +36,7 @@ export default function Authentication() {
         if (response.status === "success") {
           setIsRegistration(false);
           setUser(response.user);
+          removeWindow(windowId);
         }
       } else if (isForgotPassword) {
         response = await api.forgotPassword(email);
@@ -44,6 +48,7 @@ export default function Authentication() {
         if (response.status === "success") {
           const userData = await api.getUser();
           setUser(userData);
+          removeWindow(windowId);
         }
       }
 

@@ -1,12 +1,23 @@
-// componentRegistry.tsx
-import Authentication from "@/app/pages/Authentication/page";
-import NotFound from "@/app/pages/NotFound/page";
-import Posts from "@/app/pages/Posts/page";
-import CreatePost from "@/app/pages/CreatePost/page";
-import Post from "@/app/pages/Post/page"; // Import the single post component
-import Settings from "@/app/pages/Settings/page";
+import Authentication from "@/app/pages/Authentication";
+import NotFound from "@/app/pages/NotFound";
+import Posts from "@/app/pages/Posts";
+import CreatePost from "@/app/pages/CreatePost";
+import Post from "@/app/pages/Post";
+import Settings from "@/app/pages/Settings";
+import Search from "@/app/pages/Search";
 
 export const componentRegistry = {
+  "/search": {
+  component: Search,
+  defaultProps: {
+    width: 545,
+    height: 700,
+    minWidth: 545,
+    minHeight: 700,
+    initialX: 200,
+    initialY: 200,
+  },
+  },
   "/authentication": {
     component: Authentication,
     defaultProps: {
