@@ -1,7 +1,7 @@
 import SearchBar from "./SearchBar";
 import UserCard from "./UserCard";
 import DropdownMenu from "./DropdownMenu";
-import { useUserContext } from "@/app/contexts/userContext";
+import { useUserContext } from "@/app/contexts/UserContext";
 import { useNotificationContext } from "../contexts/NotificationContext";
 
 import { useState } from "react";

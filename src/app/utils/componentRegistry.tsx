@@ -5,6 +5,7 @@ import CreatePost from "@/app/pages/CreatePost";
 import Post from "@/app/pages/Post";
 import Settings from "@/app/pages/Settings";
 import Search from "@/app/pages/Search";
+import Profile from "@/app/pages/Profile";
 
 export const componentRegistry = {
   "/search": {
@@ -64,6 +65,17 @@ export const componentRegistry = {
   },
   "/post/[id]": {
     component: Post,
+    defaultProps: {
+      width: 600,
+      height: 800,
+      minWidth: 600,
+      minHeight: 800,
+      initialX: 200,
+      initialY: 200,
+    },
+  },
+  "/profile/[name]": {
+    component: Profile,
     defaultProps: {
       width: 600,
       height: 800,

@@ -6,7 +6,7 @@ import { FaGear } from "react-icons/fa6";
 import { CiBookmarkPlus } from "react-icons/ci";
 import { RiLogoutBoxFill } from "react-icons/ri";
 
-import { useUserContext } from "@/app/contexts/userContext";
+import { useUserContext } from "@/app/contexts/UserContext";
 import { useWindowContext } from "@/app/contexts/WindowContext";
 
 import Link from "next/link";
@@ -50,20 +50,19 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
   const iconClassName = "text-black";
 
   const handleLogout = () => {
-    api.logout(setUser);
     toggleDropdown();
+    api.logout(setUser);
   };
 
   return (
     <>
       <div ref={dropdownRef} className={dropdownClassName}>
-        <Link href={`/profile/${user.name}`}>
           <img
-            src={user.avatar}
+            src={user?.avatar}
             alt="Profile"
+            onClick={() => openWindowByPath(`/profile/${user?.name}`)}
             className="w-full h-[10vh] object-cover rounded-t-md hover:scale-105 cursor-pointer transition duration-300"
           />
-        </Link>
 
         <div className={menuItemsClassName}>
           <div className="flex items-center gap-2 w-full justify-center">

@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff; /* White background */
   --foreground: #171717; /* Very dark gray */
+  --background: #171717;
   overflow-y: hidden; /* Prevent vertical overflow */
   --text: #333333; /* Lighter black (dark gray) for better contrast */
 }
@@ -31,7 +31,6 @@ body {
     text-wrap: balance;
   }
 }
-
 /* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */
 .scrlBar::-webkit-scrollbar {
   width: 12px;

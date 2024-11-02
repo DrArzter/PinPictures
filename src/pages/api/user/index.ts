@@ -84,14 +84,14 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
                         return res.status(200).json({ status: 'success', message: 'User updated successfully', user: updatedUser });
                     } else if (type === "uiColorUpdate") {
-                        const { r, g, b, a } = fields;
+                        let { hex } = fields;
 
                         const updatedUser = await prisma.user.update({
                             where: { id: user.id },
                             data: {
                                 settings: {
                                     ...user.settings,
-                                    bgColor: `${r[0]}, ${g[0]}, ${b[0]}, ${a[0]}`
+                                    bgColor: `${hex[0]}`
                                 }
                             }
                         });

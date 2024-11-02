@@ -24,7 +24,7 @@ export default function Post({ dynamicProps, windowHeight, windowWidth }) {
       }
     };
     fetchPostData();
-  }, [dynamicProps.id]);
+  }, []);
 
   if (loading) {
     return (

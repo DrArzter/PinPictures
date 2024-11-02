@@ -12,7 +12,7 @@ import { BsFillFileEarmarkPostFill } from "react-icons/bs";
 
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useWindowContext } from "@/app/contexts/WindowContext";
-import { useUserContext } from "@/app/contexts/userContext";
+import { useUserContext } from "@/app/contexts/UserContext";
 
 
 interface FooterProps {
@@ -25,7 +25,8 @@ export default function Footer() {
 
   const { openWindowByPath } = useWindowContext();
 
-  const backgroundColor = user && user.settings?.bgColor ? `rgba(${user.settings.bgColor})` : 'rgba(255,255,255,0.3)';
+
+  const backgroundColor = user && user.settings?.bgColor ? `${user.settings.bgColor}` : '#FFFFFF5';
 
   const iconList = [
     {
@@ -72,7 +73,7 @@ export default function Footer() {
   return (
     <footer
       style={{
-        backgroundColor: backgroundColor
+        backgroundColor: backgroundColor,
       }}
       className={`backdrop-blur-xl rounded-lg bg-opacity-30 border-2 md:w-1/2 mx-auto text-center py-3 absolute bottom-2 left-0 right-0 shadow-lg`}>
       <IconList iconList={iconList} />

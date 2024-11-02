@@ -3,6 +3,7 @@ export {default as logout} from './logout';
 export {default as registration} from './registration';
 export {default as forgotPassword} from './forgotPassword';
 export {default as getUser} from './getUser';
+export {default as getProfile} from './getProfile';
 
 export {default as getPosts} from './getPosts';
 export {default as getPost} from './getPost';

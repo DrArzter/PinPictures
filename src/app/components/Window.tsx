@@ -5,7 +5,7 @@ import { RiDraggable } from "react-icons/ri";
 
 import { useWindowContext } from "@/app/contexts/WindowContext";
 import { getComponentByPath } from "@/app/utils/getComponentByPath";
-import { useUserContext } from "../contexts/userContext";
+import { useUserContext } from "@/app/contexts/UserContext";
 import { componentRegistry } from "@/app/utils/componentRegistry";
 
 import IconList from "./IconList";
@@ -260,10 +260,7 @@ export default function Window({
     },
   ];
 
-  const backgroundColor =
-    user && user.settings?.bgColor
-      ? `rgba(${user.settings.bgColor})`
-      : "rgba(255,255,255,0.3)";
+  const backgroundColor = user && user.settings?.bgColor ? `${user.settings.bgColor}` : '#FFFFFF5';
 
   if (!windowData.isOpen) {
     return (

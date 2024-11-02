@@ -1,25 +1,30 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { TwitterPicker } from 'react-color';
-import { useUserContext } from "@/app/contexts/userContext";
+import { useUserContext } from "@/app/contexts/UserContext";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
+import { motion } from "framer-motion";
 
 import patchUser from "@/app/api/updateUser";
 
-
-
 export default function Settings({ windowHeight, windowWidth }) {
+
     const [loading, setLoading] = useState(true);
     const { user, setUser } = useUserContext();
-    const [selectedImage, setSelectedImage] = useState<string | null>(user?.uiBgPicPath || null);
-    const [color, setColor] = useState('#ffffff');
+    const [selectedImage, setSelectedImage] = useState<string | null>(
+        user?.uiBgPicPath || null
+    );
+    const [color, setColor] = useState("#ffffff");
     const [colorPickerVisible, setColorPickerVisible] = useState(false);
     const [changeUiBGVisible, setChangeUiBGVisible] = useState(false);
+    const [alpha, setAlpha] = useState(1);
 
-    const handleChangeComplete = (color) => {
-        setColor(color.rgb);
-        console.log(color);
+    const handleColorChange = (e) => {
+        setColor(e.target.value);
+    };
+
+    const handleAlphaChange = (e) => {
+        setAlpha(e.target.value);
     };
 
     useEffect(() => {
@@ -46,16 +51,16 @@ export default function Settings({ windowHeight, windowWidth }) {
     const handleSubmitColorChange = async (event: any) => {
         event.preventDefault();
         const formData = new FormData();
+        const colorWithAlpha = `${color}${Math.round(alpha * 255)
+            .toString(16)
+            .padStart(2, "0")}`;
         formData.append("type", "uiColorUpdate");
-        formData.append("r", color.r);
-        formData.append("g", color.g);
-        formData.append("b", color.b);
-        formData.append("a", 0.3);
+        formData.append("hex", colorWithAlpha);
         const response = await patchUser(formData);
         if (response) {
             setUser(response.user);
         }
-    }
+    };
 
     const handleImageChange = (event: any) => {
         const file = event.target.files[0];
@@ -85,7 +90,10 @@ export default function Settings({ windowHeight, windowWidth }) {
             {loading ? (
                 <LoadingIndicator />
             ) : (
-                <div style={ContainerStyle} className="flex flex-col items-center p-14 gap-4">
+                <div
+                    style={ContainerStyle}
+                    className="flex flex-col items-center p-14 gap-4"
+                >
                     <h1 className="text-3xl font-bold text-center mb-4">Settings</h1>
                     <div>
                         <p>User ID: {user?.id}</p>
@@ -93,11 +101,18 @@ export default function Settings({ windowHeight, windowWidth }) {
                         <p>Email: {user?.email}</p>
                     </div>
 
-                    <button onClick={() => setChangeUiBGVisible(!changeUiBGVisible)} className="border-2 border-dashed border-gray-400 px-4 py-2 rounded-3xl">Change UI Background</button>
+                    <button
+                        onClick={() => setChangeUiBGVisible(!changeUiBGVisible)}
+                        className="border-2 border-dashed border-gray-400 px-4 py-2 rounded-3xl"
+                    >
+                        Change UI Background
+                    </button>
 
-                    {
-                        changeUiBGVisible && (<form className="flex flex-row items-center justify-center gap-2 w-full" onSubmit={handleSubmitUIBGChange}>
-
+                    {changeUiBGVisible && (
+                        <form
+                            className="flex flex-row items-center justify-center gap-2 w-full"
+                            onSubmit={handleSubmitUIBGChange}
+                        >
                             <input
                                 id="fileInput"
                                 type="file"
@@ -117,7 +132,9 @@ export default function Settings({ windowHeight, windowWidth }) {
                                         className="max-w-full max-h-full object-contain"
                                     />
                                 ) : (
-                                    <span className="text-gray-500">Click to select an image</span>
+                                    <span className="text-gray-500">
+                                        Click to select an image
+                                    </span>
                                 )}
                             </div>
 
@@ -127,20 +144,68 @@ export default function Settings({ windowHeight, windowWidth }) {
                             >
                                 Save
                             </button>
-                        </form>)
-                    }
+                        </form>
+                    )}
 
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 items-center">
                         <div className="flex flex-row gap-4 items-center">
                             <button
                                 className="border-2 border-dashed border-gray-400 px-4 py-2 rounded-3xl"
-                                onClick={() => setColorPickerVisible(!colorPickerVisible)}>Select background color</button>
-                            {colorPickerVisible && <button className="w-24 py-2 rounded-3xl bg-lime-500"
-                                onClick={handleSubmitColorChange}>Save</button>}
+                                onClick={() => setColorPickerVisible(!colorPickerVisible)}
+                            >
+                                Select background color
+                            </button>
                         </div>
-                        {colorPickerVisible && <TwitterPicker color={color} onChangeComplete={handleChangeComplete} className="ml-4" />}
-                    </div>
+                        {colorPickerVisible && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -30 }}
+                                transition={{ duration: 0.5 }}
+                                className="p-4 bg-white rounded-lg shadow-lg flex items-center space-x-4"
+                            >
+                                <div className="relative inline-block">
+                                    <input
+                                        type="color"
+                                        value={color}
+                                        onChange={handleColorChange}
+                                        className="absolute opacity-0 w-0 h-0 top-14"
+                                    />
+                                    <div
+                                        style={{ backgroundColor: color }}
+                                        onClick={(e) => {
+                                            e.target.parentElement.querySelector("input").click();
+                                        }}
+                                        className="w-12 h-12 rounded-full border-none cursor-pointer shadow-xl hover:shadow-inner"
+                                    />
+                                </div>
 
+                                <div className="flex flex-col items-start">
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="1"
+                                        step="0.01"
+                                        value={alpha}
+                                        onChange={handleAlphaChange}
+                                        className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer appearance-none"
+                                        style={{
+                                            background: `linear-gradient(to right, ${color}00, ${color}FF)`,
+                                        }}
+                                    />
+                                    <span className="text-sm text-gray-500 mt-1">
+                                        Opacity: {(alpha * 100).toFixed(0)}%
+                                    </span>
+                                </div>
+                                <button
+                                    className="w-24 py-2 rounded-3xl bg-lime-500"
+                                    onClick={handleSubmitColorChange}
+                                >
+                                    Save
+                                </button>
+                            </motion.div>
+                        )}
+                    </div>
                 </div>
             )}
         </>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { RxAvatar } from "react-icons/rx";
-import { useUserContext } from "@/app/contexts/userContext";
+import { useUserContext } from "@/app/contexts/UserContext";
 import LoadingIndicator from "./LoadingIndicator";
 import DropdownMenu from "./DropdownMenu";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function UserCard() {
     const { user, userLoading } = useUserContext();
 
-    const backgroundColor = user && user.settings?.bgColor ? `rgba(${user.settings.bgColor})` : 'rgba(0,0,0,0.3)';
+    const backgroundColor = user && user.settings?.bgColor ? `${user.settings.bgColor}` : '#FFFFFF5';
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const toggleDropdown = () => {

@@ -51,6 +51,7 @@ export function getComponentByPath(
     });
   }
 
+
   // Call createWindow to generate a new window instance with all required properties and settings
   return createWindow({
     id: windowId,

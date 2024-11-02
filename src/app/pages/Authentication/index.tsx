@@ -17,7 +17,7 @@ export default function Authentication({windowId}) {
 
   const { removeWindow } = useWindowContext();
 
-  const { setUser } = useUserContext();
+  const { setUser, setUserLoading } = useUserContext();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -32,6 +32,7 @@ export default function Authentication({windowId}) {
       let response;
 
       if (isRegistration) {
+
         response = await api.registration(username, email, password);
         if (response.status === "success") {
           setIsRegistration(false);
@@ -44,12 +45,14 @@ export default function Authentication({windowId}) {
           setIsForgotPassword(false);
         }
       } else {
+        setUserLoading(true);
         response = await api.login(username, password);
         if (response.status === "success") {
           const userData = await api.getUser();
           setUser(userData);
           removeWindow(windowId);
         }
+        setUserLoading(false);
       }
 
       addNotification({
