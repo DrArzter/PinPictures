@@ -6,7 +6,7 @@ import { BsHeart, BsHeartFill, BsChatDots } from "react-icons/bs";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function Post({ postId, windowHeight, windowWidth }) {
+export default function Post({ dynamicProps, windowHeight, windowWidth }) {
   const [loading, setLoading] = useState(true);
   const [post, setPost] = useState(null);
   const [currentImage, setCurrentImage] = useState(0);
@@ -15,7 +15,7 @@ export default function Post({ postId, windowHeight, windowWidth }) {
   useEffect(() => {
     const fetchPostData = async () => {
       try {
-        const fetchedPost = await fetchPost(postId);
+        const fetchedPost = await fetchPost(dynamicProps.id);
         setPost(fetchedPost);
       } catch (error) {
         console.error("Error fetching post:", error);
@@ -24,7 +24,7 @@ export default function Post({ postId, windowHeight, windowWidth }) {
       }
     };
     fetchPostData();
-  }, [postId]);
+  }, [dynamicProps.id]);
 
   if (loading) {
     return (
@@ -147,9 +147,8 @@ export default function Post({ postId, windowHeight, windowWidth }) {
               <button
                 key={index}
                 onClick={() => setCurrentImage(index)}
-                className={`h-2 w-8 rounded-full focus:outline-none transition-colors duration-300 ${
-                  index === currentImage ? "bg-white" : "bg-gray-500"
-                }`}
+                className={`h-2 w-8 rounded-full focus:outline-none transition-colors duration-300 ${index === currentImage ? "bg-white" : "bg-gray-500"
+                  }`}
               ></button>
             ))}
           </div>
@@ -191,9 +190,8 @@ export default function Post({ postId, windowHeight, windowWidth }) {
           <div className="flex items-center space-x-4">
             <button
               onClick={toggleLike}
-              className={`flex items-center space-x-1 transition-colors duration-300 focus:outline-none ${
-                liked ? "text-red-500" : "hover:text-red-500"
-              }`}
+              className={`flex items-center space-x-1 transition-colors duration-300 focus:outline-none ${liked ? "text-red-500" : "hover:text-red-500"
+                }`}
             >
               {liked ? <BsHeartFill size={22} /> : <BsHeart size={22} />}
               <motion.span

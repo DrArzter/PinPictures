@@ -10,11 +10,10 @@ export default function Post({ post, windowHeight, windowId }) {
 
   const postHeight = windowHeight * 0.4;
 
-  const postContainerClassName = `hover:scale-105 border rounded-xl focus:scale-105 transition-transform duration-300 overflow-hidden ${
-    isDarkMode
+  const postContainerClassName = `hover:scale-105 border rounded-xl focus:scale-105 transition-transform duration-300 overflow-hidden ${isDarkMode
       ? "border-gray-700 bg-gray-800 text-white"
       : "border-gray-300 bg-white text-gray-900"
-  }`;
+    }`;
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -74,9 +73,8 @@ export default function Post({ post, windowHeight, windowId }) {
         )}
 
         <div
-          className={`${
-            isDarkMode ? "bg-gray-700" : "bg-gray-300"
-          } h-[1px] w-full`}
+          className={`${isDarkMode ? "bg-gray-700" : "bg-gray-300"
+            } h-[1px] w-full`}
         />
 
         <div className={postContentClassName} onClick={handleChildClick}>
