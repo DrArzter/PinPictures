@@ -35,7 +35,7 @@ export default function Posts({ windowHeight, windowWidth, windowId }) {
 
   const postsContainerStyle = useMemo(() => ({
     width: windowWidth - 10,
-    height: windowHeight - 60,
+    height: windowHeight - 55,
   }), [windowWidth, windowHeight]);
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export default function Posts({ windowHeight, windowWidth, windowId }) {
   return (
     <>
       {loading && page === 1 ? (
-        <div className="absolute top-1/2 left-1/2">
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <LoadingIndicator />
         </div>
       ) : (

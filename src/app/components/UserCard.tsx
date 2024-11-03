@@ -5,8 +5,12 @@ import LoadingIndicator from "./LoadingIndicator";
 import DropdownMenu from "./DropdownMenu";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { useNotificationContext } from "../contexts/NotificationContext";
+
 export default function UserCard() {
     const { user, userLoading } = useUserContext();
+
+    const { addNotification } = useNotificationContext();
 
     const backgroundColor = user && user.settings?.bgColor ? `${user.settings.bgColor}` : '#FFFFFF5';
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -44,7 +48,7 @@ export default function UserCard() {
                 }}
                 onClick={toggleDropdown}
                 id="user-card"
-                className="absolute left-1 bottom-2 p-2 backdrop-blur-xl bg-opacity-30 border-2 rounded-lg shadow-2xl cursor-pointer items-center flex flex-row gap-2">
+                className="absolute left-2 bottom-2 p-2 backdrop-blur-xl bg-opacity-30 border-2 rounded-lg shadow-2xl cursor-pointer items-center flex flex-row gap-2">
                 {user ? (
                     <>
                         <img
@@ -65,7 +69,7 @@ export default function UserCard() {
 
             {/* Animated Dropdown Menu */}
             <AnimatePresence>
-                {isDropdownOpen && (
+                {isDropdownOpen && user && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}

@@ -18,8 +18,6 @@ export default function Window({
   const { user } = useUserContext();
   const { windows, setWindows, removeWindow } = useWindowContext();
 
-
-
   const windowData =
     windows.find((w) => w.id === initialWindowData.id) || initialWindowData;
 
@@ -71,7 +69,17 @@ export default function Window({
     }
   };
 
-  const handleMouseDown = (event) => {
+  const [isDragging, setIsDragging] = useState(false);
+  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeStart, setResizeStart] = useState({
+    width: windowData.width,
+    height: windowData.height,
+    x: 0,
+    y: 0,
+  });
+
+  const handleDragMouseDown = (event) => {
     if (event.button === 0) {
       setIsDragging(true);
       setStartPosition({
@@ -90,16 +98,6 @@ export default function Window({
       y: event.clientY,
     });
   };
-
-  const [isDragging, setIsDragging] = useState(false);
-  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
-  const [isResizing, setIsResizing] = useState(false);
-  const [resizeStart, setResizeStart] = useState({
-    width: windowData.width,
-    height: windowData.height,
-    x: 0,
-    y: 0,
-  });
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -128,19 +126,19 @@ export default function Window({
         windows.map((w) =>
           w.id === windowData.id
             ? {
-              ...w,
-              componentType: updatedWindow.componentType,
-              componentProps: updatedWindow.componentProps,
-              width: windowData.fullscreen
-                ? windowData.width
-                : updatedWindow.width,
-              height: windowData.fullscreen
-                ? windowData.height
-                : updatedWindow.height,
-              minWidth: updatedWindow.minWidth,
-              minHeight: updatedWindow.minHeight,
-              title: updatedWindow.title,
-            }
+                ...w,
+                componentType: updatedWindow.componentType,
+                componentProps: updatedWindow.componentProps,
+                width: windowData.fullscreen
+                  ? windowData.width
+                  : updatedWindow.width,
+                height: windowData.fullscreen
+                  ? windowData.height
+                  : updatedWindow.height,
+                minWidth: updatedWindow.minWidth,
+                minHeight: updatedWindow.minHeight,
+                title: updatedWindow.title,
+              }
             : w
         )
       );
@@ -160,10 +158,10 @@ export default function Window({
         windows.map((w) =>
           w.id === windowData.id
             ? {
-              ...w,
-              x: mousePosition.clientX - startPosition.x,
-              y: mousePosition.clientY - startPosition.y,
-            }
+                ...w,
+                x: mousePosition.clientX - startPosition.x,
+                y: mousePosition.clientY - startPosition.y,
+              }
             : w
         )
       );
@@ -179,10 +177,10 @@ export default function Window({
         windows.map((w) =>
           w.id === windowData.id
             ? {
-              ...w,
-              width: Math.min(Math.max(newWidth, w.minWidth), maxWidth),
-              height: Math.min(Math.max(newHeight, w.minHeight), maxHeight),
-            }
+                ...w,
+                width: Math.min(Math.max(newWidth, w.minWidth), maxWidth),
+                height: Math.min(Math.max(newHeight, w.minHeight), maxHeight),
+              }
             : w
         )
       );
@@ -232,25 +230,25 @@ export default function Window({
                 w.id === windowData.id
                   ? w.fullscreen
                     ? {
-                      ...w,
-                      x: 100,
-                      y: 100,
-                      width: w.minWidth,
-                      height: w.minHeight,
-                      fullscreen: false,
-                    }
+                        ...w,
+                        x: 100,
+                        y: 100,
+                        width: w.minWidth,
+                        height: w.minHeight,
+                        fullscreen: false,
+                      }
                     : {
-                      ...w,
-                      x:
-                        (document.documentElement.clientWidth - windowWidth) /
-                        2,
-                      y:
-                        (document.documentElement.clientHeight -
-                          windowHeight) * 0.05,
-                      width: windowWidth,
-                      height: windowHeight,
-                      fullscreen: true,
-                    }
+                        ...w,
+                        x:
+                          (document.documentElement.clientWidth - windowWidth) /
+                          2,
+                        y:
+                          (document.documentElement.clientHeight -
+                            windowHeight) * 0.05,
+                        width: windowWidth,
+                        height: windowHeight,
+                        fullscreen: true,
+                      }
                   : w
               )
             );
@@ -260,7 +258,8 @@ export default function Window({
     },
   ];
 
-  const backgroundColor = user && user.settings?.bgColor ? `${user.settings.bgColor}` : '#FFFFFF5';
+  const backgroundColor =
+    user && user.settings?.bgColor ? `${user.settings.bgColor}` : "#FFFFFF5";
 
   if (!windowData.isOpen) {
     return (
@@ -270,9 +269,10 @@ export default function Window({
           left: `${windowData.x}px`,
           backgroundColor,
         }}
-        className={`absolute bg-white bg-opacity-30 backdrop-blur-xl border-2 rounded-lg shadow-2xl ${mouseDown ? "select-none pointer-events-none" : ""
-          }`}
-        onMouseDown={handleMouseDown}
+        className={`absolute bg-white bg-opacity-30 backdrop-blur-xl border-2 rounded-lg shadow-2xl ${
+          mouseDown ? "select-none pointer-events-none" : ""
+        }`}
+        onMouseDown={handleDragMouseDown}
       >
         <div className="w-full flex flex-row justify-between items-center border-b-2 border-dotted">
           <div className="w-full text-end">
@@ -308,35 +308,38 @@ export default function Window({
         backgroundColor,
       }}
       className="absolute bg-white bg-opacity-30 backdrop-blur-3xl border-2 rounded-lg shadow-2xl"
-      onMouseDown={() => {
+      onMouseDown={(event) => {
         setWindows(
           windows.map((w) =>
             w.id !== windowData.id
               ? { ...w, layer: Math.max(0, w.layer - 1) }
               : {
-                ...w,
-                layer: Math.max(...windows.map((w2) => w2.layer)) + 1,
-              }
+                  ...w,
+                  layer: Math.max(...windows.map((w2) => w2.layer)) + 1,
+                }
           )
         );
       }}
     >
       <div
         className="w-full flex flex-row justify-between items-center border-b-2 border-dotted cursor-move"
-        onMouseDown={handleMouseDown}
+        onMouseDown={handleDragMouseDown}
       >
         <div className="p-2 flex justify-start">
           <IconList iconList={iconList} />
         </div>
 
-        <div className="flex flex-row text-end py-1 px-4 bg-gray-200 rounded bg-opacity-30 relative">
+        <div
+          className="flex flex-row text-end py-1 px-4 bg-gray-200 rounded bg-opacity-30 relative"
+          onMouseDown={(event) => event.stopPropagation()}
+        >
           <input
             ref={inputRef}
             type="text"
             value={pathInput}
             onChange={handlePathChange}
             onKeyDown={handlePathSubmit}
-            className="bg-transparent border-none outline-none text-white"
+            className="bg-transparent border-none outline-none text-white no-drag"
           />
           {showSuggestions && suggestions.length > 0 && (
             <ul
@@ -362,18 +365,18 @@ export default function Window({
           )}
         </div>
 
-        <div className="text-end py-2 px-4">
-          <h1>{windowData.title}</h1>
+        <div
+          className="text-end py-2 px-4">
+          <h1 style={{ userSelect: "none" }}>{windowData.title}</h1>
         </div>
       </div>
 
       {ContentComponent && (
         <ContentComponent
-        {...windowData.componentProps}
+          {...windowData.componentProps}
           windowHeight={windowData.height}
           windowWidth={windowData.width}
           windowId={windowData.id}
- 
         />
       )}
 

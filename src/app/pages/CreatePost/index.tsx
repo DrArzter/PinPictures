@@ -80,7 +80,7 @@ export default function CreatePost({ windowHeight }) {
   return (
     <div
       className="flex flex-col w-full max-w-2xl bg-white bg-opacity-20 rounded-3xl shadow-xl p-8 mt-4 overflow-y-auto absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-      style={{ maxHeight: `${windowHeight - 50}px` }}
+      style={{ maxHeight: `${windowHeight - 55}px` }}
     >
       <motion.h1
         className="text-4xl font-extrabold text-center mb-8 text-white drop-shadow-lg"

@@ -76,7 +76,7 @@ export default function Search({ windowHeight, windowWidth, windowId }) {
           {searchPosts.length > 0 && (
             <motion.div
               className="p-2"
-              style={{ height: `${windowHeight - 150}px` }}
+              style={{ height: `${windowHeight - 55}px` }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

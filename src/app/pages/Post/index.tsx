@@ -59,9 +59,6 @@ export default function Post({ dynamicProps, windowHeight, windowWidth }) {
     // Здесь можно добавить логику отправки лайка на сервер
   };
 
-  // Вычисляем доступную высоту для контента
-  const contentHeight = windowHeight - 40; // Вычтите отступы, если необходимо
-
   // Анимации Framer Motion
   const containerVariants = {
     hidden: { opacity: 0, y: 50 },
@@ -76,8 +73,8 @@ export default function Post({ dynamicProps, windowHeight, windowWidth }) {
 
   return (
     <motion.div
-      className="relative w-full py-4 px-4"
-      style={{ height: `${contentHeight}px`, overflow: "hidden" }}
+      className="relative w-full py-4 px-4 rounded-xl"
+      style={{ height: `${windowHeight - 55}px`, overflow: "hidden" }}
       initial="hidden"
       animate="visible"
       exit="hidden"

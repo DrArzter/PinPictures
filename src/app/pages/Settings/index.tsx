@@ -79,7 +79,7 @@ export default function Settings({ windowHeight, windowWidth }) {
 
     const ContainerStyle = {
         width: windowWidth - 10,
-        height: windowHeight - 60,
+        height: windowHeight - 55,
         overflowY: "scroll",
         scrollbarWidth: "none",
         msOverflowStyle: "none",
