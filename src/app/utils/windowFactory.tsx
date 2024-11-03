@@ -6,7 +6,7 @@ export function createWindow({
   type,
   existingWindowsCount = 0,
   initialX = 250,
-  initialY = 250,
+  initialY = 300,
   offsetStep = 30,
   maxOffset = 300,
   width = 400,
