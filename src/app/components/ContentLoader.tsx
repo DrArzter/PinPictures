@@ -4,10 +4,14 @@ import { useUserContext } from "@/app/contexts/UserContext";
 import Home from "@/app/home";
 import LoadingIndicator from "./LoadingIndicator";
 
+import Artoria from "@/app/resources/Artoria";
+
 export default function ContentLoader() {
   const [loading, setLoading] = useState(true);
-  const [bgImage, setBgImage] = useState(''); // Начальное пустое состояние
+  const [bgImage, setBgImage] = useState('');
   const { user, userLoading } = useUserContext();
+
+  const placeholderSVG = `data:image/svg+xml;base64,${btoa(Artoria())}`;
 
   useEffect(() => {
     const loadImage = (imgSrc) => {
@@ -15,13 +19,13 @@ export default function ContentLoader() {
       img.src = imgSrc;
 
       img.onload = () => {
-        setBgImage(imgSrc); // Устанавливаем URL только после загрузки
+        setBgImage(imgSrc);
         setLoading(false);
       };
 
       img.onerror = () => {
         console.error("Error loading image:", imgSrc);
-        setBgImage('https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg'); // Резервное изображение
+        setBgImage('https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg');
         setLoading(false);
       };
     };
@@ -34,10 +38,10 @@ export default function ContentLoader() {
     if (!userLoading) {
       loadImage(imgSrc);
     }
-  }, [user?.uiBackground, userLoading]); // Зависимости, чтобы перезапускать эффект при изменении фона или статуса загрузки пользователя
+  }, [user?.uiBackground, userLoading]);
 
   const backgroundStyle = {
-    backgroundImage: bgImage ? `url(${bgImage})` : 'none',
+    backgroundImage: bgImage ? `url(${bgImage})` : `url("${placeholderSVG}")`,
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
