@@ -8,9 +8,9 @@ export default function Windows({ mouseDown, mousePosition }) {
 
   return (
     <div>
-      {windows.map((win, index) => (
+      {windows.map((win) => (
         <Window
-          key={index}
+          key={win.id}
           windowData={win}
           mouseDown={mouseDown}
           mousePosition={mousePosition}

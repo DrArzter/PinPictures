@@ -12,6 +12,8 @@ export default function Post({ dynamicProps, windowHeight, windowWidth }) {
   const [currentImage, setCurrentImage] = useState(0);
   const [liked, setLiked] = useState(false);
 
+  console.log(dynamicProps);
+
   useEffect(() => {
     const fetchPostData = async () => {
       try {

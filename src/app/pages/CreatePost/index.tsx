@@ -2,29 +2,47 @@ import React, { useState, useRef } from "react";
 import { MdClose } from "react-icons/md";
 import { FaSpinner } from "react-icons/fa";
 import { AiOutlineCloudUpload } from "react-icons/ai";
+import { useNotificationContext } from "@/app/contexts/NotificationContext";
+import { useWindowContext } from "@/app/contexts/WindowContext";
 import { createPost } from "@/app/api";
 import { motion } from "framer-motion";
 
-export default function CreatePost({ windowHeight }) {
+export default function CreatePost({ windowHeight, windowId }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+  const { addNotification } = useNotificationContext();
+  const { removeWindow } = useWindowContext();
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
+    let response;
+  
     try {
-      await createPost({ name, description, images });
+      response = await createPost({ name, description, images });
     } catch (err) {
       console.error(err);
+      addNotification({
+        type: response.status,
+        message: response.message,
+      });
     } finally {
       setLoading(false);
+      if (response) {
+        addNotification({
+          type: response.status,
+          message: response.message,
+        });
+        removeWindow(windowId);
+      }
     }
   };
+  
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);

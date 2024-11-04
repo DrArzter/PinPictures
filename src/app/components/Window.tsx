@@ -1,3 +1,4 @@
+// Window.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { FaRegWindowClose, FaRegMinusSquare } from "react-icons/fa";
 import { BsArrowsFullscreen } from "react-icons/bs";
@@ -16,7 +17,7 @@ export default function Window({
   mousePosition,
 }) {
   const { user } = useUserContext();
-  const { windows, setWindows, removeWindow } = useWindowContext();
+  const { windows, setWindows, removeWindow, updateWindowPath } = useWindowContext();
 
   const windowData =
     windows.find((w) => w.id === initialWindowData.id) || initialWindowData;
@@ -37,12 +38,6 @@ export default function Window({
     return { width: 800, height: 600 };
   };
 
-  const updateWindowPath = (windowId, newPath) => {
-    setWindows(
-      windows.map((w) => (w.id === windowId ? { ...w, path: newPath } : w))
-    );
-  };
-
   const handlePathChange = (event) => {
     const newPath = event.target.value;
     setPathInput(newPath);
@@ -56,17 +51,23 @@ export default function Window({
     setShowSuggestions(true);
   };
 
+  const handlePathSubmit = (event) => {
+    if (event.key === "Enter") {
+      const matchingComponent = getComponentByPath(pathInput, windowData.id, windows.length);
+      if (matchingComponent) {
+        updateWindowPath(windowData.id, pathInput);
+      } else {
+        console.warn(`Component for path "${pathInput}" does not exist, but opening as custom path.`);
+        updateWindowPath(windowData.id, pathInput);
+      }
+      setShowSuggestions(false);
+    }
+  };
+
   const handleSuggestionClick = (suggestion) => {
     setPathInput(suggestion);
     setShowSuggestions(false);
     updateWindowPath(windowData.id, suggestion);
-  };
-
-  const handlePathSubmit = (event) => {
-    if (event.key === "Enter") {
-      updateWindowPath(windowData.id, pathInput);
-      setShowSuggestions(false);
-    }
   };
 
   const [isDragging, setIsDragging] = useState(false);
@@ -129,12 +130,8 @@ export default function Window({
                 ...w,
                 componentType: updatedWindow.componentType,
                 componentProps: updatedWindow.componentProps,
-                width: windowData.fullscreen
-                  ? windowData.width
-                  : updatedWindow.width,
-                height: windowData.fullscreen
-                  ? windowData.height
-                  : updatedWindow.height,
+                width: windowData.fullscreen ? windowData.width : updatedWindow.width,
+                height: windowData.fullscreen ? windowData.height : updatedWindow.height,
                 minWidth: updatedWindow.minWidth,
                 minHeight: updatedWindow.minHeight,
                 title: updatedWindow.title,
@@ -166,10 +163,8 @@ export default function Window({
         )
       );
     } else if (isResizing && mouseDown) {
-      const newWidth =
-        resizeStart.width + (mousePosition.clientX - resizeStart.x);
-      const newHeight =
-        resizeStart.height + (mousePosition.clientY - resizeStart.y);
+      const newWidth = resizeStart.width + (mousePosition.clientX - resizeStart.x);
+      const newHeight = resizeStart.height + (mousePosition.clientY - resizeStart.y);
 
       const { width: maxWidth, height: maxHeight } = getWindowDimensions();
 
@@ -223,8 +218,7 @@ export default function Window({
           className="w-7 h-7 text-white hover:scale-110 hover:cursor-pointer transition duration-300"
           onClick={(event) => {
             event.stopPropagation();
-            const { width: windowWidth, height: windowHeight } =
-              getWindowDimensions();
+            const { width: windowWidth, height: windowHeight } = getWindowDimensions();
             setWindows(
               windows.map((w) =>
                 w.id === windowData.id
@@ -239,12 +233,8 @@ export default function Window({
                       }
                     : {
                         ...w,
-                        x:
-                          (document.documentElement.clientWidth - windowWidth) /
-                          2,
-                        y:
-                          (document.documentElement.clientHeight -
-                            windowHeight) * 0.05,
+                        x: (document.documentElement.clientWidth - windowWidth) / 2,
+                        y: (document.documentElement.clientHeight - windowHeight) * 0.05,
                         width: windowWidth,
                         height: windowHeight,
                         fullscreen: true,
@@ -258,8 +248,7 @@ export default function Window({
     },
   ];
 
-  const backgroundColor =
-    user && user.settings?.bgColor ? `${user.settings.bgColor}` : "#FFFFFF5";
+  const backgroundColor = user?.settings?.bgColor || "#FFFFFF5";
 
   if (!windowData.isOpen) {
     return (
@@ -299,6 +288,7 @@ export default function Window({
 
   return (
     <div
+      key={windowData.path} // Add path as key to trigger rerender on path change
       style={{
         width: `${windowData.width}px`,
         height: `${windowData.height}px`,
@@ -365,8 +355,7 @@ export default function Window({
           )}
         </div>
 
-        <div
-          className="text-end py-2 px-4">
+        <div className="text-end py-2 px-4">
           <h1 style={{ userSelect: "none" }}>{windowData.title}</h1>
         </div>
       </div>

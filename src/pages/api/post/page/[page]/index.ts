@@ -9,13 +9,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { page } = req.query;
     const pageNumber = parseInt(page as string, 10) || 1;
-    const limit = 40;
+    const limit = 20;
     const offset = (pageNumber - 1) * limit;
 
     try {
         const posts = await prisma.post.findMany({
             skip: offset,
             take: limit,
+            orderBy: { createdAt: 'desc' },
             include: {
                 author: {
                     select: {
@@ -26,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 images: true,
                 likes: true,
                 _count: {
-                    select: { comments: true }, // count of comments
+                    select: { comments: true },
                 }
             },
         });
