@@ -1,4 +1,3 @@
-// Posts.js
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 
 import PostList from "@/app/components/PostList";
@@ -33,10 +32,13 @@ export default function Posts({ windowHeight, windowWidth, windowId }) {
   const [hasMorePosts, setHasMorePosts] = useState(true);
   const [error, setError] = useState(null);
 
-  const postsContainerStyle = useMemo(() => ({
-    width: windowWidth - 10,
-    height: windowHeight - 55,
-  }), [windowWidth, windowHeight]);
+  const postsContainerStyle = useMemo(
+    () => ({
+      width: windowWidth - 10,
+      height: windowHeight - 55,
+    }),
+    [windowWidth, windowHeight]
+  );
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -69,7 +71,7 @@ export default function Posts({ windowHeight, windowWidth, windowId }) {
     debounce(() => {
       if (
         window.scrollY + window.innerHeight >=
-        document.body.scrollHeight - 100 &&
+          document.body.scrollHeight - 100 &&
         !loading &&
         hasMorePosts
       ) {
@@ -89,28 +91,44 @@ export default function Posts({ windowHeight, windowWidth, windowId }) {
     setPage(1);
   };
 
-  const postList = useMemo(() => (
-    <PostList posts={posts} windowHeight={windowHeight} windowWidth={windowWidth} windowId={windowId}/>
-  ), [posts, windowHeight, windowWidth]);
+  const postList = useMemo(
+    () => (
+      <PostList
+        posts={posts}
+        windowHeight={windowHeight}
+        windowWidth={windowWidth}
+        windowId={windowId}
+      />
+    ),
+    [posts, windowHeight, windowWidth]
+  );
 
   return (
-    <>
+    <div
+      id="posts"
+      style={postsContainerStyle}
+      className="relative flex flex-col items-center justify-center mx-auto"
+    >
       {loading && page === 1 ? (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <LoadingIndicator />
         </div>
       ) : (
-        <div id="posts" style={postsContainerStyle}>
-          {error && <div className="text-red-500">{error}</div>}
+        <>
+          {error && (
+            <div className="text-red-500 text-center mb-4">{error}</div>
+          )}
           {posts.length > 0 ? (
             postList
           ) : (
-            !loading && <NoPostsFound />
+            !loading && <NoPostsFound className="text-center" />
           )}
-          {loading && hasMorePosts && <LoadingIndicator />}
+          {loading && hasMorePosts && (
+            <LoadingIndicator className="my-4" />
+          )}
           {!hasMorePosts && <LoadMoreButton onClick={handleLoadMore} />}
-        </div>
+        </>
       )}
-    </>
+    </div>
   );
 }

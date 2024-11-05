@@ -10,13 +10,11 @@ import { useNotificationContext } from '@/app/contexts/NotificationContext';
 import { useUserContext } from '@/app/contexts/UserContext';
 import { useWindowContext } from '@/app/contexts/WindowContext';
 
-export default function Authentication({windowId}) {
-
+export default function Authentication({ windowId, windowHeight, windowWidth }) {
   const [isRegistration, setIsRegistration] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
 
   const { removeWindow } = useWindowContext();
-
   const { setUser, setUserLoading } = useUserContext();
 
   const [username, setUsername] = useState("");
@@ -32,7 +30,6 @@ export default function Authentication({windowId}) {
       let response;
 
       if (isRegistration) {
-
         response = await api.registration(username, email, password);
         if (response.status === "success") {
           setIsRegistration(false);
@@ -71,7 +68,6 @@ export default function Authentication({windowId}) {
     setPassword("");
   };
 
-  // Функция переключения на восстановление пароля
   const toggleForgotPassword = () => {
     setIsForgotPassword(!isForgotPassword);
     setIsRegistration(false);
@@ -79,10 +75,10 @@ export default function Authentication({windowId}) {
     setPassword("");
   };
 
-  const containerClassName = "flex flex-col items-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full";
+  const containerClassName = "flex flex-col items-center justify-center";
 
   return (
-    <div className={containerClassName}>
+    <div style={{ height: `${windowHeight -55}px`, width: `${windowWidth}px` }} className={containerClassName}>
       {isRegistration ? (
         <Registration
           username={username}
@@ -95,17 +91,23 @@ export default function Authentication({windowId}) {
           toggleRegistration={toggleRegistration}
         />
       ) : isForgotPassword ? (
-        <div>
-          <p>Enter your email to reset password</p>
-          <form onSubmit={handleSubmit}>
+        <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+          <p className="mb-4">Enter your email to reset password</p>
+          <form onSubmit={handleSubmit} className="flex flex-col items-center">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
               required
+              className="mb-4 p-2 border rounded w-64"
             />
-            <button type="submit">Reset Password</button>
+            <button
+              type="submit"
+              className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600"
+            >
+              Reset Password
+            </button>
           </form>
         </div>
       ) : (

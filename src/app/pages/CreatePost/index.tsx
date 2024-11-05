@@ -20,9 +20,9 @@ export default function CreatePost({ windowHeight, windowId }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     let response;
-  
+
     try {
       response = await createPost({ name, description, images });
     } catch (err) {
@@ -42,7 +42,6 @@ export default function CreatePost({ windowHeight, windowId }) {
       }
     }
   };
-  
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -93,8 +92,6 @@ export default function CreatePost({ windowHeight, windowId }) {
 
   const isSubmitDisabled = !name || !description || images.length === 0 || loading;
 
-  const imagesContainerMaxHeight = windowHeight * 0.4;
-
   return (
     <div
       className="flex flex-col w-full max-w-2xl bg-white bg-opacity-20 rounded-3xl shadow-xl p-8 mt-4 overflow-y-auto absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
@@ -140,7 +137,7 @@ export default function CreatePost({ windowHeight, windowId }) {
             onClick={handleFileInputClick}
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
-            style={{ maxHeight: `${imagesContainerMaxHeight}px`, overflowY: "auto" }}
+            style={{ maxHeight: `${windowHeight * 0.4}px`, overflowY: "auto" }}
           >
             <AiOutlineCloudUpload className="text-white text-6xl mb-4" />
             <p className="text-white">Перетащите изображения сюда или нажмите для выбора файлов</p>

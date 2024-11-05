@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from "react";
-
 import { motion } from "framer-motion";
 import { FaEnvelope, FaRegClock, FaHeart } from "react-icons/fa";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
-
 import { getProfile } from "@/app/api";
 
 export default function Profile({ dynamicProps, windowWidth, windowHeight }) {
   const { name } = dynamicProps;
-
   const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
-    if (userProfile) {
-      return;
-    }
+    if (userProfile) return;
 
     getProfile(name)
       .then((profile) => {
@@ -27,7 +22,11 @@ export default function Profile({ dynamicProps, windowWidth, windowHeight }) {
   }, [name, userProfile]);
 
   if (!userProfile) {
-    return <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"><LoadingIndicator /></div>;
+    return (
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <LoadingIndicator />
+      </div>
+    );
   }
 
   return (
@@ -36,28 +35,27 @@ export default function Profile({ dynamicProps, windowWidth, windowHeight }) {
         backgroundImage: `url(${userProfile?.background})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
+        overflow: "hidden",
         height: `${windowHeight - 55}px`,
-        borderRadius: `5px`,
+        width: `${windowWidth - 5}px`,
       }}
-      className="w-full relative"
+      className="relative flex items-center justify-center rounded-lg"
     >
-      {/* Полупрозрачный слой для размытия */}
-      <div
-        className="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm"
-        style={{ borderRadius: "5px" }}
-      ></div>
-      
+      {/* Semi-transparent layer for background overlay */}
+      <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-lg rounded-lg"></div>
+
       <motion.div
-        className="relative bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-2xl p-8 w-5/6 mx-auto"
+        className="relative bg-gradient-to-r from-blue-600 to-purple-700 rounded-lg shadow-2xl p-8 mx-auto"
+        style={{ width: `${windowWidth * 0.8}px` }}
         initial={{ opacity: 0, y: -30 }}
-        animate={{ opacity: 1, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="flex flex-col items-center">
           <motion.img
             src={userProfile?.avatar}
             alt={`${userProfile?.name}'s avatar`}
-            className="w-28 h-28 rounded-full border-4 border-white shadow-md"
+            className="w-28 h-28 rounded-full border-4 border-white shadow-lg"
             whileHover={{ scale: 1.05 }}
           />
           <motion.h1
@@ -77,12 +75,11 @@ export default function Profile({ dynamicProps, windowWidth, windowHeight }) {
             </span>
           </div>
         </div>
-        <div className="mt-8 bg-white rounded-lg shadow-inner p-4">
-          <h2 className="text-xl font-semibold text-gray-800 mb-3">
-            Recent Posts
-          </h2>
+
+        <div className="mt-8 bg-white rounded-lg shadow-inner p-4 max-h-60 overflow-y-auto">
+          <h2 className="text-xl font-semibold text-gray-800 mb-3">Recent Posts</h2>
           {userProfile?.posts.length > 0 ? (
-            <ul className="space-y-3">
+            <ul className="space-y-3 pl-3 pr-2">
               {userProfile.posts.map((post) => (
                 <motion.li
                   key={post.id}
@@ -113,5 +110,4 @@ export default function Profile({ dynamicProps, windowWidth, windowHeight }) {
       </motion.div>
     </div>
   );
-  
 }

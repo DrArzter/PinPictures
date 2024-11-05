@@ -56,3 +56,11 @@ body {
   scrollbar-width: thin;                   /* Thin scrollbar */
   scrollbar-color: #c3c3d9 transparent;    /* Thumb color with transparent track */
 }
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hidden {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}

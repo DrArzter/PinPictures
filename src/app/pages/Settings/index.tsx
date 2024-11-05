@@ -8,7 +8,6 @@ import { motion } from "framer-motion";
 import patchUser from "@/app/api/updateUser";
 
 export default function Settings({ windowHeight, windowWidth }) {
-
     const [loading, setLoading] = useState(true);
     const { user, setUser } = useUserContext();
     const [selectedImage, setSelectedImage] = useState<string | null>(
@@ -31,7 +30,7 @@ export default function Settings({ windowHeight, windowWidth }) {
         setLoading(false);
     }, [user]);
 
-    const handleSubmitUIBGChange = async (event: any) => {
+    const handleSubmitUIBGChange = async (event) => {
         event.preventDefault();
         const file = event.target[0]?.files[0];
         if (!file) return;
@@ -41,14 +40,13 @@ export default function Settings({ windowHeight, windowWidth }) {
         formData.append("type", "uiBgUpdate");
 
         const response = await patchUser(formData);
-        console.log(response);
         if (response) {
             setUser(response.user);
             setSelectedImage(response.user.uiBackground);
         }
     };
 
-    const handleSubmitColorChange = async (event: any) => {
+    const handleSubmitColorChange = async (event) => {
         event.preventDefault();
         const formData = new FormData();
         const colorWithAlpha = `${color}${Math.round(alpha * 255)
@@ -62,7 +60,7 @@ export default function Settings({ windowHeight, windowWidth }) {
         }
     };
 
-    const handleImageChange = (event: any) => {
+    const handleImageChange = (event) => {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
@@ -77,12 +75,10 @@ export default function Settings({ windowHeight, windowWidth }) {
         document.getElementById("fileInput")?.click();
     };
 
-    const ContainerStyle = {
+    const containerStyle = {
         width: windowWidth - 10,
         height: windowHeight - 55,
-        overflowY: "scroll",
-        scrollbarWidth: "none",
-        msOverflowStyle: "none",
+        overflowY: "auto",
     };
 
     return (
@@ -91,8 +87,8 @@ export default function Settings({ windowHeight, windowWidth }) {
                 <LoadingIndicator />
             ) : (
                 <div
-                    style={ContainerStyle}
-                    className="flex flex-col items-center p-14 gap-4"
+                    style={containerStyle}
+                    className="flex flex-col items-center justify-center scrollbar-hidden p-6 gap-6 rounded-xl shadow-lg"
                 >
                     <h1 className="text-3xl font-bold text-center mb-4">Settings</h1>
                     <div>
@@ -140,7 +136,7 @@ export default function Settings({ windowHeight, windowWidth }) {
 
                             <button
                                 type="submit"
-                                className="w-24 py-2 rounded-3xl bg-lime-500 "
+                                className="w-24 py-2 rounded-3xl bg-lime-500"
                             >
                                 Save
                             </button>
