@@ -69,7 +69,7 @@ export default function Footer() {
     {
       name: "Message",
       icon: (
-        <AiOutlineMessage className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" />
+        <AiOutlineMessage className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" onClick={() => {openWindowByPath("/chats")}} />
       ),
     },
 

@@ -5,9 +5,21 @@ import CreatePost from "@/app/pages/CreatePost";
 import Post from "@/app/pages/Post";
 import Settings from "@/app/pages/Settings";
 import Search from "@/app/pages/Search";
+import Chats from "@/app/pages/Chats";
 import Profile from "@/app/pages/Profile";
 
 export const componentRegistry = {
+  "/chats": {
+    component: Chats,
+    defaultProps: {
+      width: 545,
+      height: 700,
+      minWidth: 545,
+      minHeight: 700,
+      initialX: 200,
+      initialY: 200,
+    },
+  },
   "/search": {
     component: Search,
     defaultProps: {
@@ -44,10 +56,10 @@ export const componentRegistry = {
   "/post/create": {
     component: CreatePost,
     defaultProps: {
-      width: 800,
-      height: 980,
-      minWidth: 770,
-      minHeight: 980,
+      width: 600,
+      height: 850,
+      minWidth: 600,
+      minHeight: 850,
       initialX: 200,
       initialY: 200,
     },

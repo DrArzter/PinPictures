@@ -385,6 +385,7 @@ export default function Window({
           windowHeight={windowData.height}
           windowWidth={windowData.width}
           windowId={windowData.id}
+          user={user}
         />
       )}
 

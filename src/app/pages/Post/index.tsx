@@ -5,7 +5,7 @@ import { BsHeart, BsHeartFill, BsChatDots } from "react-icons/bs";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function Post({ dynamicProps, windowHeight, windowWidth }) {
+export default function Post({ dynamicProps, windowHeight, windowWidth, user }) {
   const [loading, setLoading] = useState(true);
   const [post, setPost] = useState(null);
   const [currentImage, setCurrentImage] = useState(0);
