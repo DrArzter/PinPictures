@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useState } from "react";
 
 import * as api from "@/app/api";
@@ -6,11 +6,15 @@ import * as api from "@/app/api";
 import Login from "../../components/Login";
 import Registration from "../../components/Registration";
 
-import { useNotificationContext } from '@/app/contexts/NotificationContext';
-import { useUserContext } from '@/app/contexts/UserContext';
-import { useWindowContext } from '@/app/contexts/WindowContext';
+import { useNotificationContext } from "@/app/contexts/NotificationContext";
+import { useUserContext } from "@/app/contexts/UserContext";
+import { useWindowContext } from "@/app/contexts/WindowContext";
 
-export default function Authentication({ windowId, windowHeight, windowWidth }) {
+export default function Authentication({
+  windowId,
+  windowHeight,
+  windowWidth,
+}) {
   const [isRegistration, setIsRegistration] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
 
@@ -78,7 +82,10 @@ export default function Authentication({ windowId, windowHeight, windowWidth }) 
   const containerClassName = "flex flex-col items-center justify-center";
 
   return (
-    <div style={{ height: `${windowHeight -55}px`, width: `${windowWidth}px` }} className={containerClassName}>
+    <div
+      style={{ height: `${windowHeight - 55}px`, width: `${windowWidth}px` }}
+      className={containerClassName}
+    >
       {isRegistration ? (
         <Registration
           username={username}

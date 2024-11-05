@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useContext } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 
@@ -12,7 +12,6 @@ const Registration = ({
   handleSubmit,
   toggleRegistration,
 }) => {
-
   const containerClassName = `flex flex-col items-center w-full max-w-md gap-6 p-8 sm:p-16`;
 
   const inputClassName = `w-full p-2 border rounded text-lightModeText`;
@@ -23,14 +22,16 @@ const Registration = ({
     console.log("Captcha value:", value);
   };
 
-
   return (
     <div className={containerClassName}>
       <div className="text-center">
         <h2 className="text-2xl">Welcome to PinPictures</h2>
         <p>Join us and explore the community!</p>
       </div>
-      <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4 w-full">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col items-center gap-4 w-full"
+      >
         <div className="w-full">
           <label className="block text-sm mb-1">Username</label>
           <input

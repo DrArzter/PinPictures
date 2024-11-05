@@ -1,4 +1,4 @@
-import api from './axiosApi';
+import api from "./axiosApi";
 
 export default async function login(username: string, password: string) {
   try {
@@ -6,16 +6,16 @@ export default async function login(username: string, password: string) {
       `/user/login`,
       {
         email: username,
-        password: password
+        password: password,
       },
       {
-        withCredentials: true
+        withCredentials: true,
       }
     );
     return response.data;
   } catch (error) {
-    console.error('Error during login:', error);
-    alert('Error during login. Please try again.');
+    console.error("Error during login:", error);
+    alert("Error during login. Please try again.");
     throw error;
   }
 }

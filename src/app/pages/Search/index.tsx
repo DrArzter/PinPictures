@@ -33,7 +33,11 @@ export default function Search({ windowHeight, windowWidth, windowId }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      style={{ height: `${windowHeight - 55}px`, width: `${windowWidth}px`, overflow: "hidden" }}
+      style={{
+        height: `${windowHeight - 55}px`,
+        width: `${windowWidth}px`,
+        overflow: "hidden",
+      }}
     >
       {/* Search Bar */}
       <motion.div
@@ -46,7 +50,7 @@ export default function Search({ windowHeight, windowWidth, windowId }) {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
         >
           <motion.input
             className={searchInputClassName}
@@ -57,7 +61,7 @@ export default function Search({ windowHeight, windowWidth, windowId }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            style={{ width: '75%' }}
+            style={{ width: "75%" }}
           />
           <motion.button
             type="submit"

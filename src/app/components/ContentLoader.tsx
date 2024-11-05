@@ -8,7 +8,7 @@ import Artoria from "@/app/resources/Artoria";
 
 export default function ContentLoader() {
   const [loading, setLoading] = useState(true);
-  const [bgImage, setBgImage] = useState('');
+  const [bgImage, setBgImage] = useState("");
   const { user, userLoading } = useUserContext();
 
   const placeholderSVG = `data:image/svg+xml;base64,${btoa(Artoria())}`;
@@ -25,12 +25,15 @@ export default function ContentLoader() {
 
       img.onerror = () => {
         console.error("Error loading image:", imgSrc);
-        setBgImage('https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg');
+        setBgImage(
+          "https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg"
+        );
         setLoading(false);
       };
     };
 
-    let imgSrc = 'https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg';
+    let imgSrc =
+      "https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg";
     if (user && user.uiBackground) {
       imgSrc = user.uiBackground;
     }
@@ -72,5 +75,9 @@ export default function ContentLoader() {
     );
   }
 
-  return <div style={backgroundStyle}><Home /></div>;
+  return (
+    <div style={backgroundStyle}>
+      <Home />
+    </div>
+  );
 }

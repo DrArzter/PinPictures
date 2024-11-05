@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useEffect, use } from "react";
 
 import IconList from "./IconList";
@@ -14,7 +14,6 @@ import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useWindowContext } from "@/app/contexts/WindowContext";
 import { useUserContext } from "@/app/contexts/UserContext";
 
-
 interface FooterProps {
   windows: Window[];
   setWindows: React.Dispatch<React.SetStateAction<Window[]>>;
@@ -25,37 +24,76 @@ export default function Footer() {
 
   const { openWindowByPath } = useWindowContext();
 
-
-  const backgroundColor = user && user.settings?.bgColor ? `${user.settings.bgColor}` : '#FFFFFF5';
+  const backgroundColor =
+    user && user.settings?.bgColor ? `${user.settings.bgColor}` : "#FFFFFF5";
 
   const iconList = [
     {
-      name: "Post", icon: <BsFillFileEarmarkPostFill className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
-        onClick={() => { openWindowByPath("/posts"); }} />
-    },
-
-    {
-      name: "Bell", icon: <FaBell className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
-        onClick={() => { handleButtonClicksex(); }} />
-    },
-
-    user ? {
-      name: "Add", icon: (<CiSquarePlus className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
-        onClick={() => { openWindowByPath("/post/create"); }} />
-      )
-    } : null,
-
-    { name: "Message", icon: <AiOutlineMessage className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" /> },
-
-    !user && {
-      name: "Authentication",
-      icon: (<RiLoginBoxFill className="w-8 h-8 text-white hover:scale-110 hover:cursor-pointer transition duration-300"
-        onClick={() => openWindowByPath("/authentication")} />
+      name: "Post",
+      icon: (
+        <BsFillFileEarmarkPostFill
+          className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
+          onClick={() => {
+            openWindowByPath("/posts");
+          }}
+        />
       ),
     },
 
-    { name: "Search", icon: <SlMagnifier className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
-      onClick={() => { openWindowByPath("/search"); }} /> },
+    {
+      name: "Bell",
+      icon: (
+        <FaBell
+          className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
+          onClick={() => {
+            handleButtonClicksex();
+          }}
+        />
+      ),
+    },
+
+    user
+      ? {
+          name: "Add",
+          icon: (
+            <CiSquarePlus
+              className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
+              onClick={() => {
+                openWindowByPath("/post/create");
+              }}
+            />
+          ),
+        }
+      : null,
+
+    {
+      name: "Message",
+      icon: (
+        <AiOutlineMessage className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" />
+      ),
+    },
+
+    !user && {
+      name: "Authentication",
+      icon: (
+        <RiLoginBoxFill
+          className="w-8 h-8 text-white hover:scale-110 hover:cursor-pointer transition duration-300"
+          onClick={() => openWindowByPath("/authentication")}
+        />
+      ),
+    },
+
+    {
+      name: "Search",
+      icon: (
+        <SlMagnifier
+          className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
+          onClick={() => {
+            openWindowByPath("/search");
+          }}
+        />
+      ),
+    },
   ].filter(Boolean);
 
   const { addNotification } = useNotificationContext();
@@ -75,7 +113,8 @@ export default function Footer() {
       style={{
         backgroundColor: backgroundColor,
       }}
-      className={`backdrop-blur-xl rounded-lg bg-opacity-30 border-2 md:w-1/2 mx-auto text-center py-3 absolute bottom-2 left-0 right-0 shadow-lg`}>
+      className={`backdrop-blur-xl rounded-lg bg-opacity-30 border-2 md:w-1/2 mx-auto text-center py-3 absolute bottom-2 left-0 right-0 shadow-lg`}
+    >
       <IconList iconList={iconList} />
     </footer>
   );

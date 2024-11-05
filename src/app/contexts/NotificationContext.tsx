@@ -7,7 +7,10 @@ export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
 
   const addNotification = (notification) => {
-    setNotifications((prevNotifications) => [...prevNotifications, notification]);
+    setNotifications((prevNotifications) => [
+      ...prevNotifications,
+      notification,
+    ]);
   };
 
   const removeNotification = (index) => {
@@ -17,7 +20,9 @@ export const NotificationProvider = ({ children }) => {
   };
 
   return (
-    <NotificationContext.Provider value={{ notifications, addNotification, removeNotification }}>
+    <NotificationContext.Provider
+      value={{ notifications, addNotification, removeNotification }}
+    >
       {children}
     </NotificationContext.Provider>
   );

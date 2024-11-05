@@ -77,7 +77,9 @@ export default function Profile({ dynamicProps, windowWidth, windowHeight }) {
         </div>
 
         <div className="mt-8 bg-white rounded-lg shadow-inner p-4 max-h-60 overflow-y-auto">
-          <h2 className="text-xl font-semibold text-gray-800 mb-3">Recent Posts</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-3">
+            Recent Posts
+          </h2>
           {userProfile?.posts.length > 0 ? (
             <ul className="space-y-3 pl-3 pr-2">
               {userProfile.posts.map((post) => (
@@ -90,7 +92,9 @@ export default function Profile({ dynamicProps, windowWidth, windowHeight }) {
                   }}
                 >
                   <div>
-                    <h3 className="text-lg text-gray-800 font-semibold">{post.name}</h3>
+                    <h3 className="text-lg text-gray-800 font-semibold">
+                      {post.name}
+                    </h3>
                     <p className="text-gray-600 mt-1">{post.description}</p>
                     <div className="text-sm text-gray-500 mt-2">
                       Created at: {new Date(post.createdAt).toLocaleString()}

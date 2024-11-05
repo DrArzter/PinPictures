@@ -17,7 +17,9 @@ export default async function handler(
 
   try {
     if (!name) {
-      return res.status(400).json({ status: "error", message: "Profile post ID" });
+      return res
+        .status(400)
+        .json({ status: "error", message: "Profile post ID" });
     }
     const profile = await prisma.user.findUnique({
       where: {
@@ -33,7 +35,6 @@ export default async function handler(
         posts: true,
       },
     });
-
 
     if (!profile) {
       return res

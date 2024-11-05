@@ -12,7 +12,7 @@ export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen)
+    setIsDropdownOpen(!isDropdownOpen);
     if (!user) {
       addNotification({
         message: `Сначала авторизуйтесь`,
@@ -31,14 +31,18 @@ export default function Header() {
 
   const searchBarContainerClassName = "justify-center";
 
-  const backgroundColor = user && user.settings?.bgColor ? `rgba(${user.settings.bgColor})` : 'rgba(255,255,255,0.3)';
+  const backgroundColor =
+    user && user.settings?.bgColor
+      ? `rgba(${user.settings.bgColor})`
+      : "rgba(255,255,255,0.3)";
 
   return (
     <header
       style={{
         backgroundColor: backgroundColor,
       }}
-      className={headerClassName}>
+      className={headerClassName}
+    >
       <div className={searchBarContainerClassName}>
         <SearchBar />
       </div>

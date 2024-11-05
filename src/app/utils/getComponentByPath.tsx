@@ -4,7 +4,7 @@ import { createWindow } from "./windowFactory";
 
 /**
  * Retrieves a component configuration based on the given path, and creates a window instance.
- * 
+ *
  * @param path - The path used to identify and retrieve the corresponding component.
  * @param windowId - Unique ID for the window instance being created.
  * @param existingWindowsCount - The count of currently open windows.
@@ -16,13 +16,16 @@ export function getComponentByPath(
   existingWindowsCount: number
 ) {
   // Utility function to escape special characters in a string for use in a regular expression
-  const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); 
+  const escapeRegExp = (string) =>
+    string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
   // Find a matching route in the component registry by converting each route with dynamic parameters to a regular expression
   const matchedRoute = Object.keys(componentRegistry).find((route) => {
     try {
       // Escape route, then replace dynamic segments
-      const regexRoute = new RegExp("^" + route.replace(/\[([^\]]+)\]/g, "([^/]+)") + "$");
+      const regexRoute = new RegExp(
+        "^" + route.replace(/\[([^\]]+)\]/g, "([^/]+)") + "$"
+      );
       return regexRoute.test(path);
     } catch (error) {
       console.warn(`Error processing route "${route}":`, error);
@@ -31,11 +34,15 @@ export function getComponentByPath(
   });
 
   // Retrieve the component entry from the registry based on the matched route or fall back to NotFound
-  const registryEntry = matchedRoute ? componentRegistry[matchedRoute] : componentRegistry["*"];
+  const registryEntry = matchedRoute
+    ? componentRegistry[matchedRoute]
+    : componentRegistry["*"];
 
   // If no component matches and no NotFound handler exists, log a warning and return null
   if (!registryEntry) {
-    console.warn(`No component found for path: ${path}, and no NotFound handler.`);
+    console.warn(
+      `No component found for path: ${path}, and no NotFound handler.`
+    );
     return null;
   }
 
@@ -50,7 +57,9 @@ export function getComponentByPath(
 
   if (paramMatches) {
     // Create regex to match the path and extract dynamic parameter values
-    const routeRegex = new RegExp("^" + matchedRoute.replace(/\[([^\]]+)\]/g, "([^/]+)") + "$");
+    const routeRegex = new RegExp(
+      "^" + matchedRoute.replace(/\[([^\]]+)\]/g, "([^/]+)") + "$"
+    );
     const pathParams = path.match(routeRegex);
 
     // Map matched parameters to their names and values from the path

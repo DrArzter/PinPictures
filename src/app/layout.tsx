@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   description: "Pin OS",
   icons: {
     icon: "/icons/favicon.ico",
-  }
+  },
 };
 
 export default function RootLayout({

@@ -4,6 +4,8 @@ import PostList from "@/app/components/PostList";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import NoPostsFound from "@/app/components/NoPostsFound";
 
+import { useUserContext } from "@/app/contexts/UserContext";
+
 import * as postUtils from "@/app/utils/postUtils";
 
 const debounce = (func, wait) => {
@@ -31,6 +33,8 @@ export default function Posts({ windowHeight, windowWidth, windowId }) {
   const [posts, setPosts] = useState([]);
   const [hasMorePosts, setHasMorePosts] = useState(true);
   const [error, setError] = useState(null);
+
+  const { user } = useUserContext();
 
   const postsContainerStyle = useMemo(
     () => ({
@@ -98,6 +102,7 @@ export default function Posts({ windowHeight, windowWidth, windowId }) {
         windowHeight={windowHeight}
         windowWidth={windowWidth}
         windowId={windowId}
+        user={user}
       />
     ),
     [posts, windowHeight, windowWidth]
@@ -118,14 +123,10 @@ export default function Posts({ windowHeight, windowWidth, windowId }) {
           {error && (
             <div className="text-red-500 text-center mb-4">{error}</div>
           )}
-          {posts.length > 0 ? (
-            postList
-          ) : (
-            !loading && <NoPostsFound className="text-center" />
-          )}
-          {loading && hasMorePosts && (
-            <LoadingIndicator className="my-4" />
-          )}
+          {posts.length > 0
+            ? postList
+            : !loading && <NoPostsFound className="text-center" />}
+          {loading && hasMorePosts && <LoadingIndicator className="my-4" />}
           {!hasMorePosts && <LoadMoreButton onClick={handleLoadMore} />}
         </>
       )}

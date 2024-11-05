@@ -2,9 +2,9 @@ import React, { createContext, useState, useEffect } from "react";
 
 const ThemeContext = createContext({
   isDarkMode: false,
-  toggleTheme: () => { },
+  toggleTheme: () => {},
   isMobile: false,
-  setIsMobile: () => { },
+  setIsMobile: () => {},
 });
 
 export const ThemeProvider = ({ children }) => {

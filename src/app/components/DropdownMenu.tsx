@@ -19,10 +19,14 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
   const dropdownRef = useRef(null);
 
   const handleClickOutside = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target) && event.target.id !== "user-card") {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target) &&
+      event.target.id !== "user-card"
+    ) {
       toggleDropdown();
     }
-  };  
+  };
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -43,7 +47,9 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
   }, [isDropdownOpen, toggleDropdown]);
 
   const dropdownClassName = `absolute w-[10vw] z-[999] bottom-20 left-1 rounded-md shadow-lg transform transition-all duration-300 ease-in-out 
-    ${isDropdownOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"} bg-white`;
+    ${
+      isDropdownOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"
+    } bg-white`;
 
   const menuItemsClassName = `flex flex-col gap-4 p-4 h-[calc(100%-10vh)] transition-colors text-black`;
 
@@ -57,16 +63,19 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
   return (
     <>
       <div ref={dropdownRef} className={dropdownClassName}>
-          <img
-            src={user?.avatar}
-            alt="Profile"
-            onClick={() => openWindowByPath(`/profile/${user?.name}`)}
-            className="w-full h-[10vh] object-cover rounded-t-md hover:scale-105 cursor-pointer transition duration-300"
-          />
+        <img
+          src={user?.avatar}
+          alt="Profile"
+          onClick={() => openWindowByPath(`/profile/${user?.name}`)}
+          className="w-full h-[10vh] object-cover rounded-t-md hover:scale-105 cursor-pointer transition duration-300"
+        />
 
         <div className={menuItemsClassName}>
           <div className="flex items-center gap-2 w-full justify-center">
-            <FaGear className={iconClassName} onClick={() => openWindowByPath("/settings")} />
+            <FaGear
+              className={iconClassName}
+              onClick={() => openWindowByPath("/settings")}
+            />
             <span>Settings</span>
           </div>
 
@@ -82,7 +91,6 @@ export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
             <RiLogoutBoxFill className={iconClassName} />
             <span>Logout</span>
           </div>
-
         </div>
       </div>
     </>

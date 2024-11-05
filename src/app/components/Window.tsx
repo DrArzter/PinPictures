@@ -17,7 +17,8 @@ export default function Window({
   mousePosition,
 }) {
   const { user } = useUserContext();
-  const { windows, setWindows, removeWindow, updateWindowPath } = useWindowContext();
+  const { windows, setWindows, removeWindow, updateWindowPath } =
+    useWindowContext();
 
   const windowData =
     windows.find((w) => w.id === initialWindowData.id) || initialWindowData;
@@ -53,11 +54,17 @@ export default function Window({
 
   const handlePathSubmit = (event) => {
     if (event.key === "Enter") {
-      const matchingComponent = getComponentByPath(pathInput, windowData.id, windows.length);
+      const matchingComponent = getComponentByPath(
+        pathInput,
+        windowData.id,
+        windows.length
+      );
       if (matchingComponent) {
         updateWindowPath(windowData.id, pathInput);
       } else {
-        console.warn(`Component for path "${pathInput}" does not exist, but opening as custom path.`);
+        console.warn(
+          `Component for path "${pathInput}" does not exist, but opening as custom path.`
+        );
         updateWindowPath(windowData.id, pathInput);
       }
       setShowSuggestions(false);
@@ -130,8 +137,12 @@ export default function Window({
                 ...w,
                 componentType: updatedWindow.componentType,
                 componentProps: updatedWindow.componentProps,
-                width: windowData.fullscreen ? windowData.width : updatedWindow.width,
-                height: windowData.fullscreen ? windowData.height : updatedWindow.height,
+                width: windowData.fullscreen
+                  ? windowData.width
+                  : updatedWindow.width,
+                height: windowData.fullscreen
+                  ? windowData.height
+                  : updatedWindow.height,
                 minWidth: updatedWindow.minWidth,
                 minHeight: updatedWindow.minHeight,
                 title: updatedWindow.title,
@@ -163,8 +174,10 @@ export default function Window({
         )
       );
     } else if (isResizing && mouseDown) {
-      const newWidth = resizeStart.width + (mousePosition.clientX - resizeStart.x);
-      const newHeight = resizeStart.height + (mousePosition.clientY - resizeStart.y);
+      const newWidth =
+        resizeStart.width + (mousePosition.clientX - resizeStart.x);
+      const newHeight =
+        resizeStart.height + (mousePosition.clientY - resizeStart.y);
 
       const { width: maxWidth, height: maxHeight } = getWindowDimensions();
 
@@ -218,7 +231,8 @@ export default function Window({
           className="w-7 h-7 text-white hover:scale-110 hover:cursor-pointer transition duration-300"
           onClick={(event) => {
             event.stopPropagation();
-            const { width: windowWidth, height: windowHeight } = getWindowDimensions();
+            const { width: windowWidth, height: windowHeight } =
+              getWindowDimensions();
             setWindows(
               windows.map((w) =>
                 w.id === windowData.id
@@ -233,8 +247,13 @@ export default function Window({
                       }
                     : {
                         ...w,
-                        x: (document.documentElement.clientWidth - windowWidth) / 2,
-                        y: (document.documentElement.clientHeight - windowHeight) * 0.05,
+                        x:
+                          (document.documentElement.clientWidth - windowWidth) /
+                          2,
+                        y:
+                          (document.documentElement.clientHeight -
+                            windowHeight) *
+                          0.05,
                         width: windowWidth,
                         height: windowHeight,
                         fullscreen: true,

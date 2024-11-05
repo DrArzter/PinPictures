@@ -64,7 +64,9 @@ export default function CreatePost({ windowHeight, windowId }) {
   const handleRemoveImage = (index, e) => {
     e.stopPropagation();
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
-    setImagePreviews((prevPreviews) => prevPreviews.filter((_, i) => i !== index));
+    setImagePreviews((prevPreviews) =>
+      prevPreviews.filter((_, i) => i !== index)
+    );
   };
 
   const handleFileInputClick = () => {
@@ -90,7 +92,8 @@ export default function CreatePost({ windowHeight, windowId }) {
     });
   };
 
-  const isSubmitDisabled = !name || !description || images.length === 0 || loading;
+  const isSubmitDisabled =
+    !name || !description || images.length === 0 || loading;
 
   return (
     <div
@@ -107,7 +110,9 @@ export default function CreatePost({ windowHeight, windowId }) {
       </motion.h1>
       <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
         <div>
-          <label className="block text-lg font-medium mb-2 text-white">Post title</label>
+          <label className="block text-lg font-medium mb-2 text-white">
+            Post title
+          </label>
           <motion.input
             type="text"
             placeholder="Enter post title..."
@@ -120,7 +125,9 @@ export default function CreatePost({ windowHeight, windowId }) {
           />
         </div>
         <div>
-          <label className="block text-lg font-medium mb-2 text-white">Post description</label>
+          <label className="block text-lg font-medium mb-2 text-white">
+            Post description
+          </label>
           <motion.textarea
             placeholder="Enter post description..."
             className="w-full p-4 border border-transparent rounded-xl resize-none focus:outline-none transition duration-300"
@@ -140,7 +147,9 @@ export default function CreatePost({ windowHeight, windowId }) {
             style={{ maxHeight: `${windowHeight * 0.4}px`, overflowY: "auto" }}
           >
             <AiOutlineCloudUpload className="text-white text-6xl mb-4" />
-            <p className="text-white">Перетащите изображения сюда или нажмите для выбора файлов</p>
+            <p className="text-white">
+              Перетащите изображения сюда или нажмите для выбора файлов
+            </p>
             <p className="text-sm text-white mt-2">({images.length}/10)</p>
             <input
               ref={fileInputRef}

@@ -1,39 +1,77 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { FiLayers } from "react-icons/fi";
 import { BsHeart, BsHeartFill, BsChatDots } from "react-icons/bs";
 import ThemeContext from "@/app/contexts/ThemeContext";
 import { useWindowContext } from "@/app/contexts/WindowContext";
+import { useNotificationContext } from "../contexts/NotificationContext";
+import * as api from "@/app/api";
 
-export default function Post({ post, windowHeight, windowId }) {
+export default function Post({ post, windowHeight, windowId, user, ...props }) {
   const { isDarkMode } = useContext(ThemeContext);
-  const { updateWindowPath, openWindowByPath } = useWindowContext();
+  const { openWindowByPath } = useWindowContext();
+  const { addNotification } = useNotificationContext();
+  const [isLiked, setIsLiked] = React.useState(false);
+  const [likeCount, setLikeCount] = React.useState(post._count.likes);
 
+  // Определяем высоту поста
   const postHeight = windowHeight * 0.4;
 
-  const postContainerClassName = `hover:scale-105 border rounded-xl focus:scale-105 transition-transform duration-300 overflow-hidden ${isDarkMode
+  // Классы для контейнера поста
+  const postContainerClassName = `hover:scale-105 border rounded-xl focus:scale-105 transition-transform duration-300 overflow-hidden ${
+    isDarkMode
       ? "border-gray-700 bg-gray-800 text-white"
       : "border-gray-300 bg-white text-gray-900"
-    }`;
+  }`;
+
+  // Устанавливаем состояние лайка только если пользователь авторизован
+  useEffect(() => {
+    if (
+      user &&
+      post.likes &&
+      post.likes.some((like) => like.userId === user.id)
+    ) {
+      setIsLiked(true);
+    }
+  }, [post.likes, user]);
 
   const handleClick = (e) => {
     e.preventDefault();
-    openWindowByPath(`/post/${post.id}`); // Передаем windowId первым аргументом
+    openWindowByPath(`/post/${post.id}`);
   };
 
   const handleChildClick = (e) => {
     e.stopPropagation();
   };
 
+  const handleLikeClick = async (e) => {
+    e.stopPropagation();
+
+    if (!user) {
+      addNotification({
+        type: "error",
+        message: "You must be logged in to like posts.",
+      });
+      return;
+    }
+
+    try {
+      const response = await api.likePost(post.id);
+      if (response.status === "success") {
+        const newLikeState = !isLiked;
+        setIsLiked(newLikeState);
+        setLikeCount((prevCount) => prevCount + (newLikeState ? 1 : -1));
+      }
+    } catch (error) {
+      console.error("Error updating like:", error);
+    }
+  };
+
+  // Условные классы и переменные для UI
   const imageContainerClassName = "w-full flex-1 overflow-hidden relative";
-
   const layersIconClassName = "absolute top-2 right-2 text-2xl text-yellow-500";
-
   const postContentClassName = "p-4 flex flex-row items-center justify-between";
-
   const postDescriptionClassName = "text-sm overflow-hidden line-clamp-3";
-
   const hasMultipleImages = post.images && post.images.length > 1;
-
   const postActionsClassName = "flex flex-row items-center space-x-4 mt-2";
   const likeButtonClassName =
     "flex items-center space-x-1 hover:text-yellow-500";
@@ -50,9 +88,7 @@ export default function Post({ post, windowHeight, windowId }) {
       <div className="flex flex-col h-full">
         {post.images && (
           <div className={imageContainerClassName}>
-            {hasMultipleImages && (
-              <FiLayers className={layersIconClassName} />
-            )}
+            {hasMultipleImages && <FiLayers className={layersIconClassName} />}
             <img
               src={post.images[0].picpath}
               alt={post.name}
@@ -73,26 +109,21 @@ export default function Post({ post, windowHeight, windowId }) {
         )}
 
         <div
-          className={`${isDarkMode ? "bg-gray-700" : "bg-gray-300"
-            } h-[1px] w-full`}
+          className={`${
+            isDarkMode ? "bg-gray-700" : "bg-gray-300"
+          } h-[1px] w-full`}
         />
 
         <div className={postContentClassName} onClick={handleChildClick}>
           <p className={postDescriptionClassName}>{post.description}</p>
           <div className={postActionsClassName}>
-            <button
-              className={likeButtonClassName}
-              onClick={handleChildClick}
-            >
-              <BsHeart size={20} />
-              <span>{0}</span>
+            <button className={likeButtonClassName} onClick={handleLikeClick}>
+              {isLiked ? <BsHeartFill size={20} /> : <BsHeart size={20} />}
+              <span>{likeCount}</span>
             </button>
-            <div
-              className={commentButtonClassName}
-              onClick={handleChildClick}
-            >
+            <div className={commentButtonClassName} onClick={handleChildClick}>
               <BsChatDots size={20} />
-              <span>{0}</span>
+              <span>{post._count.comments}</span>
             </div>
           </div>
         </div>

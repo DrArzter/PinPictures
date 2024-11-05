@@ -9,15 +9,15 @@ import Profile from "@/app/pages/Profile";
 
 export const componentRegistry = {
   "/search": {
-  component: Search,
-  defaultProps: {
-    width: 545,
-    height: 700,
-    minWidth: 545,
-    minHeight: 700,
-    initialX: 200,
-    initialY: 200,
-  },
+    component: Search,
+    defaultProps: {
+      width: 545,
+      height: 700,
+      minWidth: 545,
+      minHeight: 700,
+      initialX: 200,
+      initialY: 200,
+    },
   },
   "/authentication": {
     component: Authentication,

@@ -2,19 +2,28 @@ import React, { useMemo } from "react";
 import Post from "./Post";
 import { motion } from "framer-motion";
 
-export default function PostList({ posts, windowHeight, windowWidth, windowId }) {
+export default function PostList({
+  posts,
+  windowHeight,
+  windowWidth,
+  windowId,
+  ...props
+}) {
   const minColumnWidth = 300;
   const maxColumns = 4;
 
-  const columns = Math.max(1, Math.min(maxColumns, Math.floor(windowWidth / minColumnWidth)));
+  const columns = Math.max(
+    1,
+    Math.min(maxColumns, Math.floor(windowWidth / minColumnWidth))
+  );
 
   const postListStyle = {
-    display: 'grid',
+    display: "grid",
     gridTemplateColumns: `repeat(${columns}, 1fr)`,
-    gap: '16px',
+    gap: "16px",
     height: windowHeight,
-    overflowY: 'scroll',
-    padding: '16px',
+    overflowY: "scroll",
+    padding: "16px",
   };
 
   const postItems = useMemo(
@@ -26,7 +35,12 @@ export default function PostList({ posts, windowHeight, windowWidth, windowId })
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
         >
-          <Post post={post} windowHeight={windowHeight} windowId={windowId} />
+          <Post
+            post={post}
+            windowHeight={windowHeight}
+            windowId={windowId}
+            {...props}
+          />
         </motion.div>
       )),
     [posts, windowHeight, windowId]
