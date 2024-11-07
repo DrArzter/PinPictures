@@ -4,7 +4,7 @@ import { uploadFiles } from "@/utils/s3Module";
 import { authMiddleware } from "@/middlewares/authMiddleware";
 import formidable from "formidable";
 import fs from "fs/promises";
-import { handleError } from "@/utils/errorHandler"; // Импорт функции для обработки ошибок
+import { handleError } from "@/utils/errorHandler";
 
 export const config = {
   api: {
