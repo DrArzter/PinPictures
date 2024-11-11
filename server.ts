@@ -2,6 +2,7 @@ const express = require('express');
 const next = require('next');
 const http = require('http');
 const { Server } = require('socket.io');
+const cookie = require('cookie');
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
@@ -12,12 +13,35 @@ const port = process.env.PORT || 3000;
 app.prepare().then(() => {
     const expressApp = express();
     const server = http.createServer(expressApp);
-    const io = new Server(server);
+    const io = new Server(server, {
+        cors: {
+            origin: "*",
+            methods: ["GET", "POST"]
+        }
+    });
 
     io.on('connection', (socket) => {
         console.log('New client connected:', socket.id);
 
-        socket.emit('message', 'Hello from Socket.IO!');
+        const cookies = socket.handshake.headers.cookie;
+
+        if (cookies) {
+            const parsedCookies = cookie.parse(cookies);
+            const token = parsedCookies.token;
+
+            if (token) {
+                console.log('Token:', token);
+            } else {
+                console.log('Token not found in cookies.');
+            }
+        } else {
+            console.log('No cookies found in handshake.');
+            socket.disconnect(true);
+        }
+
+        socket.on('getChats', () => {
+            console.log('getChats event received from client:', socket.id);
+        });
 
         socket.on('disconnect', () => {
             console.log('Client disconnected:', socket.id);
@@ -32,8 +56,7 @@ app.prepare().then(() => {
         return handle(req, res);
     });
 
-    server.listen(port, (err) => {
-        if (err) throw err;
-        console.log(`> Ready on http://localhost:${port}`);
+    server.listen(port, () => {
+        console.log(`> Ready on port ${port}`);
     });
 });

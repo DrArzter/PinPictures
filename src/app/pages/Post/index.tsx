@@ -1,29 +1,145 @@
-import React, { useEffect, useState } from "react";
+// DetailedPost.js
+import React, { useEffect, useState, useContext } from "react";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { fetchPost } from "@/app/utils/postUtils";
 import { BsHeart, BsHeartFill, BsChatDots } from "react-icons/bs";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { motion, AnimatePresence } from "framer-motion";
+import ThemeContext from "@/app/contexts/ThemeContext";
+import { useWindowContext } from "@/app/contexts/WindowContext";
+import { useNotificationContext } from "@/app/contexts/NotificationContext";
+import * as api from "@/app/api";
 
-export default function Post({ dynamicProps, windowHeight, windowWidth, user }) {
-  const [loading, setLoading] = useState(true);
+export default function Post({ dynamicProps, windowHeight, windowWidth, user } : any) {
+  const { isDarkMode } = useContext(ThemeContext);
+  const { openWindowByPath } = useWindowContext() as any;
+  const { addNotification } = useNotificationContext() as any;
+
   const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState(0);
-  const [liked, setLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
 
   useEffect(() => {
     const fetchPostData = async () => {
       try {
-        const fetchedPost = await fetchPost(dynamicProps.id);
-        setPost(fetchedPost);
+        const fetchedPost = await fetchPost(dynamicProps.id as any);
+        setPost(fetchedPost as any);
+
+        setLikeCount(fetchedPost._count ? fetchedPost._count.likes : 0 as any);
+        setComments(fetchedPost.comments || [] as any);
+
+        if (user && fetchedPost.likes.some((like : any) => like.userId === user.id)) {
+          setIsLiked(true);
+        }
       } catch (error) {
         console.error("Error fetching post:", error);
+        addNotification({
+          type: "error",
+          message: "Не удалось загрузить пост.",
+        } as any);
       } finally {
-        setLoading(false);
+        setLoading(false as any);
       }
     };
     fetchPostData();
-  }, []);
+  }, [dynamicProps.id, user, addNotification]);
+
+  const handleLikeClick = async () => {
+    if (!user) {
+      addNotification({
+        type: "error",
+        message: "Вы должны войти в систему, чтобы лайкать посты.",
+      });
+      return;
+    }
+
+    try {
+      const response = await api.likePost(post.id as any);
+      if (response.status === "success") {
+        const newLikeState = !isLiked;
+        setIsLiked(newLikeState as any);
+        setLikeCount((prevCount) => prevCount + (newLikeState ? 1 : -1) as any);
+      }
+    } catch (error) {
+      console.error("Error updating like:", error);
+      addNotification({
+        type: "error",
+        message: "Не удалось обновить лайк.",
+      });
+    }
+  };
+
+  const handleImageClick = () => {
+    setCurrentImage((prevIndex : any) =>
+      prevIndex === post.images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const handlePrevImage = (e : any) => {
+    e.stopPropagation();
+    setCurrentImage((prevIndex : any) =>
+      prevIndex === 0 ? post.images.length - 1 : prevIndex - 1
+    );
+  };
+
+  const handleNextImage = (e : any) => {
+    e.stopPropagation();
+    setCurrentImage((prevIndex : any) =>
+      prevIndex === post.images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const handleAddComment = async (e : any) => {
+    e.preventDefault();
+    if (!user) {
+      addNotification({
+        type: "error",
+        message: "Вы должны войти в систему, чтобы добавлять комментарии.",
+      });
+      return;
+    }
+
+    if (newComment.trim() === "") {
+      addNotification({
+        type: "error",
+        message: "Комментарий не может быть пустым.",
+      });
+      return;
+    }
+
+    try {
+      // Заглушка функции добавления комментария
+      // Здесь вы можете вызвать API для добавления комментария
+      console.log("Добавление комментария:", newComment);
+      addNotification({
+        type: "success",
+        message: "Комментарий успешно добавлен (заглушка).",
+      });
+
+      // Обновление списка комментариев локально
+      const addedComment = {
+        id: Date.now(), // временный ID
+        user: {
+          name: user.name,
+          avatar: user.avatar,
+        },
+        text: newComment,
+        createdAt: new Date().toISOString(),
+      };
+      setComments([...comments, addedComment] as any);
+      setNewComment("" as any);
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      addNotification({
+        type: "error",
+        message: "Не удалось добавить комментарий.",
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -41,45 +157,22 @@ export default function Post({ dynamicProps, windowHeight, windowWidth, user }) 
     );
   }
 
-  const prevImage = () => {
-    setCurrentImage((prevIndex) =>
-      prevIndex === 0 ? post.images.length - 1 : prevIndex - 1
-    );
-  };
-
-  const nextImage = () => {
-    setCurrentImage((prevIndex) =>
-      prevIndex === post.images.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
-  const toggleLike = () => {
-    setLiked(!liked);
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0 },
-  };
-
-  const imageVariants = {
-    enter: { opacity: 0, x: 100 },
-    center: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -100 },
-  };
+  const hasMultipleImages = post?.images && post?.images.length > 1;
+  const postContainerClassName = `relative flex flex-col items-center justify-center w-full max-w-3xl p-4 rounded-xl ${
+    isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+  } bg-opacity-20 shadow-xl scrollbar-hidden`;
 
   return (
-    <div className="flex justify-center items-center">
+    <div style={{ height: `${windowHeight - 55}px` }} className="flex justify-center items-center p-4">
       <motion.div
-        className="relative flex flex-col items-center justify-center w-full max-w-3xl p-4 rounded-xl bg-white bg-opacity-20 shadow-xl scrollbar-hidden"
+        className={postContainerClassName}
         style={{ height: `${windowHeight - 55}px`, width: `${windowWidth}px` }}
-        initial="hidden"
-        animate="visible"
-        exit="hidden"
-        variants={containerVariants}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Background animated image */}
+        {/* Фоновое анимированное изображение */}
         <div className="absolute inset-0 overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.img
@@ -97,37 +190,35 @@ export default function Post({ dynamicProps, windowHeight, windowWidth, user }) 
         </div>
 
         <div className="relative z-10 flex flex-col items-center h-full w-full overflow-y-auto scrollbar-hidden">
-          {/* Image Gallery */}
+          {/* Галерея изображений */}
           <div className="relative w-full max-w-4xl">
             <div className="overflow-hidden rounded-2xl shadow-xl">
               <AnimatePresence mode="wait">
                 <motion.img
                   key={currentImage}
-                  src={post.images[currentImage].picpath}
+                  src={post?.images[currentImage].picpath}
                   alt="Post Image"
-                  variants={imageVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.5 }}
                   className="w-full h-auto max-h-[50vh] object-cover cursor-pointer"
                   loading="lazy"
-                  onClick={nextImage}
+                  onClick={handleImageClick}
                 />
               </AnimatePresence>
             </div>
-
-            {post.images.length > 1 && (
+            {hasMultipleImages && (
               <>
                 <button
-                  onClick={prevImage}
-                  className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-black bg-opacity-30 hover:bg-opacity-50 text-white p-3 rounded-full ml-2 focus:outline-none"
+                  onClick={handlePrevImage}
+                  className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white bg-opacity-50 rounded-full p-1"
                 >
                   <AiOutlineLeft size={24} />
                 </button>
                 <button
-                  onClick={nextImage}
-                  className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-black bg-opacity-30 hover:bg-opacity-50 text-white p-3 rounded-full mr-2 focus:outline-none"
+                  onClick={handleNextImage}
+                  className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-white bg-opacity-50 rounded-full p-1"
                 >
                   <AiOutlineRight size={24} />
                 </button>
@@ -135,74 +226,84 @@ export default function Post({ dynamicProps, windowHeight, windowWidth, user }) 
             )}
           </div>
 
-          {post.images.length > 1 && (
-            <div className="flex space-x-2 mt-2">
-              {post.images.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentImage(index)}
-                  className={`h-2 w-8 rounded-full focus:outline-none transition-colors duration-300 ${
-                    index === currentImage ? "bg-white" : "bg-gray-500"
-                  }`}
-                ></button>
-              ))}
-            </div>
-          )}
+          {/* Секция деталей поста */}
+          <motion.div className="p-6 mt-6 w-full max-w-3xl shadow-2xl">
+            {/* Название и описание */}
+            <h1 className="text-2xl font-bold">{post?.name}</h1>
+            <p className="mt-4">{post.description}</p>
 
-          {/* Post Details */}
-          <motion.div
-            className="bg-gray-800 bg-opacity-90 rounded-2xl p-6 mt-6 w-full max-w-3xl shadow-2xl"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-              <h1 className="text-3xl font-extrabold mb-2 sm:mb-0">
-                {post.name}
-              </h1>
-              <p className="text-sm text-gray-300">
-                {new Date(post.createdAt).toLocaleDateString()}
-              </p>
+            {/* Действия: лайк и комментарии */}
+            <div className="flex items-center space-x-4 mt-6">
+              <button onClick={handleLikeClick} className="flex items-center space-x-1">
+                {isLiked ? <BsHeartFill size={22} /> : <BsHeart size={22} />}
+                <span>{likeCount}</span>
+              </button>
+              <button
+                className="flex items-center space-x-1"
+                onClick={() => openWindowByPath(`/post/${post.id}`)}
+              >
+                <BsChatDots size={22} />
+                <span>{post._count.comments}</span>
+              </button>
             </div>
-            <p className="text-base mb-4">{post.description}</p>
 
-            {/* Author Info */}
-            <div className="flex items-center mb-4">
-              <img
-                src={post.author.avatar}
-                alt="Author Avatar"
-                className="w-14 h-14 rounded-full mr-3 border-2 border-white shadow-lg"
-              />
-              <div>
-                <p className="text-xl font-semibold">{post.author.name}</p>
-                {post.author.bio && (
-                  <p className="text-sm text-gray-400">{post.author.bio}</p>
+            {/* Раздел комментариев */}
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold mb-4">Комментарии</h2>
+              <div className="space-y-4 max-h-60 overflow-y-auto">
+                {comments.length > 0 ? (
+                  comments.map((comment) => (
+                    <div key={comment.id} className="flex items-start space-x-3">
+                      <img
+                        src={comment.user.avatar}
+                        alt={comment.user.name}
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <div>
+                        <p className="font-semibold">{comment.user.name}</p>
+                        <p className="text-sm">{comment.text}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(comment.createdAt).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">Нет комментариев. Будьте первым!</p>
                 )}
               </div>
-            </div>
 
-            {/* Actions */}
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={toggleLike}
-                className={`flex items-center space-x-1 transition-colors duration-300 focus:outline-none ${
-                  liked ? "text-red-500" : "hover:text-red-500"
-                }`}
-              >
-                {liked ? <BsHeartFill size={22} /> : <BsHeart size={22} />}
-                <motion.span
-                  key={liked ? "liked" : "unliked"}
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {liked ? post.likesCount + 1 : post.likesCount}
-                </motion.span>
-              </button>
-              <button className="flex items-center space-x-1 hover:text-blue-500 transition-colors duration-300 focus:outline-none">
-                <BsChatDots size={22} />
-                <span>{post.commentsCount || 0}</span>
-              </button>
+              {/* Форма добавления комментария */}
+              <form onSubmit={handleAddComment} className="mt-6 flex items-center space-x-3">
+                <img
+                  src={user?.avatar || "/default-avatar.png"}
+                  alt={user?.name || "User"}
+                  className="w-10 h-10 rounded-full"
+                />
+                {user ? (
+                  <>
+                    <input
+                      type="text"
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="Добавьте комментарий..."
+                      className={`flex-1 px-4 py-2 rounded-lg ${
+                        isDarkMode
+                          ? "bg-gray-700 text-white placeholder-gray-400"
+                          : "bg-gray-100 text-gray-900 placeholder-gray-500"
+                      } focus:outline-none`}
+                    />
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                      Отправить
+                    </button>
+                  </>
+                ) : (
+                  <p className="text-gray-500">Войдите, чтобы оставить комментарий.</p>
+                )}
+              </form>
             </div>
           </motion.div>
         </div>

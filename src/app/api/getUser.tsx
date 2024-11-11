@@ -6,9 +6,14 @@ export default async function getUser() {
       withCredentials: true,
     });
     return response.data.data;
-  } catch (error) {
+  } catch (error: unknown) {
     if (
+      error instanceof Error &&
+      "response" in error &&
       error.response &&
+      typeof error.response === "object" &&
+      "status" in error.response &&
+      "data" in error.response &&
       error.response.status === 401 &&
       error.response.data.message === "No token provided"
     ) {

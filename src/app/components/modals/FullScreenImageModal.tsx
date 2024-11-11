@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 
-export default function FullScreenImage({ imageUrl, onClose }) {
+export default function FullScreenImage({ imageUrl, onClose }: any) {
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: any) => {
       if (event.key === 'Escape') {
         onClose();
       }

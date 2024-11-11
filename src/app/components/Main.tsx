@@ -8,14 +8,14 @@ export default function Main() {
   const [mousePosition, setMousePosition] = React.useState(false);
   const [mouseClickTarget, setMouseClickTarget] = React.useState(false);
 
-  function debug(event) {
+  function debug(event : any) {
     setMouseClickTarget(event.target);
   }
 
   return (
     <main
       className="w-full h-5/6 left-0 right-0 top-1/5 fixed mx-auto my-auto"
-      onMouseMove={(event) => setMousePosition(event)}
+      onMouseMove={(event) => setMousePosition(event as any)}
       onClick={debug}
       onMouseDown={() => setMouseDown(true)}
       onMouseUp={() => setMouseDown(false)}

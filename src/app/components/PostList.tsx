@@ -8,7 +8,7 @@ export default function PostList({
   windowWidth,
   windowId,
   ...props
-}) {
+}: any) {
   const minColumnWidth = 300;
   const maxColumns = 4;
 
@@ -17,18 +17,18 @@ export default function PostList({
     Math.min(maxColumns, Math.floor(windowWidth / minColumnWidth))
   );
 
-  const postListStyle = {
+  const postListStyle: React.CSSProperties = {
     display: "grid",
     gridTemplateColumns: `repeat(${columns}, 1fr)`,
     gap: "16px",
     height: windowHeight,
-    overflowY: "scroll",
+    overflowY: "scroll" as React.CSSProperties["overflowY"], // Ensure correct type
     padding: "16px",
   };
 
   const postItems = useMemo(
     () =>
-      posts.map((post, index) => (
+      posts.map((post: any, index: number) => (
         <motion.div
           key={post.id}
           initial={{ opacity: 0, y: 20 }}

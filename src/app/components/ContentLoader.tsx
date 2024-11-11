@@ -9,12 +9,12 @@ import Artoria from "@/app/resources/Artoria";
 export default function ContentLoader() {
   const [loading, setLoading] = useState(true);
   const [bgImage, setBgImage] = useState("");
-  const { user, userLoading } = useUserContext();
+  const { user, userLoading } = useUserContext() as any;
 
   const placeholderSVG = `data:image/svg+xml;base64,${btoa(Artoria())}`;
 
   useEffect(() => {
-    const loadImage = (imgSrc) => {
+    const loadImage = (imgSrc: any) => {
       const img = new Image();
       img.src = imgSrc;
 

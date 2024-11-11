@@ -1,11 +1,11 @@
 import api from "./axiosApi";
 
-export default async function createPost(Post: Post) {
+export default async function createPost(Post: any) {
   try {
     const formData = new FormData();
 
     // Добавление изображений в FormData
-    Post.images.forEach((image, index) => {
+    Post.images.forEach((image: any, index: number) => {
       formData.append(`image[${index}]`, image);
     });
 

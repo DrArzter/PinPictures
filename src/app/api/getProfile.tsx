@@ -6,9 +6,9 @@ export default async function getProfile(name: string) {
       withCredentials: true,
     });
     return response.data.data;
-  } catch (error) {
-    if (error.response) {
-      console.log("User is not");
+  } catch (error: unknown) {
+    if (error instanceof Error && "response" in error) {
+      console.log("User is not found");
       return null;
     } else {
       console.error("Error fetching user:", error);

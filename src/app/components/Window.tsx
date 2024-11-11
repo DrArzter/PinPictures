@@ -15,13 +15,13 @@ export default function Window({
   windowData: initialWindowData,
   mouseDown,
   mousePosition,
-}) {
-  const { user } = useUserContext();
+} : any) {
+  const { user } = useUserContext() as any;
   const { windows, setWindows, removeWindow, updateWindowPath } =
-    useWindowContext();
+    useWindowContext() as any;
 
   const windowData =
-    windows.find((w) => w.id === initialWindowData.id) || initialWindowData;
+    windows.find((w : any) => w.id === initialWindowData.id) || initialWindowData;
 
   const [pathInput, setPathInput] = useState(windowData.path);
   const [suggestions, setSuggestions] = useState([]);
@@ -39,7 +39,7 @@ export default function Window({
     return { width: 800, height: 600 };
   };
 
-  const handlePathChange = (event) => {
+  const handlePathChange = (event : any) => {
     const newPath = event.target.value;
     setPathInput(newPath);
 
@@ -48,11 +48,11 @@ export default function Window({
       path.toLowerCase().startsWith(newPath.toLowerCase())
     );
 
-    setSuggestions(filteredSuggestions);
+    setSuggestions(filteredSuggestions as any);
     setShowSuggestions(true);
   };
 
-  const handlePathSubmit = (event) => {
+  const handlePathSubmit = (event : any) => {
     if (event.key === "Enter") {
       const matchingComponent = getComponentByPath(
         pathInput,
@@ -71,7 +71,7 @@ export default function Window({
     }
   };
 
-  const handleSuggestionClick = (suggestion) => {
+  const handleSuggestionClick = (suggestion : any) => {
     setPathInput(suggestion);
     setShowSuggestions(false);
     updateWindowPath(windowData.id, suggestion);
@@ -87,7 +87,7 @@ export default function Window({
     y: 0,
   });
 
-  const handleDragMouseDown = (event) => {
+  const handleDragMouseDown = (event : any) => {
     if (event.button === 0) {
       setIsDragging(true);
       setStartPosition({
@@ -97,7 +97,7 @@ export default function Window({
     }
   };
 
-  const handleResizeStart = (event) => {
+  const handleResizeStart = (event : any) => {
     setIsResizing(true);
     setResizeStart({
       width: windowData.width,
@@ -108,7 +108,7 @@ export default function Window({
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event : any) => {
       if (
         inputRef.current &&
         !inputRef.current.contains(event.target) &&
@@ -131,7 +131,7 @@ export default function Window({
     );
     if (updatedWindow) {
       setWindows(
-        windows.map((w) =>
+        windows.map((w : any) =>
           w.id === windowData.id
             ? {
                 ...w,
@@ -163,7 +163,7 @@ export default function Window({
   useEffect(() => {
     if (isDragging && mouseDown) {
       setWindows(
-        windows.map((w) =>
+        windows.map((w : any) =>
           w.id === windowData.id
             ? {
                 ...w,
@@ -182,7 +182,7 @@ export default function Window({
       const { width: maxWidth, height: maxHeight } = getWindowDimensions();
 
       setWindows(
-        windows.map((w) =>
+        windows.map((w : any) =>
           w.id === windowData.id
             ? {
                 ...w,
@@ -234,7 +234,7 @@ export default function Window({
             const { width: windowWidth, height: windowHeight } =
               getWindowDimensions();
             setWindows(
-              windows.map((w) =>
+              windows.map((w : any) =>
                 w.id === windowData.id
                   ? w.fullscreen
                     ? {
@@ -289,7 +289,7 @@ export default function Window({
               onClick={(event) => {
                 event.stopPropagation();
                 setWindows(
-                  windows.map((w) =>
+                  windows.map((w : any) =>
                     w.id === windowData.id ? { ...w, isOpen: !w.isOpen } : w
                   )
                 );
@@ -319,12 +319,12 @@ export default function Window({
       className="absolute bg-white bg-opacity-30 backdrop-blur-3xl border-2 rounded-lg shadow-2xl"
       onMouseDown={(event) => {
         setWindows(
-          windows.map((w) =>
+          windows.map((w : any) =>
             w.id !== windowData.id
               ? { ...w, layer: Math.max(0, w.layer - 1) }
               : {
                   ...w,
-                  layer: Math.max(...windows.map((w2) => w2.layer)) + 1,
+                  layer: Math.max(...windows.map((w2 : any) => w2.layer)) + 1,
                 }
           )
         );

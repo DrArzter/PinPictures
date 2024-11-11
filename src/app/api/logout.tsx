@@ -1,7 +1,6 @@
-import axios from "axios";
 import api from "./axiosApi";
 
-export default async function logout(setUser) {
+export default async function logout(setUser: any) {
   try {
     const response = await api.post(
       "/user/logout",

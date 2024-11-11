@@ -1,6 +1,6 @@
 import React from "react";
 
-export const Logo = ({ isDarkMode }) => {
+export const Logo = ({ isDarkMode } : any) => {
     return (
         <svg
             width="40px"

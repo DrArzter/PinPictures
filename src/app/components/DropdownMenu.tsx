@@ -13,23 +13,24 @@ import Link from "next/link";
 
 import * as api from "@/app/api";
 
-export default function DropdownMenu({ isDropdownOpen, toggleDropdown }) {
-  const { user, setUser } = useUserContext();
-  const { openWindowByPath } = useWindowContext();
-  const dropdownRef = useRef(null);
+export default function DropdownMenu({ isDropdownOpen, toggleDropdown }: any) {
+  const { user, setUser } = useUserContext() as any;
+  const { openWindowByPath } = useWindowContext() as any;
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleClickOutside = (event) => {
+  const handleClickOutside = (event: MouseEvent) => {
     if (
       dropdownRef.current &&
-      !dropdownRef.current.contains(event.target) &&
-      event.target.id !== "user-card"
+      !dropdownRef.current.contains(event.target as Node) &&
+      (event.target as HTMLElement).id !== "user-card"
     ) {
       toggleDropdown();
     }
   };
+  
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: any) => {
       if (event.key === "Escape") {
         toggleDropdown();
       }

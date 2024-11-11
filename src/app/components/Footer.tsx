@@ -20,9 +20,9 @@ interface FooterProps {
 }
 
 export default function Footer() {
-  const { user } = useUserContext();
+  const { user } = useUserContext() as any;
 
-  const { openWindowByPath } = useWindowContext();
+  const { openWindowByPath } = useWindowContext() as any;
 
   const backgroundColor =
     user && user.settings?.bgColor ? `${user.settings.bgColor}` : "#FFFFFF5";
@@ -59,7 +59,7 @@ export default function Footer() {
             <CiSquarePlus
               className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
               onClick={() => {
-                openWindowByPath("/post/create");
+                openWindowByPath("/post/create" as string);
               }}
             />
           ),
@@ -69,7 +69,7 @@ export default function Footer() {
     {
       name: "Message",
       icon: (
-        <AiOutlineMessage className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" onClick={() => {openWindowByPath("/chats")}} />
+        <AiOutlineMessage className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" onClick={() => {openWindowByPath("/chats" as string)}} />
       ),
     },
 
@@ -96,7 +96,7 @@ export default function Footer() {
     },
   ].filter(Boolean);
 
-  const { addNotification } = useNotificationContext();
+  const { addNotification } = useNotificationContext() as any;
 
   const handleButtonClicksex = () => {
     addNotification({
