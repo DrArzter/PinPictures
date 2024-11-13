@@ -4,15 +4,29 @@ import { BsHeart, BsHeartFill, BsChatDots } from "react-icons/bs";
 import ThemeContext from "@/app/contexts/ThemeContext";
 import { useWindowContext } from "@/app/contexts/WindowContext";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
+import type { Post as PostType, User } from "@/app/types/global"; // Импортируем интерфейсы с type-only import
 import * as api from "@/app/api";
 
-export default function Post({ post, windowHeight, windowId, user, ...props } : any) {
+interface PostProps {
+  post: PostType;
+  windowHeight: number;
+  windowId: number;
+  user: User | null;
+}
+
+export default function Post({
+  post,
+  windowHeight,
+  windowId,
+  user,
+  ...props
+}: PostProps) {
   const { isDarkMode } = useContext(ThemeContext);
-  const { openWindowByPath } = useWindowContext() as any;
-  const { addNotification } = useNotificationContext() as any;
+  const { openWindowByPath } = useWindowContext();
+  const { addNotification } = useNotificationContext();
 
   const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(post._count.likes);
+  const [likeCount, setLikeCount] = useState<number>(post._count.likes);
 
   const postHeight = windowHeight * 0.4;
 
@@ -23,31 +37,29 @@ export default function Post({ post, windowHeight, windowId, user, ...props } : 
   }`;
 
   useEffect(() => {
-    if (
-      user &&
-      post.likes &&
-      post.likes.some((like : any) => like.userId === user.id)
-    ) {
+    if (user && post.likes && post.likes.some((like) => like.userId === user.id)) {
       setIsLiked(true);
     }
   }, [post.likes, user]);
 
-  const handlePostClick = (e : any) => {
+  const handlePostClick = (e: React.MouseEvent) => {
     e.preventDefault();
     openWindowByPath(`/post/${post.id}`);
   };
 
-  const handleChildClick = (e : any) => {
+  const handleChildClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
 
-  const handleLikeClick = async (e : any) => {
+  const handleLikeClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
     if (!user) {
       addNotification({
-        type: "error",
+        status: "error", // Используем правильное поле `status`
         message: "You must be logged in to like posts.",
+        time: 5000,
+        clickable: true,
       });
       return;
     }
@@ -57,13 +69,15 @@ export default function Post({ post, windowHeight, windowId, user, ...props } : 
       if (response.status === "success") {
         const newLikeState = !isLiked;
         setIsLiked(newLikeState);
-        setLikeCount((prevCount : any) => prevCount + (newLikeState ? 1 : -1));
+        setLikeCount((prevCount) => prevCount + (newLikeState ? 1 : -1));
       }
     } catch (error) {
       console.error("Error updating like:", error);
       addNotification({
-        type: "error",
+        status: "error",
         message: "Failed to update like.",
+        time: 5000,
+        clickable: false,
       });
     }
   };
@@ -75,10 +89,8 @@ export default function Post({ post, windowHeight, windowId, user, ...props } : 
   const postDescriptionClassName = "text-sm overflow-hidden line-clamp-3";
   const hasMultipleImages = post.images && post.images.length > 1;
   const postActionsClassName = "flex flex-row items-center space-x-4 mt-2";
-  const likeButtonClassName =
-    "flex items-center space-x-1 hover:text-yellow-500";
-  const commentButtonClassName =
-    "flex items-center space-x-1 hover:text-yellow-500";
+  const likeButtonClassName = "flex items-center space-x-1 hover:text-yellow-500";
+  const commentButtonClassName = "flex items-center space-x-1 hover:text-yellow-500";
 
   return (
     <div
@@ -110,16 +122,9 @@ export default function Post({ post, windowHeight, windowId, user, ...props } : 
           </div>
         )}
 
-        <div
-          className={`${
-            isDarkMode ? "bg-gray-700" : "bg-gray-300"
-          } h-[1px] w-full`}
-        />
+        <div className={`${isDarkMode ? "bg-gray-700" : "bg-gray-300"} h-[1px] w-full`} />
 
-        <div
-          className={postContentClassName}
-          onClick={handleChildClick}
-        >
+        <div className={postContentClassName} onClick={handleChildClick}>
           <p className={postDescriptionClassName}>{post.description}</p>
           <div className={postActionsClassName}>
             <button className={likeButtonClassName} onClick={handleLikeClick}>

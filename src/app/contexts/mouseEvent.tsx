@@ -1,10 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, ReactNode, useState, useContext, createContext } from "react";
 
-// Create a context for the mouse state
-const MouseContext = React.createContext();
+interface MouseContextType {
+  mouseDown: boolean;
+}
 
-export const MouseProvider = ({ children }) => {
-  const [mouseDown, setMouseDown] = React.useState(false);
+const MouseContext = createContext<MouseContextType | undefined>(undefined);
+
+interface MouseProviderProps {
+  children: ReactNode;
+}
+
+export const MouseProvider: React.FC<MouseProviderProps> = ({ children }) => {
+  const [mouseDown, setMouseDown] = useState(false);
 
   useEffect(() => {
     const handleMouseDown = () => {
@@ -31,4 +38,10 @@ export const MouseProvider = ({ children }) => {
   );
 };
 
-export const useMouseContext = () => React.useContext(MouseContext);
+export const useMouseContext = (): MouseContextType => {
+  const context = useContext(MouseContext);
+  if (!context) {
+    throw new Error("useMouseContext must be used within a MouseProvider");
+  }
+  return context;
+};

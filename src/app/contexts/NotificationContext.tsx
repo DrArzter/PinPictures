@@ -1,19 +1,27 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, ReactNode } from "react";
+import { Notification } from "@/app/types/global";
 
-// Create a context for the notifications
-const NotificationContext = React.createContext();
+// Создаем контекст для уведомлений
+interface NotificationContextType {
+  notifications: Notification[];
+  addNotification: (notification: Notification) => void;
+  removeNotification: (index: number) => void;
+}
 
-export const NotificationProvider = ({ children }) => {
-  const [notifications, setNotifications] = useState([]);
+const NotificationContext = React.createContext<NotificationContextType | undefined>(undefined);
 
-  const addNotification = (notification) => {
-    setNotifications((prevNotifications) => [
-      ...prevNotifications,
-      notification,
-    ]);
+interface NotificationProviderProps {
+  children: ReactNode;
+}
+
+export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const addNotification = (notification: Notification) => {
+    setNotifications((prevNotifications) => [...prevNotifications, notification]);
   };
 
-  const removeNotification = (index) => {
+  const removeNotification = (index: number) => {
     setNotifications((prevNotifications) =>
       prevNotifications.filter((_, i) => i !== index)
     );
@@ -28,4 +36,10 @@ export const NotificationProvider = ({ children }) => {
   );
 };
 
-export const useNotificationContext = () => useContext(NotificationContext);
+export const useNotificationContext = (): NotificationContextType => {
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error("useNotificationContext must be used within a NotificationProvider");
+  }
+  return context;
+};

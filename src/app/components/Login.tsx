@@ -1,5 +1,15 @@
 "use client";
-import React, { useContext } from "react";
+import React from "react";
+
+interface LoginProps {
+  username: string;
+  setUsername: (value: string) => void;
+  password: string;
+  setPassword: (value: string) => void;
+  handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  toggleRegistration: () => void;
+  toggleForgotPassword: () => void;
+}
 
 export default function Login({
   username,
@@ -9,7 +19,7 @@ export default function Login({
   handleSubmit,
   toggleRegistration,
   toggleForgotPassword,
-} : any) {
+}: LoginProps) {
   const containerClassName = `flex flex-col items-center w-full max-w-md gap-6 p-8 sm:p-16`;
 
   const inputClassName = `w-full p-2 border rounded text-black`;
@@ -31,7 +41,7 @@ export default function Login({
             type="text"
             placeholder="Enter your email..."
             value={username}
-            onChange={(e : any) => setUsername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
             className={inputClassName}
           />
         </div>
@@ -41,7 +51,7 @@ export default function Login({
             type="password"
             placeholder="Enter your password..."
             value={password}
-            onChange={(e : any) => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             className={inputClassName}
           />
         </div>

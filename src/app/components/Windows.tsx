@@ -3,12 +3,12 @@ import React from "react";
 import Window from "./Window";
 import { useWindowContext } from "@/app/contexts/WindowContext";
 
-export default function Windows({ mouseDown, mousePosition } : any) {
-  const { windows } = useWindowContext() as any;
+export default function Windows({ mouseDown, mousePosition }: { mouseDown: boolean; mousePosition: { clientX: number; clientY: number } }) {
+  const { windows } = useWindowContext();
 
   return (
     <div>
-      {windows.map((win : any) => (
+      {windows.map((win) => (
         <Window
           key={win.id}
           windowData={win}

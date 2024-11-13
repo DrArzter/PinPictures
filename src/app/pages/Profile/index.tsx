@@ -4,7 +4,15 @@ import { FaEnvelope, FaRegClock, FaHeart } from "react-icons/fa";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { getProfile } from "@/app/api";
 
-export default function Profile({ dynamicProps, windowWidth, windowHeight }) {
+import { User } from "@/app/types/global";
+
+interface ProfileProps {
+  dynamicProps: User;
+  windowWidth: number;
+  windowHeight: number;
+}
+
+export default function Profile({ dynamicProps, windowWidth, windowHeight }: ProfileProps) {
   const { name } = dynamicProps;
   const [userProfile, setUserProfile] = useState(null);
 

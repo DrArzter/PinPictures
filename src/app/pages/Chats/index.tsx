@@ -1,11 +1,24 @@
 // components/Chats.js
 import React, { useEffect, useState } from "react";
 import { useSocketContext } from "@/app/contexts/SocketContext";
+import { User } from "@/app/types/global";
 
 import ChatList from "@/app/components/ChatList";
 import Chat from "@/app/components/Chat";
 
-export default function Chats({ windowHeight, windowWidth, windowId, user }) {
+interface ChatsProprs {
+  windowHeight: number;
+  windowWidth: number;
+  windowId: number;
+  user: User;
+}
+
+export default function Chats({
+  windowHeight,
+  windowWidth,
+  windowId,
+  user,
+}: ChatsProprs) {
   const { socket } = useSocketContext();
   const [chats, setChats] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
@@ -34,10 +47,16 @@ export default function Chats({ windowHeight, windowWidth, windowId, user }) {
       className="flex flex-col items-center justify-center scrollbar-hidden p-4"
     >
       <div className="flex flex-row w-full h-full gap-2">
-        <div style={{ width: `${windowWidth / 12 * 3}px` }} className="rounded-2xl bg-gray-800 p-2">
+        <div
+          style={{ width: `${(windowWidth / 12) * 3}px` }}
+          className="rounded-2xl bg-gray-800 p-2"
+        >
           <ChatList chats={chats} user={user} />
         </div>
-        <div style={{ width: `${windowWidth / 12 * 9}px` }} className="p-2 rounded-2xl bg-gray-800 ">
+        <div
+          style={{ width: `${(windowWidth / 12) * 9}px` }}
+          className="p-2 rounded-2xl bg-gray-800 "
+        >
           <Chat user={user} chat={activeChat} />
         </div>
       </div>

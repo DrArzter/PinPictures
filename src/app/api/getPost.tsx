@@ -1,10 +1,11 @@
 import api from "./axiosApi";
+import { GetPostResponse, Post } from "@/app/types/global";
 
-export default async function getPost(id: number) {
+export default async function getPost(id: number): Promise<Post> {
   try {
-    const response = await api.get(`/post/id/${id}`);
+    const response = await api.get<GetPostResponse>(`/post/id/${id}`);
     return response.data.post;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error fetching posts:", error);
     throw error;
   }

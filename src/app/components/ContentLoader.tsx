@@ -5,16 +5,18 @@ import Home from "@/app/home";
 import LoadingIndicator from "./LoadingIndicator";
 
 import Artoria from "@/app/resources/Artoria";
+import { User } from "@/app/types/global"; // Предполагаем, что интерфейс User определен в global.d.ts
 
 export default function ContentLoader() {
-  const [loading, setLoading] = useState(true);
-  const [bgImage, setBgImage] = useState("");
-  const { user, userLoading } = useUserContext() as any;
+  const [loading, setLoading] = useState<boolean>(true);
+  const [bgImage, setBgImage] = useState<string>("");
+
+  const { user, userLoading } = useUserContext() as { user: User | null; userLoading: boolean };
 
   const placeholderSVG = `data:image/svg+xml;base64,${btoa(Artoria())}`;
 
   useEffect(() => {
-    const loadImage = (imgSrc: any) => {
+    const loadImage = (imgSrc: string) => {
       const img = new Image();
       img.src = imgSrc;
 
@@ -32,12 +34,13 @@ export default function ContentLoader() {
       };
     };
 
-    let imgSrc =
-      "https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg";
+    // Устанавливаем исходное изображение по умолчанию
+    let imgSrc: string = "https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg";
     if (user && user.uiBackground) {
       imgSrc = user.uiBackground;
     }
 
+    // Загружаем изображение только если userLoading завершен
     if (!userLoading) {
       loadImage(imgSrc);
     }

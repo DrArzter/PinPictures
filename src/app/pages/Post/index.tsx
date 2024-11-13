@@ -10,7 +10,21 @@ import { useWindowContext } from "@/app/contexts/WindowContext";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import * as api from "@/app/api";
 
-export default function Post({ dynamicProps, windowHeight, windowWidth, user } : any) {
+import { Post as PostType, User } from "@/app/types/global";
+
+interface PostProps {
+  dynamicProps: PostType;
+  windowHeight: number;
+  windowWidth: number;
+  user: User | null;
+}
+
+export default function Post({
+  dynamicProps,
+  windowHeight,
+  windowWidth,
+  user,
+}: any) {
   const { isDarkMode } = useContext(ThemeContext);
   const { openWindowByPath } = useWindowContext() as any;
   const { addNotification } = useNotificationContext() as any;
@@ -29,10 +43,15 @@ export default function Post({ dynamicProps, windowHeight, windowWidth, user } :
         const fetchedPost = await fetchPost(dynamicProps.id as any);
         setPost(fetchedPost as any);
 
-        setLikeCount(fetchedPost._count ? fetchedPost._count.likes : 0 as any);
-        setComments(fetchedPost.comments || [] as any);
+        setLikeCount(
+          fetchedPost._count ? fetchedPost._count.likes : (0 as any)
+        );
+        setComments(fetchedPost.comments || ([] as any));
 
-        if (user && fetchedPost.likes.some((like : any) => like.userId === user.id)) {
+        if (
+          user &&
+          fetchedPost.likes.some((like: any) => like.userId === user.id)
+        ) {
           setIsLiked(true);
         }
       } catch (error) {
@@ -62,7 +81,9 @@ export default function Post({ dynamicProps, windowHeight, windowWidth, user } :
       if (response.status === "success") {
         const newLikeState = !isLiked;
         setIsLiked(newLikeState as any);
-        setLikeCount((prevCount) => prevCount + (newLikeState ? 1 : -1) as any);
+        setLikeCount(
+          (prevCount) => (prevCount + (newLikeState ? 1 : -1)) as any
+        );
       }
     } catch (error) {
       console.error("Error updating like:", error);
@@ -74,26 +95,26 @@ export default function Post({ dynamicProps, windowHeight, windowWidth, user } :
   };
 
   const handleImageClick = () => {
-    setCurrentImage((prevIndex : any) =>
+    setCurrentImage((prevIndex: any) =>
       prevIndex === post.images.length - 1 ? 0 : prevIndex + 1
     );
   };
 
-  const handlePrevImage = (e : any) => {
+  const handlePrevImage = (e: any) => {
     e.stopPropagation();
-    setCurrentImage((prevIndex : any) =>
+    setCurrentImage((prevIndex: any) =>
       prevIndex === 0 ? post.images.length - 1 : prevIndex - 1
     );
   };
 
-  const handleNextImage = (e : any) => {
+  const handleNextImage = (e: any) => {
     e.stopPropagation();
-    setCurrentImage((prevIndex : any) =>
+    setCurrentImage((prevIndex: any) =>
       prevIndex === post.images.length - 1 ? 0 : prevIndex + 1
     );
   };
 
-  const handleAddComment = async (e : any) => {
+  const handleAddComment = async (e: any) => {
     e.preventDefault();
     if (!user) {
       addNotification({
@@ -163,7 +184,10 @@ export default function Post({ dynamicProps, windowHeight, windowWidth, user } :
   } bg-opacity-20 shadow-xl scrollbar-hidden`;
 
   return (
-    <div style={{ height: `${windowHeight - 55}px` }} className="flex justify-center items-center p-4">
+    <div
+      style={{ height: `${windowHeight - 55}px` }}
+      className="flex justify-center items-center p-4"
+    >
       <motion.div
         className={postContainerClassName}
         style={{ height: `${windowHeight - 55}px`, width: `${windowWidth}px` }}
@@ -234,7 +258,10 @@ export default function Post({ dynamicProps, windowHeight, windowWidth, user } :
 
             {/* Действия: лайк и комментарии */}
             <div className="flex items-center space-x-4 mt-6">
-              <button onClick={handleLikeClick} className="flex items-center space-x-1">
+              <button
+                onClick={handleLikeClick}
+                className="flex items-center space-x-1"
+              >
                 {isLiked ? <BsHeartFill size={22} /> : <BsHeart size={22} />}
                 <span>{likeCount}</span>
               </button>
@@ -253,7 +280,10 @@ export default function Post({ dynamicProps, windowHeight, windowWidth, user } :
               <div className="space-y-4 max-h-60 overflow-y-auto">
                 {comments.length > 0 ? (
                   comments.map((comment) => (
-                    <div key={comment.id} className="flex items-start space-x-3">
+                    <div
+                      key={comment.id}
+                      className="flex items-start space-x-3"
+                    >
                       <img
                         src={comment.user.avatar}
                         alt={comment.user.name}
@@ -269,12 +299,17 @@ export default function Post({ dynamicProps, windowHeight, windowWidth, user } :
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500">Нет комментариев. Будьте первым!</p>
+                  <p className="text-gray-500">
+                    Нет комментариев. Будьте первым!
+                  </p>
                 )}
               </div>
 
               {/* Форма добавления комментария */}
-              <form onSubmit={handleAddComment} className="mt-6 flex items-center space-x-3">
+              <form
+                onSubmit={handleAddComment}
+                className="mt-6 flex items-center space-x-3"
+              >
                 <img
                   src={user?.avatar || "/default-avatar.png"}
                   alt={user?.name || "User"}
@@ -301,7 +336,9 @@ export default function Post({ dynamicProps, windowHeight, windowWidth, user } :
                     </button>
                   </>
                 ) : (
-                  <p className="text-gray-500">Войдите, чтобы оставить комментарий.</p>
+                  <p className="text-gray-500">
+                    Войдите, чтобы оставить комментарий.
+                  </p>
                 )}
               </form>
             </div>

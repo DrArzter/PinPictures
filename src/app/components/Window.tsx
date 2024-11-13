@@ -10,25 +10,32 @@ import { useUserContext } from "@/app/contexts/UserContext";
 import { componentRegistry } from "@/app/utils/componentRegistry";
 
 import IconList from "./IconList";
+import { Window as WindowType } from "@/app/types/global"; // Импорт интерфейса
+
+interface WindowProps {
+  windowData: WindowType;
+  mouseDown: boolean;
+  mousePosition: { clientX: number; clientY: number };
+}
 
 export default function Window({
   windowData: initialWindowData,
   mouseDown,
   mousePosition,
-} : any) {
-  const { user } = useUserContext() as any;
+}: WindowProps) {
+  const { user } = useUserContext();
   const { windows, setWindows, removeWindow, updateWindowPath } =
-    useWindowContext() as any;
+    useWindowContext();
 
   const windowData =
-    windows.find((w : any) => w.id === initialWindowData.id) || initialWindowData;
+    windows.find((w) => w.id === initialWindowData.id) || initialWindowData;
 
   const [pathInput, setPathInput] = useState(windowData.path);
-  const [suggestions, setSuggestions] = useState([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const inputRef = useRef(null);
-  const suggestionsListRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const suggestionsListRef = useRef<HTMLUListElement | null>(null);
 
   const getWindowDimensions = () => {
     if (typeof window !== "undefined") {
@@ -39,7 +46,7 @@ export default function Window({
     return { width: 800, height: 600 };
   };
 
-  const handlePathChange = (event : any) => {
+  const handlePathChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newPath = event.target.value;
     setPathInput(newPath);
 
@@ -48,11 +55,11 @@ export default function Window({
       path.toLowerCase().startsWith(newPath.toLowerCase())
     );
 
-    setSuggestions(filteredSuggestions as any);
+    setSuggestions(filteredSuggestions);
     setShowSuggestions(true);
   };
 
-  const handlePathSubmit = (event : any) => {
+  const handlePathSubmit = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       const matchingComponent = getComponentByPath(
         pathInput,
@@ -71,7 +78,7 @@ export default function Window({
     }
   };
 
-  const handleSuggestionClick = (suggestion : any) => {
+  const handleSuggestionClick = (suggestion: string) => {
     setPathInput(suggestion);
     setShowSuggestions(false);
     updateWindowPath(windowData.id, suggestion);
@@ -87,7 +94,7 @@ export default function Window({
     y: 0,
   });
 
-  const handleDragMouseDown = (event : any) => {
+  const handleDragMouseDown = (event: React.MouseEvent) => {
     if (event.button === 0) {
       setIsDragging(true);
       setStartPosition({
@@ -97,7 +104,7 @@ export default function Window({
     }
   };
 
-  const handleResizeStart = (event : any) => {
+  const handleResizeStart = (event: React.MouseEvent) => {
     setIsResizing(true);
     setResizeStart({
       width: windowData.width,
@@ -108,12 +115,12 @@ export default function Window({
   };
 
   useEffect(() => {
-    const handleClickOutside = (event : any) => {
+    const handleClickOutside = (event: MouseEvent) => {
       if (
         inputRef.current &&
-        !inputRef.current.contains(event.target) &&
+        !inputRef.current.contains(event.target as Node) &&
         (!suggestionsListRef.current ||
-          !suggestionsListRef.current.contains(event.target))
+          !suggestionsListRef.current.contains(event.target as Node))
       ) {
         setShowSuggestions(false);
       }
@@ -131,7 +138,7 @@ export default function Window({
     );
     if (updatedWindow) {
       setWindows(
-        windows.map((w : any) =>
+        windows.map((w) =>
           w.id === windowData.id
             ? {
                 ...w,
@@ -163,7 +170,7 @@ export default function Window({
   useEffect(() => {
     if (isDragging && mouseDown) {
       setWindows(
-        windows.map((w : any) =>
+        windows.map((w) =>
           w.id === windowData.id
             ? {
                 ...w,
@@ -182,7 +189,7 @@ export default function Window({
       const { width: maxWidth, height: maxHeight } = getWindowDimensions();
 
       setWindows(
-        windows.map((w : any) =>
+        windows.map((w) =>
           w.id === windowData.id
             ? {
                 ...w,
@@ -234,7 +241,7 @@ export default function Window({
             const { width: windowWidth, height: windowHeight } =
               getWindowDimensions();
             setWindows(
-              windows.map((w : any) =>
+              windows.map((w) =>
                 w.id === windowData.id
                   ? w.fullscreen
                     ? {
@@ -289,7 +296,7 @@ export default function Window({
               onClick={(event) => {
                 event.stopPropagation();
                 setWindows(
-                  windows.map((w : any) =>
+                  windows.map((w) =>
                     w.id === windowData.id ? { ...w, isOpen: !w.isOpen } : w
                   )
                 );
@@ -307,7 +314,7 @@ export default function Window({
 
   return (
     <div
-      key={windowData.path} // Add path as key to trigger rerender on path change
+      key={windowData.path}
       style={{
         width: `${windowData.width}px`,
         height: `${windowData.height}px`,
@@ -319,12 +326,12 @@ export default function Window({
       className="absolute bg-white bg-opacity-30 backdrop-blur-3xl border-2 rounded-lg shadow-2xl"
       onMouseDown={(event) => {
         setWindows(
-          windows.map((w : any) =>
+          windows.map((w) =>
             w.id !== windowData.id
               ? { ...w, layer: Math.max(0, w.layer - 1) }
               : {
                   ...w,
-                  layer: Math.max(...windows.map((w2 : any) => w2.layer)) + 1,
+                  layer: Math.max(...windows.map((w2) => w2.layer)) + 1,
                 }
           )
         );

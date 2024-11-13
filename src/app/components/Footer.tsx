@@ -1,6 +1,5 @@
 "use client";
-import React, { useEffect, use } from "react";
-
+import React from "react";
 import IconList from "./IconList";
 
 import { FaBell } from "react-icons/fa";
@@ -13,19 +12,14 @@ import { BsFillFileEarmarkPostFill } from "react-icons/bs";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useWindowContext } from "@/app/contexts/WindowContext";
 import { useUserContext } from "@/app/contexts/UserContext";
-
-interface FooterProps {
-  windows: Window[];
-  setWindows: React.Dispatch<React.SetStateAction<Window[]>>;
-}
+import { User, Notification } from "@/app/types/global"; // Импортируем интерфейс User, если он уже определен
 
 export default function Footer() {
-  const { user } = useUserContext() as any;
+  const { user } = useUserContext() as { user: User | null };
 
-  const { openWindowByPath } = useWindowContext() as any;
+  const { openWindowByPath } = useWindowContext() as { openWindowByPath: (path: string) => void };
 
-  const backgroundColor =
-    user && user.settings?.bgColor ? `${user.settings.bgColor}` : "#FFFFFF5";
+  const backgroundColor = user && user.settings?.bgColor ? `${user.settings.bgColor}` : "#FFFFFF5";
 
   const iconList = [
     {
@@ -59,7 +53,7 @@ export default function Footer() {
             <CiSquarePlus
               className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
               onClick={() => {
-                openWindowByPath("/post/create" as string);
+                openWindowByPath("/post/create");
               }}
             />
           ),
@@ -69,7 +63,12 @@ export default function Footer() {
     {
       name: "Message",
       icon: (
-        <AiOutlineMessage className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300" onClick={() => {openWindowByPath("/chats" as string)}} />
+        <AiOutlineMessage
+          className="w-8 h-8 text-white hover:transform hover:scale-110 hover:cursor-pointer transition duration-300"
+          onClick={() => {
+            openWindowByPath("/chats");
+          }}
+        />
       ),
     },
 
@@ -96,7 +95,7 @@ export default function Footer() {
     },
   ].filter(Boolean);
 
-  const { addNotification } = useNotificationContext() as any;
+  const { addNotification } = useNotificationContext() as { addNotification: (notification: Notification) => void };
 
   const handleButtonClicksex = () => {
     addNotification({

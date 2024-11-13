@@ -1,15 +1,23 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, ReactNode } from "react";
 
-const ThemeContext = createContext({
+// Интерфейс для значений контекста
+interface ThemeContextType {
+  isDarkMode: boolean;
+  toggleTheme: () => void;
+}
+
+// Создаем контекст с типами по умолчанию
+const ThemeContext = createContext<ThemeContextType>({
   isDarkMode: false,
   toggleTheme: () => {},
-  isMobile: false,
-  setIsMobile: () => {},
 });
 
-export const ThemeProvider = ({ children }) => {
+interface ThemeProviderProps {
+  children: ReactNode;
+}
+
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const isDarkModeStorage = localStorage.getItem("DarkTheme");
@@ -24,7 +32,7 @@ export const ThemeProvider = ({ children }) => {
   };
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleTheme, isMobile }}>
+    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

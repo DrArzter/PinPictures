@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
+import { User } from "@/app/types/global";
 
-export default function ChatList({ chats, user } : any) {
+interface ChatListProps {
+  user: User;
+  chats: any;
+}
+
+export default function ChatList({ chats, user } : ChatListProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredChats = chats.filter((chat : any) =>

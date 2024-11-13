@@ -10,11 +10,17 @@ import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useUserContext } from "@/app/contexts/UserContext";
 import { useWindowContext } from "@/app/contexts/WindowContext";
 
+interface AuthenticationProps {
+  windowId: number;
+  windowHeight: number;
+  windowWidth: number;
+}
+
 export default function Authentication({
   windowId,
   windowHeight,
   windowWidth,
-}) {
+}: AuthenticationProps) {
   const [isRegistration, setIsRegistration] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
 
@@ -35,20 +41,23 @@ export default function Authentication({
 
       if (isRegistration) {
         response = await api.registration(username, email, password);
-        if (response.status === "success") {
+        if (response && response.status === "success") {
+          // Проверка на наличие response
           setIsRegistration(false);
           setUser(response.user);
           removeWindow(windowId);
         }
       } else if (isForgotPassword) {
         response = await api.forgotPassword(email);
-        if (response.status === "success") {
+        if (response && response.status === "success") {
+          // Проверка на наличие response
           setIsForgotPassword(false);
         }
       } else {
         setUserLoading(true);
         response = await api.login(username, password);
-        if (response.status === "success") {
+        if (response && response.status === "success") {
+          // Проверка на наличие response
           const userData = await api.getUser();
           setUser(userData);
           removeWindow(windowId);
@@ -56,12 +65,24 @@ export default function Authentication({
         setUserLoading(false);
       }
 
-      addNotification({
-        status: response.status,
-        message: response.message,
-      });
+      // Убедимся, что response не undefined перед добавлением уведомления
+      if (response) {
+        addNotification({
+          status: response.status,
+          message: response.message,
+          time: 5000,
+          clickable: false,
+        });
+      }
     } catch (error) {
       console.error("Error during authentication:", error);
+      // Добавим уведомление об ошибке, если catch блок отработает
+      addNotification({
+        status: "error",
+        message: "An error occurred during authentication.",
+        time: 5000,
+        clickable: false,
+      });
     }
   };
 

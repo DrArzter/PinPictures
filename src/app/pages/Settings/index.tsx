@@ -5,9 +5,15 @@ import { useUserContext } from "@/app/contexts/UserContext";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { motion } from "framer-motion";
 
+import { User } from "@/app/types/global";
 import patchUser from "@/app/api/updateUser";
 
-export default function Settings({ windowHeight, windowWidth }) {
+interface SettingsProps {
+  windowHeight: number;
+  windowWidth: number;
+}
+
+export default function Settings({ windowHeight, windowWidth }: SettingsProps) {
   const [loading, setLoading] = useState(true);
   const { user, setUser } = useUserContext();
   const [selectedImage, setSelectedImage] = useState<string | null>(
@@ -18,21 +24,30 @@ export default function Settings({ windowHeight, windowWidth }) {
   const [changeUiBGVisible, setChangeUiBGVisible] = useState(false);
   const [alpha, setAlpha] = useState(1);
 
-  const handleColorChange = (e) => {
+  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setColor(e.target.value);
   };
 
-  const handleAlphaChange = (e) => {
-    setAlpha(e.target.value);
+  const handleAlphaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAlpha(Number(e.target.value)); // Ensure value is treated as a number
   };
 
   useEffect(() => {
     setLoading(false);
   }, [user]);
 
-  const handleSubmitUIBGChange = async (event) => {
+  // Обработчик для изменения фона UI
+  const handleSubmitUIBGChange = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
-    const file = event.target[0]?.files[0];
+
+    // Приведение типа, чтобы TypeScript знал, что event.target — это HTMLFormElement
+    const fileInput = event.target instanceof HTMLFormElement
+      ? (event.target.elements[0] as HTMLInputElement) // Извлекаем первый элемент формы
+      : null;
+      
+    const file = fileInput?.files?.[0];
     if (!file) return;
 
     const formData = new FormData();
@@ -46,7 +61,10 @@ export default function Settings({ windowHeight, windowWidth }) {
     }
   };
 
-  const handleSubmitColorChange = async (event) => {
+  // Обработчик для изменения цвета UI
+  const handleSubmitColorChange = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
     const formData = new FormData();
     const colorWithAlpha = `${color}${Math.round(alpha * 255)
@@ -60,8 +78,9 @@ export default function Settings({ windowHeight, windowWidth }) {
     }
   };
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
+  // Обработчик для выбора нового изображения
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]; // Безопасное извлечение файла
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -75,10 +94,10 @@ export default function Settings({ windowHeight, windowWidth }) {
     document.getElementById("fileInput")?.click();
   };
 
-  const containerStyle = {
+  const containerStyle: React.CSSProperties = {
     width: windowWidth - 10,
     height: windowHeight - 55,
-    overflowY: "auto",
+    overflowY: "auto", // Это допустимо как строка
   };
 
   return (
@@ -107,7 +126,7 @@ export default function Settings({ windowHeight, windowWidth }) {
           {changeUiBGVisible && (
             <form
               className="flex flex-row items-center justify-center gap-2 w-full"
-              onSubmit={handleSubmitUIBGChange}
+              onSubmit={handleSubmitUIBGChange} // onSubmit используется для формы
             >
               <input
                 id="fileInput"
@@ -135,7 +154,7 @@ export default function Settings({ windowHeight, windowWidth }) {
               </div>
 
               <button
-                type="submit"
+                type="submit" // Кнопка отправляет форму, активируя onSubmit
                 className="w-24 py-2 rounded-3xl bg-lime-500"
               >
                 Save
@@ -170,7 +189,8 @@ export default function Settings({ windowHeight, windowWidth }) {
                   <div
                     style={{ backgroundColor: color }}
                     onClick={(e) => {
-                      e.target.parentElement.querySelector("input").click();
+                      const target = e.target as HTMLElement;
+                      target.parentElement?.querySelector("input")?.click();
                     }}
                     className="w-12 h-12 rounded-full border-none cursor-pointer shadow-xl hover:shadow-inner"
                   />
@@ -194,8 +214,8 @@ export default function Settings({ windowHeight, windowWidth }) {
                   </span>
                 </div>
                 <button
+                  type="submit"
                   className="w-24 py-2 rounded-3xl bg-lime-500"
-                  onClick={handleSubmitColorChange}
                 >
                   Save
                 </button>

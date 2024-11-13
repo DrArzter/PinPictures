@@ -1,10 +1,17 @@
-// contexts/SocketContext.js
-import React, { createContext, useContext, useEffect, useState } from "react";
-import io from "socket.io-client";
+// contexts/SocketContext.tsx
+import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { io, Socket } from "socket.io-client";
 
-export const SocketContext = createContext();
+// Интерфейс для значений контекста
+interface SocketContextType {
+  socket: Socket | null;
+  setSocket: React.Dispatch<React.SetStateAction<Socket | null>>;
+}
 
-export const useSocketContext = () => {
+export const SocketContext = createContext<SocketContextType | undefined>(undefined);
+
+// Кастомный хук для использования SocketContext
+export const useSocketContext = (): SocketContextType => {
   const context = useContext(SocketContext);
   if (!context) {
     throw new Error("useSocketContext must be used within a SocketProvider");
@@ -12,11 +19,17 @@ export const useSocketContext = () => {
   return context;
 };
 
-export const SocketProvider = ({ children }) => {
-  const [socket, setSocket] = useState(null);
+// Интерфейс для пропсов SocketProvider
+interface SocketProviderProps {
+  children: ReactNode;
+}
+
+export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const socketIo = io();
+    // Указываем URL или конфигурацию для `io()`
+    const socketIo = io("http://localhost:3000"); // Замените на актуальный URL сервера
 
     socketIo.on("connect", () => {
       console.log("Successfully connected to server Socket.IO");

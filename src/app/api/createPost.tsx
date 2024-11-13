@@ -1,29 +1,56 @@
 import api from "./axiosApi";
+import {
+  PostData,
+  CreatePostResponse,
+  ApiResponse,
+  NewPost,
+} from "@/app/types/global";
+import { AxiosError } from "axios";
 
-export default async function createPost(Post: any) {
+export default async function createPost(
+  post: PostData
+): Promise<ApiResponse<NewPost>> {
   try {
     const formData = new FormData();
 
-    // Добавление изображений в FormData
-    Post.images.forEach((image: any, index: number) => {
+    post.images.forEach((image, index) => {
       formData.append(`image[${index}]`, image);
     });
 
-    // Добавление других данных в FormData (если нужно)
-    formData.append("name", Post.name);
-    formData.append("description", Post.description);
+    formData.append("name", post.name);
+    formData.append("description", post.description);
 
-    // Отправка данных на сервер
-    const response = await api.post("/post", formData, {
-      withCredentials: true, // Передача куки при необходимости
+    const response = await api.post<CreatePostResponse>("/post", formData, {
+      withCredentials: true,
     });
 
-    return response?.data;
-  } catch (error: any) {
-    console.error(
-      "Error creating post:",
-      error.response?.data || error.message
-    );
-    throw error;
+    return {
+      status: "success",
+      message: "Post created successfully",
+      data: response.data.newPost,
+    };
+  } catch (error: unknown) {
+    if (error instanceof AxiosError && error.response) {
+      console.error(
+        "Error creating post:",
+        error.response.data || error.message
+      );
+
+      return {
+        status: "error",
+        message:
+          error.response.data?.message ||
+          "An error occurred while creating the post",
+        data: {} as NewPost,
+      };
+    } else {
+      console.error("Unexpected error:", error);
+
+      return {
+        status: "error",
+        message: "An unexpected error occurred",
+        data: {} as NewPost,
+      };
+    }
   }
 }

@@ -1,18 +1,26 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SlMagnifier } from "react-icons/sl";
 import { motion, AnimatePresence } from "framer-motion";
 
 import PostList from "@/app/components/PostList";
-
 import * as api from "@/app/api";
+import { User } from "@/app/types/global";
 
-export default function Search({ windowHeight, windowWidth, windowId }) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [searchPosts, setSearchPosts] = useState([]);
-  const [searchUsers, setSearchUsers] = useState([]);
+interface SearchProps {
+  windowHeight: number;
+  windowWidth: number;
+  windowId: number;
+  user: User | null;
+}
 
-  const handleSearch = (e) => {
+export default function Search({ windowHeight, windowWidth, windowId, user }: SearchProps) {
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [searchPosts, setSearchPosts] = useState<any[]>([]);
+  const [searchUsers, setSearchUsers] = useState<any[]>([]);
+
+  // Handle the form submission and search
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!searchTerm) return;
     setLoading(true);
@@ -45,7 +53,7 @@ export default function Search({ windowHeight, windowWidth, windowId }) {
         style={{ width: `${windowWidth * 0.8}px` }}
       >
         <motion.form
-          onSubmit={handleSearch}
+          onSubmit={handleSearch}  // Use only onSubmit here
           className={searchBarClassName}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -64,9 +72,8 @@ export default function Search({ windowHeight, windowWidth, windowId }) {
             style={{ width: "75%" }}
           />
           <motion.button
-            type="submit"
+            type="submit"  // This button triggers the form submission
             className={searchIconContainerClassName}
-            onClick={handleSearch}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
@@ -98,6 +105,7 @@ export default function Search({ windowHeight, windowWidth, windowId }) {
                 windowHeight={windowHeight}
                 windowWidth={windowWidth}
                 windowId={windowId}
+                user={user}
               />
             </motion.div>
           )}

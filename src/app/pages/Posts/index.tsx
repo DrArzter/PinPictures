@@ -4,6 +4,8 @@ import PostList from "@/app/components/PostList";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import NoPostsFound from "@/app/components/NoPostsFound";
 
+import { User } from "@/app/types/global";
+
 import * as postUtils from "@/app/utils/postUtils";
 
 const debounce = (func, wait) => {
@@ -25,7 +27,14 @@ const LoadMoreButton = ({ onClick }) => (
   </div>
 );
 
-export default function Posts({ windowHeight, windowWidth, windowId, user }) {
+interface PostProps {
+  windowHeight: number;
+  windowWidth: number;
+  windowId: number;
+  user: User | null;
+}
+
+export default function Posts({ windowHeight, windowWidth, windowId, user }: PostProps) {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [posts, setPosts] = useState([]);

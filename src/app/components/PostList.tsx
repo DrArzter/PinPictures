@@ -1,14 +1,24 @@
 import React, { useMemo } from "react";
 import Post from "./Post";
 import { motion } from "framer-motion";
+import type { Post as PostType, User } from "@/app/types/global"; // Импорт интерфейсов Post и User
+
+interface PostListProps {
+  posts: PostType[];
+  windowHeight: number;
+  windowWidth: number;
+  windowId: number;
+  user: User | null;
+}
 
 export default function PostList({
   posts,
   windowHeight,
   windowWidth,
   windowId,
+  user,
   ...props
-}: any) {
+}: PostListProps) {
   const minColumnWidth = 300;
   const maxColumns = 4;
 
@@ -22,13 +32,13 @@ export default function PostList({
     gridTemplateColumns: `repeat(${columns}, 1fr)`,
     gap: "16px",
     height: windowHeight,
-    overflowY: "scroll" as React.CSSProperties["overflowY"], // Ensure correct type
+    overflowY: "scroll" as React.CSSProperties["overflowY"],
     padding: "16px",
   };
 
   const postItems = useMemo(
     () =>
-      posts.map((post: any, index: number) => (
+      posts.map((post, index) => (
         <motion.div
           key={post.id}
           initial={{ opacity: 0, y: 20 }}
@@ -39,11 +49,12 @@ export default function PostList({
             post={post}
             windowHeight={windowHeight}
             windowId={windowId}
+            user={user} // Передаем user в компонент Post
             {...props}
           />
         </motion.div>
       )),
-    [posts, windowHeight, windowId]
+    [posts, windowHeight, windowId, user]
   );
 
   return (

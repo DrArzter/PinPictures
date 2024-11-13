@@ -6,49 +6,71 @@ import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useWindowContext } from "@/app/contexts/WindowContext";
 import { createPost } from "@/app/api";
 import { motion } from "framer-motion";
+import { ApiResponse, NewPost } from "@/app/types/global";
 
-export default function CreatePost({ windowHeight, windowWidth, windowId }) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [images, setImages] = useState([]);
-  const [imagePreviews, setImagePreviews] = useState([]);
+interface CreatePostProps {
+  windowHeight: number;
+  windowWidth: number;
+  windowId: number;
+}
+
+export default function CreatePost({
+  windowHeight,
+  windowWidth,
+  windowId,
+}: CreatePostProps) {
+  const [name, setName] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [images, setImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<
+    (string | ArrayBuffer | null)[]
+  >([]);
   const { addNotification } = useNotificationContext();
   const { removeWindow } = useWindowContext();
-  const [loading, setLoading] = useState(false);
-  const fileInputRef = useRef(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  console.log(windowHeight);
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    let response;
+    let response: ApiResponse<NewPost> | undefined;
 
     try {
       response = await createPost({ name, description, images });
     } catch (err) {
       console.error(err);
       addNotification({
-        type: response?.status || 'error',
-        message: response?.message || 'An error occurred',
+        status: "error", // Explicitly set to "error" on failure
+        message: "An error occurred",
+        time: 5000,
+        clickable: false,
       });
     } finally {
       setLoading(false);
       if (response) {
+        const status: "success" | "error" | "info" | "warning" =
+          response.status === "success" || response.status === "error"
+            ? response.status
+            : "info";
+
         addNotification({
-          type: response.status,
+          status,
           message: response.message,
+          time: 5000,
+          clickable: false,
         });
-        removeWindow(windowId);
+        if (response.status === "success") {
+          removeWindow(windowId);
+        }
       }
     }
   };
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
     if (files.length + images.length > 10) {
-      alert("Максимум 10 изображений");
+      alert("Maximum of 10 images allowed");
       return;
     }
 
@@ -63,7 +85,7 @@ export default function CreatePost({ windowHeight, windowWidth, windowId }) {
     });
   };
 
-  const handleRemoveImage = (index, e) => {
+  const handleRemoveImage = (index: number, e: React.MouseEvent) => {
     e.stopPropagation();
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
     setImagePreviews((prevPreviews) =>
@@ -72,14 +94,14 @@ export default function CreatePost({ windowHeight, windowWidth, windowId }) {
   };
 
   const handleFileInputClick = () => {
-    fileInputRef.current.click();
+    fileInputRef.current?.click();
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
     if (files.length + images.length > 10) {
-      alert("Максимум 10 изображений");
+      alert("Maximum of 10 images allowed");
       return;
     }
 
@@ -104,7 +126,10 @@ export default function CreatePost({ windowHeight, windowWidth, windowId }) {
     >
       <div
         className="flex flex-col rounded-3xl overflow-y-auto scrollbar-hidden"
-        style={{ maxHeight: `${windowHeight - 55}px`, maxWidth: `${windowWidth - 20}px` }}
+        style={{
+          maxHeight: `${windowHeight - 55}px`,
+          maxWidth: `${windowWidth - 20}px`,
+        }}
       >
         <motion.h1
           className="text-4xl font-extrabold text-center mb-8 text-white drop-shadow-lg"
@@ -150,11 +175,14 @@ export default function CreatePost({ windowHeight, windowWidth, windowId }) {
               onClick={handleFileInputClick}
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
-              style={{ maxHeight: `${windowHeight * 0.4}px`, overflowY: "auto" }}
+              style={{
+                maxHeight: `${windowHeight * 0.4}px`,
+                overflowY: "auto",
+              }}
             >
               <AiOutlineCloudUpload className="text-white text-6xl mb-4" />
               <p className="text-white">
-                Перетащите изображения сюда или нажмите для выбора файлов
+                Drag and drop images here or click to select files
               </p>
               <p className="text-sm text-white mt-2">({images.length}/10)</p>
               <input
@@ -178,7 +206,7 @@ export default function CreatePost({ windowHeight, windowWidth, windowId }) {
                       transition={{ duration: 0.3 }}
                     >
                       <img
-                        src={preview}
+                        src={preview as string}
                         alt={`Preview ${index}`}
                         className="w-32 h-32 object-cover rounded-xl transform group-hover:scale-105 transition duration-300"
                       />
@@ -207,7 +235,11 @@ export default function CreatePost({ windowHeight, windowWidth, windowId }) {
             whileTap={!isSubmitDisabled ? { scale: 0.98 } : {}}
             transition={{ duration: 0.2 }}
           >
-            {loading ? <FaSpinner className="animate-spin mx-auto" /> : "Publish"}
+            {loading ? (
+              <FaSpinner className="animate-spin mx-auto" />
+            ) : (
+              "Publish"
+            )}
           </motion.button>
         </form>
       </div>

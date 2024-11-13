@@ -4,12 +4,10 @@ import { useUserContext } from "@/app/contexts/UserContext";
 import LoadingIndicator from "./LoadingIndicator";
 import DropdownMenu from "./DropdownMenu";
 import { motion, AnimatePresence } from "framer-motion";
-
 import { useNotificationContext } from "../contexts/NotificationContext";
 
 export default function UserCard() {
   const { user, userLoading } = useUserContext();
-
   const { addNotification } = useNotificationContext();
 
   const backgroundColor =
@@ -32,9 +30,7 @@ export default function UserCard() {
   if (userLoading) {
     return (
       <div
-        style={{
-          backgroundColor: backgroundColor,
-        }}
+        style={{ backgroundColor }}
         className=" w-48 justify-center flex-row backdrop-blur-md bg-opacity-30 border-2 rounded-lg shadow-2xl cursor-pointer items-center"
       >
         <LoadingIndicator />
@@ -45,9 +41,7 @@ export default function UserCard() {
   return (
     <>
       <div
-        style={{
-          backgroundColor: backgroundColor,
-        }}
+        style={{ backgroundColor }}
         onClick={toggleDropdown}
         id="user-card"
         className="absolute left-2 bottom-2 p-2 backdrop-blur-xl bg-opacity-30 border-2 rounded-lg shadow-2xl cursor-pointer items-center flex flex-row gap-2"

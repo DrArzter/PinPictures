@@ -1,6 +1,11 @@
 import React from "react";
 
-export default function NotFound({ windowHeight, windowWidth }) {
+interface NotFoundProps {
+  windowHeight: number;
+  windowWidth: number;
+}
+
+export default function NotFound({ windowHeight, windowWidth }: NotFoundProps) {
   // Main container centered on the screen
   const containerClassName = `flex flex-col items-center justify-center`;
 

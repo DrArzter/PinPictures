@@ -1,8 +1,19 @@
 "use client";
-import React, { useContext } from "react";
+import React from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 
-const Registration = ({
+interface RegistrationProps {
+  username: string;
+  setUsername: (value: string) => void;
+  email: string;
+  setEmail: (value: string) => void;
+  password: string;
+  setPassword: (value: string) => void;
+  handleSubmit: (event: React.FormEvent) => void;
+  toggleRegistration: () => void;
+}
+
+const Registration: React.FC<RegistrationProps> = ({
   username,
   setUsername,
   email,
@@ -18,7 +29,7 @@ const Registration = ({
 
   const buttonClassName = `w-full py-2 rounded-3xl bg-red-500`;
 
-  const onCaptchaChange = (value) => {
+  const onCaptchaChange = (value: string | null) => {
     console.log("Captcha value:", value);
   };
 

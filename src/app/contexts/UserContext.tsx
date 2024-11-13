@@ -1,12 +1,17 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, ReactNode } from "react";
 import * as api from "@/app/api";
+import { User, UserContextType } from "@/app/types/global";
 
-// Создаем UserContext
-const UserContext = React.createContext();
+// Создаем UserContext с типом UserContextType
+const UserContext = React.createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [userLoading, setUserLoading] = useState(true);
+interface UserProviderProps {
+  children: ReactNode;
+}
+
+export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [userLoading, setUserLoading] = useState<boolean>(true);
 
   const fetchUser = async () => {
     try {
@@ -37,4 +42,10 @@ export const UserProvider = ({ children }) => {
   );
 };
 
-export const useUserContext = () => useContext(UserContext);
+export const useUserContext = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUserContext must be used within a UserProvider");
+  }
+  return context;
+};
