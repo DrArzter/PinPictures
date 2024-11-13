@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 
 interface DecodedToken {
-  userId: string;
+  userId: number; // Преобразуем в число, если это число в базе данных
   iat: number;
   exp: number;
 }
@@ -31,11 +31,20 @@ export async function authMiddleware(
         .json({ status: "error", message: "Invalid token" });
     }
 
+    // Преобразуем userId в число, если это необходимо
+    const userId = decoded.userId;
+
     const user = await prisma.user.findUnique({
       where: {
-        id: decoded.userId,
+        id: userId,
       },
     });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "User not found" });
+    }
 
     const { password, bananaLevel, ...userWithoutSensitiveInfo } = user;
 

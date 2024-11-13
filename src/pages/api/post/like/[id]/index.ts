@@ -2,12 +2,18 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { authMiddleware } from "@/middlewares/authMiddleware";
 import { handleError } from "@/utils/errorHandler";
+import { User } from "@/app/types/global"; // Assuming User is defined in types
 
 export const config = {
   api: {
     bodyParser: true,
   },
 };
+
+// A type guard to check if user is not null
+function isUser(user: User | null): user is User {
+  return user !== null;
+}
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -18,7 +24,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   authMiddleware(req, res, async () => {
     const user = req.user;
-    if (!user) {
+
+    if (!isUser(user)) {
       return res
         .status(404)
         .json({ status: "error", message: "User not found" });
@@ -46,7 +53,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       const existingLike = await prisma.likes.findFirst({
         where: {
           postId,
-          userId: req.user.id,
+          userId: user.id,
         },
       });
 
@@ -56,7 +63,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         await prisma.likes.create({
           data: {
             postId,
-            userId: req.user.id,
+            userId: user.id,
           },
         });
       }

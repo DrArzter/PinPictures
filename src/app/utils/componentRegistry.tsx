@@ -8,7 +8,27 @@ import Search from "@/app/pages/Search";
 import Chats from "@/app/pages/Chats";
 import Profile from "@/app/pages/Profile";
 
-export const componentRegistry = {
+interface ComponentProps {
+  width: number;
+  height: number;
+  minWidth: number;
+  minHeight: number;
+  initialX: number;
+  initialY: number;
+}
+
+interface ComponentEntry {
+  component: React.ComponentType<any>;
+  defaultProps: ComponentProps;
+  title?: string;
+}
+
+interface ComponentRegistry {
+  [route: string]: ComponentEntry;  // Allow dynamic routes as keys
+}
+
+// Define the component registry with correct type definitions
+export const componentRegistry: ComponentRegistry = {
   "/chats": {
     component: Chats,
     defaultProps: {

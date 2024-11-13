@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { signToken } from "@/utils/jwt";
 import { hashPassword } from "@/utils/hashPassword";
-import { handleError } from "@/utils/errorHandler"; // Импорт функции для обработки ошибок
+import { handleError } from "@/utils/errorHandler"; // Import the error handler function
 import { z } from "zod";
 
 const registrationSchema = z.object({
@@ -22,6 +22,7 @@ export default async function handler(
   }
 
   try {
+    // Validate request body against the schema
     registrationSchema.parse(req.body);
 
     const { email, name, password } = req.body as {
@@ -30,6 +31,7 @@ export default async function handler(
       password: string;
     };
 
+    // Create a new user in the database
     const user = await prisma.user.create({
       data: {
         email,
@@ -37,11 +39,16 @@ export default async function handler(
         password: await hashPassword(password),
         avatar: `https://ui-avatars.com/api/?name=${name}&background=ACACAC&color=fff`,
         background: `https://ui-avatars.com/api/?name=${name}&background=ACACAC&color=fff`,
+        settings: {
+          bgColor: "#ffffff",
+        },
       },
     });
 
+    // Generate a token for the new user
     const token = signToken(user);
 
+    // Set the token in the cookie
     res.setHeader("Set-Cookie", [
       `token=${token}; SameSite=lax; HttpOnly; Path=/; Max-Age=${
         60 * 60 * 24 * 30
@@ -56,6 +63,6 @@ export default async function handler(
         token: token,
       });
   } catch (error) {
-    return handleError(res, error); // Обработка ошибки через общую функцию
+    return handleError(res, error); // Handle errors through the shared function
   }
 }

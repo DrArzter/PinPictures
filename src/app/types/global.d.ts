@@ -1,5 +1,12 @@
 // src/app/types/global.d.ts
+import { NextApiRequest } from "next";
 
+
+declare module "next" {
+  interface NextApiRequest {
+    user: User | null;
+  }
+}
 // Notification Interfaces
 export interface Notification {
   message: string;
@@ -127,3 +134,5 @@ export interface GetPostResponse {
   message: string;
   post: Post;
 }
+
+

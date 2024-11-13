@@ -1,4 +1,3 @@
-// getComponentByPath.tsx
 import { componentRegistry } from "./componentRegistry";
 import { createWindow } from "./windowFactory";
 
@@ -16,13 +15,13 @@ export function getComponentByPath(
   existingWindowsCount: number
 ) {
   // Utility function to escape special characters in a string for use in a regular expression
-  const escapeRegExp = (string) =>
+  const escapeRegExp = (string: string): string =>
     string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
   // Find a matching route in the component registry by converting each route with dynamic parameters to a regular expression
   const matchedRoute = Object.keys(componentRegistry).find((route) => {
     try {
-      // Escape route, then replace dynamic segments
+      // Escape route, then replace dynamic segments (e.g., [id] to (.+))
       const regexRoute = new RegExp(
         "^" + route.replace(/\[([^\]]+)\]/g, "([^/]+)") + "$"
       );
@@ -33,12 +32,16 @@ export function getComponentByPath(
     }
   });
 
-  // Retrieve the component entry from the registry based on the matched route or fall back to NotFound
-  const registryEntry = matchedRoute
-    ? componentRegistry[matchedRoute]
-    : componentRegistry["*"];
+  // Ensure matchedRoute is defined before proceeding
+  if (!matchedRoute) {
+    console.warn(`No matching route found for path: ${path}`);
+    return null;
+  }
 
-  // If no component matches and no NotFound handler exists, log a warning and return null
+  // Retrieve the component entry from the registry based on the matched route or fall back to NotFound
+  const registryEntry =
+    componentRegistry[matchedRoute] || componentRegistry["*"];
+
   if (!registryEntry) {
     console.warn(
       `No component found for path: ${path}, and no NotFound handler.`
