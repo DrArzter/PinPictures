@@ -1,3 +1,4 @@
+// ./src/app/components/Notifications.tsx
 import React, { useEffect } from "react";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useWindowContext } from "@/app/contexts/WindowContext";
@@ -27,7 +28,10 @@ export default function NotificationComponent() {
   }, [notifications, removeNotification]);
 
   // Функция для получения класса уведомления в зависимости от статуса и кликабельности
-  const getNotificationClassName = (status: Notification["status"], clickable: boolean) =>
+  const getNotificationClassName = (
+    status: Notification["status"],
+    clickable: boolean
+  ) =>
     `notification p-4 rounded-2xl shadow-2xl mt-2 ${
       clickable ? "cursor-pointer" : ""
     } ${

@@ -1,14 +1,15 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import * as api from "@/app/api";
-
 import Login from "../../components/Login";
 import Registration from "../../components/Registration";
 
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useUserContext } from "@/app/contexts/UserContext";
 import { useWindowContext } from "@/app/contexts/WindowContext";
+import { useSocketContext } from "@/app/contexts/SocketContext";
+import { io } from "socket.io-client";
 
 interface AuthenticationProps {
   windowId: number;
@@ -26,12 +27,12 @@ export default function Authentication({
 
   const { removeWindow } = useWindowContext();
   const { setUser, setUserLoading } = useUserContext();
+  const { addNotification } = useNotificationContext();
+  const { setSocket } = useSocketContext();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const { addNotification } = useNotificationContext();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +43,6 @@ export default function Authentication({
       if (isRegistration) {
         response = await api.registration(username, email, password);
         if (response && response.status === "success") {
-          // Проверка на наличие response
           setIsRegistration(false);
           setUser(response.user);
           removeWindow(windowId);
@@ -50,14 +50,12 @@ export default function Authentication({
       } else if (isForgotPassword) {
         response = await api.forgotPassword(email);
         if (response && response.status === "success") {
-          // Проверка на наличие response
           setIsForgotPassword(false);
         }
       } else {
         setUserLoading(true);
         response = await api.login(username, password);
         if (response && response.status === "success") {
-          // Проверка на наличие response
           const userData = await api.getUser();
           setUser(userData);
           removeWindow(windowId);
@@ -65,8 +63,11 @@ export default function Authentication({
         setUserLoading(false);
       }
 
-      // Убедимся, что response не undefined перед добавлением уведомления
-      if (response) {
+      if (response && response.status === "success") {
+        // Open socket connection after successful login or registration
+        const socketIo = io("http://localhost:3000");
+        setSocket(socketIo);
+
         addNotification({
           status: response.status,
           message: response.message,
@@ -76,7 +77,6 @@ export default function Authentication({
       }
     } catch (error) {
       console.error("Error during authentication:", error);
-      // Добавим уведомление об ошибке, если catch блок отработает
       addNotification({
         status: "error",
         message: "An error occurred during authentication.",

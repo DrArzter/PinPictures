@@ -1,6 +1,14 @@
-// contexts/SocketContext.tsx
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+// ./src/app/contexts/SocketContext.tsx
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 import { io, Socket } from "socket.io-client";
+import { useNotificationContext } from "@/app/contexts/NotificationContext";
+import { Notification } from "@/app/types/global";
 
 // Интерфейс для значений контекста
 interface SocketContextType {
@@ -8,7 +16,9 @@ interface SocketContextType {
   setSocket: React.Dispatch<React.SetStateAction<Socket | null>>;
 }
 
-export const SocketContext = createContext<SocketContextType | undefined>(undefined);
+export const SocketContext = createContext<SocketContextType | undefined>(
+  undefined
+);
 
 // Кастомный хук для использования SocketContext
 export const useSocketContext = (): SocketContextType => {
@@ -26,17 +36,17 @@ interface SocketProviderProps {
 
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
+  const { addNotification } = useNotificationContext(); // Достаем функцию addNotification
 
   useEffect(() => {
-    // Указываем URL или конфигурацию для `io()`
-    const socketIo = io("http://localhost:3000"); // Замените на актуальный URL сервера
+    const socketIo = io("http://localhost:3000");
 
     socketIo.on("connect", () => {
       console.log("Successfully connected to server Socket.IO");
     });
 
-    socketIo.on("message", (data) => {
-      console.log("Message from server:", data);
+    socketIo.on("notification", (Notification: Notification) => {
+      addNotification(Notification as Notification);
     });
 
     socketIo.on("disconnect", () => {
@@ -48,7 +58,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     return () => {
       socketIo.disconnect();
     };
-  }, []);
+  }, [addNotification]);
 
   return (
     <SocketContext.Provider value={{ socket, setSocket }}>

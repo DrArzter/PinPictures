@@ -1,3 +1,4 @@
+// ./src/app/contexts/NotificationContext.ts
 import React, { useState, useContext, ReactNode } from "react";
 import { Notification } from "@/app/types/global";
 
@@ -8,17 +9,24 @@ interface NotificationContextType {
   removeNotification: (index: number) => void;
 }
 
-const NotificationContext = React.createContext<NotificationContextType | undefined>(undefined);
+const NotificationContext = React.createContext<
+  NotificationContextType | undefined
+>(undefined);
 
 interface NotificationProviderProps {
   children: ReactNode;
 }
 
-export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
+export const NotificationProvider: React.FC<NotificationProviderProps> = ({
+  children,
+}) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const addNotification = (notification: Notification) => {
-    setNotifications((prevNotifications) => [...prevNotifications, notification]);
+    setNotifications((prevNotifications) => [
+      ...prevNotifications,
+      notification,
+    ]);
   };
 
   const removeNotification = (index: number) => {
@@ -39,7 +47,9 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
 export const useNotificationContext = (): NotificationContextType => {
   const context = useContext(NotificationContext);
   if (!context) {
-    throw new Error("useNotificationContext must be used within a NotificationProvider");
+    throw new Error(
+      "useNotificationContext must be used within a NotificationProvider"
+    );
   }
   return context;
 };

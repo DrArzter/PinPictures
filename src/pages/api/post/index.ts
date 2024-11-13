@@ -1,3 +1,4 @@
+// ./pages/api/post/index.ts
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { uploadFiles } from "@/utils/s3Module";
@@ -110,6 +111,15 @@ export default async function handler(
             },
           });
         }
+
+        // Отправка уведомления о новом посте через Socket.IO
+        global.io.emit("notification", {
+          status: "success",
+          message: `New post created by ${user.name}: ${post.name}`,
+          time: 5000,
+          clickable: true,
+          link_to: `/posts/${newPostId}`, // ссылка на новый пост
+        });
 
         res
           .status(201)
