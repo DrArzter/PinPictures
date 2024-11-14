@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { authMiddleware } from "@/middlewares/authMiddleware";
 import { handleError } from "@/utils/errorHandler";
+import { Comments } from "@prisma/client";
 import { z } from "zod";
 
 const commentSchema = z.object({
@@ -32,10 +33,10 @@ const commentSchema = z.object({
         }
   
         const { comment } = commentSchema.parse(req.body);
-        const newComment = await prisma.comment.create({
+        const newComment = await prisma.comments.create({
           data: {
             comment: comment,
-            authorId: user.id,
+            userId: user.id,
             postId: postId,
           },
         });

@@ -11,6 +11,7 @@ import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import * as api from "@/app/api";
 
 import { Post as PostType, User } from "@/app/types/global";
+import { set } from "zod";
 
 interface PostProps {
   dynamicProps: PostType;
@@ -35,6 +36,7 @@ export default function Post({
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [comments, setComments] = useState([]);
+  const [commentsCount, setCommentsCount] = useState(0);
   const [newComment, setNewComment] = useState("");
 
   useEffect(() => {
@@ -42,12 +44,11 @@ export default function Post({
       try {
         const fetchedPost = await fetchPost(dynamicProps.id as any);
         setPost(fetchedPost as any);
-
         setLikeCount(
           fetchedPost._count ? fetchedPost._count.likes : (0 as any)
         );
         setComments(fetchedPost.comments || ([] as any));
-
+        setCommentsCount(fetchedPost._count ? fetchedPost._count.comments : 0);
         if (
           user &&
           fetchedPost.likes.some((like: any) => like.userId === user.id)
@@ -120,6 +121,9 @@ export default function Post({
       addNotification({
         type: "error",
         message: "Вы должны войти в систему, чтобы добавлять комментарии.",
+        time: 5000,
+        clickable: true,
+        link_to: "/authentication",
       });
       return;
     }
@@ -127,23 +131,25 @@ export default function Post({
     if (newComment.trim() === "") {
       addNotification({
         type: "error",
-        message: "Комментарий не может быть пустым.",
+        message: "Comment cannot be empty.",
+        time: 5000,
+        clickable: false,
       });
       return;
     }
 
     try {
-      // Заглушка функции добавления комментария
-      // Здесь вы можете вызвать API для добавления комментария
-      console.log("Добавление комментария:", newComment);
-      addNotification({
-        type: "success",
-        message: "Комментарий успешно добавлен (заглушка).",
-      });
-
-      // Обновление списка комментариев локально
+      const response = await api.uploadComment(post.id as any, newComment);
+      if (response.status === "success"){
+        addNotification({
+          type: response.status,
+          message: response.message
+          
+        })
+      }
+      
       const addedComment = {
-        id: Date.now(), // временный ID
+        id: Date.now(),
         user: {
           name: user.name,
           avatar: user.avatar,
