@@ -214,7 +214,7 @@ export default function Settings({ windowHeight, windowWidth }: SettingsProps) {
                   </span>
                 </div>
                 <button
-                  type="submit"
+                  onClick={handleSubmitColorChange}
                   className="w-24 py-2 rounded-3xl bg-lime-500"
                 >
                   Save

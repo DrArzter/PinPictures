@@ -160,10 +160,9 @@ export default function Post({
       setComments([...comments, addedComment] as any);
       setNewComment("" as any);
     } catch (error) {
-      console.error("Error adding comment:", error);
       addNotification({
         type: "error",
-        message: "Не удалось добавить комментарий.",
+        message: "An error occurred while adding the comment.",
       });
     }
   };
@@ -291,13 +290,13 @@ export default function Post({
                       className="flex items-start space-x-3"
                     >
                       <img
-                        src={comment.user.avatar}
-                        alt={comment.user.name}
+                        src={comment.author.avatar}
+                        alt={comment.author.name}
                         className="w-10 h-10 rounded-full"
                       />
                       <div>
-                        <p className="font-semibold">{comment.user.name}</p>
-                        <p className="text-sm">{comment.text}</p>
+                        <p className="font-semibold">{comment.author.name}</p>
+                        <p className="text-sm">{comment.comment}</p>
                         <p className="text-xs text-gray-500">
                           {new Date(comment.createdAt).toLocaleString()}
                         </p>

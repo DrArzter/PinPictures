@@ -44,7 +44,7 @@ CREATE TABLE `Comments` (
     `userId` INTEGER NOT NULL,
     `postId` INTEGER NOT NULL,
     `comment` VARCHAR(191) NOT NULL,
-    `picpath` VARCHAR(191) NOT NULL,
+    `picpath` VARCHAR(191),
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)

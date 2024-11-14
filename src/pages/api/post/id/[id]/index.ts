@@ -41,7 +41,9 @@ export default async function handler(
           },
         },
         comments: {
-          include: {
+          select: {
+            comment: true,
+            createdAt: true,
             author: {
               select: {
                 name: true,
