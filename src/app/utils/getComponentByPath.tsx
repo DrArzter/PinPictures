@@ -19,44 +19,35 @@ export function getComponentByPath(
     string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
   // Find a matching route in the component registry by converting each route with dynamic parameters to a regular expression
-  const matchedRoute = Object.keys(componentRegistry).find((route) => {
-    try {
-      // Escape route, then replace dynamic segments (e.g., [id] to (.+))
-      const regexRoute = new RegExp(
-        "^" + route.replace(/\[([^\]]+)\]/g, "([^/]+)") + "$"
-      );
-      return regexRoute.test(path);
-    } catch (error) {
-      console.warn(`Error processing route "${route}":`, error);
-      return false;
-    }
-  });
-
-  // Ensure matchedRoute is defined before proceeding
-  if (!matchedRoute) {
-    console.warn(`No matching route found for path: ${path}`);
-    return null;
-  }
+  const matchedRoute =
+    Object.keys(componentRegistry).find((route) => {
+      try {
+        // Escape route, then replace dynamic segments (e.g., [id] to (.+))
+        const regexRoute = new RegExp(
+          "^" + route.replace(/\[([^\]]+)\]/g, "([^/]+)") + "$"
+        );
+        return regexRoute.test(path);
+      } catch (error) {
+        console.warn(`Error processing route "${route}":`, error);
+        return false;
+      }
+    }) || "*";
 
   // Retrieve the component entry from the registry based on the matched route or fall back to NotFound
-  const registryEntry =
-    componentRegistry[matchedRoute] || componentRegistry["*"];
+  const registryEntry = componentRegistry[matchedRoute];
 
   if (!registryEntry) {
-    console.warn(
-      `No component found for path: ${path}, and no NotFound handler.`
-    );
     return null;
   }
 
   // Destructure component and defaultProps from the registry entry
   const { component: Component, defaultProps } = registryEntry;
   const title = registryEntry.title || Component.name || "Untitled Window";
-  const windowType = matchedRoute ? Component.name || "Component" : "NotFound";
+  const windowType = Component.name || "NotFound";
 
   // Extract dynamic route parameters from the path
   let dynamicProps: { [key: string]: string | null } = {};
-  const paramMatches = matchedRoute?.match(/\[([^\]]+)\]/g);
+  const paramMatches = matchedRoute.match(/\[([^\]]+)\]/g);
 
   if (paramMatches) {
     // Create regex to match the path and extract dynamic parameter values
