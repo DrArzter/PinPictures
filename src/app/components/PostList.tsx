@@ -1,7 +1,8 @@
+// src/app/components/PostList.tsx
 import React, { useMemo } from "react";
 import Post from "./Post";
 import { motion } from "framer-motion";
-import type { Post as PostType, User } from "@/app/types/global"; // Импорт интерфейсов Post и User
+import type { Post as PostType, User } from "@/app/types/global";
 
 interface PostListProps {
   posts: PostType[];
@@ -11,14 +12,14 @@ interface PostListProps {
   user: User | null;
 }
 
-export default function PostList({
+const PostList: React.FC<PostListProps> = ({
   posts,
   windowHeight,
   windowWidth,
   windowId,
   user,
   ...props
-}: PostListProps) {
+}) => {
   const minColumnWidth = 300;
   const maxColumns = 4;
 
@@ -31,8 +32,6 @@ export default function PostList({
     display: "grid",
     gridTemplateColumns: `repeat(${columns}, 1fr)`,
     gap: "16px",
-    height: windowHeight,
-    overflowY: "scroll" as React.CSSProperties["overflowY"],
     padding: "16px",
   };
 
@@ -49,7 +48,7 @@ export default function PostList({
             post={post}
             windowHeight={windowHeight}
             windowId={windowId}
-            user={user} // Передаем user в компонент Post
+            user={user}
             {...props}
           />
         </motion.div>
@@ -57,9 +56,7 @@ export default function PostList({
     [posts, windowHeight, windowId, user]
   );
 
-  return (
-    <div className="scrlBar overflow-hidden max-h-full" style={postListStyle}>
-      {postItems}
-    </div>
-  );
-}
+  return <div style={postListStyle}>{postItems}</div>;
+};
+
+export default React.memo(PostList);

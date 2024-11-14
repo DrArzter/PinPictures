@@ -41,7 +41,7 @@ export default function CreatePost({
     } catch (err) {
       console.error(err);
       addNotification({
-        status: "error", // Explicitly set to "error" on failure
+        status: "error",
         message: "An error occurred",
         time: 5000,
         clickable: false,

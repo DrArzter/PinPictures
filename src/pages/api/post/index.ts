@@ -50,12 +50,10 @@ export default async function handler(
             : [files[key]];
 
           if (fileArray.length > 10) {
-            return res
-              .status(400)
-              .json({
-                status: "error",
-                message: "You can only upload up to 10 images",
-              });
+            return res.status(400).json({
+              status: "error",
+              message: "You can only upload up to 10 images",
+            });
           }
 
           for (const image of fileArray) {
@@ -112,22 +110,11 @@ export default async function handler(
           });
         }
 
-        // Отправка уведомления о новом посте через Socket.IO
-        global.io.emit("notification", {
+        res.status(201).json({
           status: "success",
-          message: `New post created by ${user.name}: ${post.name}`,
-          time: 5000,
-          clickable: true,
-          link_to: `/posts/${newPostId}`, // ссылка на новый пост
+          message: "Post created successfully",
+          data: newPost,
         });
-
-        res
-          .status(201)
-          .json({
-            status: "success",
-            message: "Post created successfully",
-            newPost,
-          });
       } catch (error) {
         return handleError(res, error);
       }

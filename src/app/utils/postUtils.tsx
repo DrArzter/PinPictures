@@ -1,51 +1,46 @@
+// utils/postUtils.ts
 import * as api from "@/app/api";
 
-import { PostData } from "@/app/types/global";
+import { PostData, Post } from "@/app/types/global";
 
-export const fetchPosts = async (page: number) => {
+export const fetchPosts = async (page: number): Promise<Post[]> => {
   try {
-    // Fetch posts using the API
     const fetchedPosts = await api.getPosts(page);
-    return fetchedPosts;  // Return the fetched posts
+    return fetchedPosts;
   } catch (error: unknown) {
-    // Handle error gracefully
     if (error instanceof Error) {
       console.error("Error fetching posts:", error.message);
     } else {
       console.error("Unknown error fetching posts");
     }
-    return [];  // Return an empty array on error
+    return [];
   }
 };
 
-export const fetchPost = async (id: number) => {
+export const fetchPost = async (id: number): Promise<Post | null> => {
   try {
-    // Fetch a single post using the API
     const fetchedPost = await api.getPost(id);
-    return fetchedPost;  // Return the fetched post
+    return fetchedPost;
   } catch (error: unknown) {
-    // Handle error gracefully
     if (error instanceof Error) {
       console.error("Error fetching post:", error.message);
     } else {
       console.error("Unknown error fetching post");
     }
-    return null;  // Return null on error
+    return null;
   }
 };
 
-export const createPost = async (post: PostData) => {
+export const createPost = async (post: PostData): Promise<Post | null> => {
   try {
-    // Create a new post using the API
     const createdPost = await api.createPost(post);
-    return createdPost;  // Return the created post
+    return createdPost;
   } catch (error: unknown) {
-    // Handle error gracefully
     if (error instanceof Error) {
       console.error("Error creating post:", error.message);
     } else {
       console.error("Unknown error creating post");
     }
-    return null;  // Return null on error
+    return null;
   }
 };

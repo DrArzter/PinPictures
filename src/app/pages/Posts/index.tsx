@@ -1,31 +1,20 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+// src/app/pages/Posts/index.tsx
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import PostList from "@/app/components/PostList";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import NoPostsFound from "@/app/components/NoPostsFound";
 
-import { User } from "@/app/types/global";
+import { User, Post as PostType } from "@/app/types/global";
 
 import * as postUtils from "@/app/utils/postUtils";
-
-const debounce = (func, wait) => {
-  let timeout;
-  return (...args) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-};
-
-const LoadMoreButton = ({ onClick }) => (
-  <div
-    className="flex justify-center items-center mt-16 text-center cursor-pointer"
-    onClick={onClick}
-  >
-    <p className="text-lg font-semibold text-yellow-400">
-      That's all for now, but you can try again later :)
-    </p>
-  </div>
-);
 
 interface PostProps {
   windowHeight: number;
@@ -34,71 +23,52 @@ interface PostProps {
   user: User | null;
 }
 
-export default function Posts({ windowHeight, windowWidth, windowId, user }: PostProps) {
+const Posts: React.FC<PostProps> = ({
+  windowHeight,
+  windowWidth,
+  windowId,
+  user,
+}) => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<PostType[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const postsContainerStyle = useMemo(
-    () => ({
-      width: windowWidth - 10,
-      height: windowHeight - 55,
-    }),
-    [windowWidth, windowHeight]
-  );
+  const postsContainerRef = useRef<HTMLDivElement>(null);
+  const [initialLoad, setInitialLoad] = useState(true); // Флаг для начальной загрузки
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      if (hasMorePosts) {
-        setLoading(true);
-        setError(null);
+  const fetchMorePosts = useCallback(async () => {
+    if (loading || !hasMorePosts) return;
 
-        try {
-          const newPosts = await postUtils.fetchPosts(page);
-          if (newPosts.length === 0) {
-            setHasMorePosts(false);
-          } else {
-            setPosts((prevPosts) =>
-              page === 1 ? newPosts : [...prevPosts, ...newPosts]
-            );
-          }
-        } catch (err) {
-          console.error("Error fetching posts:", err);
-          setError("Failed to load posts, please try again later.");
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
+    setLoading(true);
+    setError(null);
 
-    fetchPosts();
-  }, [page, hasMorePosts]);
-
-  const handleScroll = useCallback(
-    debounce(() => {
-      if (
-        window.scrollY + window.innerHeight >=
-          document.body.scrollHeight - 100 &&
-        !loading &&
-        hasMorePosts
-      ) {
+    try {
+      const newPosts = await postUtils.fetchPosts(page);
+      if (newPosts.length === 0) {
+        setHasMorePosts(false);
+      } else {
+        setPosts((prevPosts) => [...prevPosts, ...newPosts]);
         setPage((prevPage) => prevPage + 1);
       }
-    }, 200),
-    [loading, hasMorePosts]
-  );
+    } catch (err) {
+      setError("Failed to fetch posts.");
+    } finally {
+      setLoading(false);
+    }
+  }, [page, loading, hasMorePosts]);
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+    fetchMorePosts();
+  }, []);
 
-  const handleLoadMore = () => {
-    setHasMorePosts(true);
-    setPage(1);
-  };
+  useEffect(() => {
+    if (initialLoad && postsContainerRef.current) {
+      postsContainerRef.current.scrollTop = 0;
+      setInitialLoad(false);
+    }
+  }, [initialLoad]);
 
   const postList = useMemo(
     () => (
@@ -110,31 +80,63 @@ export default function Posts({ windowHeight, windowWidth, windowId, user }: Pos
         user={user}
       />
     ),
-    [posts, windowHeight, windowWidth]
+    [posts, windowHeight, windowWidth, windowId, user]
   );
+
+  const retryFetch = () => {
+    setError(null);
+    fetchMorePosts();
+  };
 
   return (
     <div
       id="posts"
-      style={postsContainerStyle}
-      className="relative flex flex-col items-center justify-center mx-auto"
+      ref={postsContainerRef}
+      style={{
+        width: windowWidth - 20,
+        height: windowHeight - 60,
+        overflow: "auto",
+        margin: "0 auto",
+        boxSizing: "border-box",
+      }}
+      className="relative"
     >
-      {loading && page === 1 ? (
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+      {error && (
+        <div className="text-red-500 text-center mb-4">
+          {error}
+          <button onClick={retryFetch} className="ml-2 text-blue-500 underline">
+            Повторить попытку
+          </button>
+        </div>
+      )}
+      {posts.length > 0 ? (
+        <InfiniteScroll
+          dataLength={posts.length}
+          next={fetchMorePosts}
+          hasMore={hasMorePosts}
+          loader={<LoadingIndicator className="my-4" />}
+          endMessage={
+            <div className="flex justify-center items-center text-center">
+              <p className="text-lg font-semibold text-yellow-400">
+                That's all for now 😊
+              </p>
+            </div>
+          }
+          scrollableTarget="posts"
+          style={{ width: "100%" }}
+        >
+          {postList}
+        </InfiniteScroll>
+      ) : (
+        !loading && <NoPostsFound className="text-center" />
+      )}
+      {loading && page === 1 && (
+        <div className="absolute inset-0 flex items-center justify-center">
           <LoadingIndicator />
         </div>
-      ) : (
-        <>
-          {error && (
-            <div className="text-red-500 text-center mb-4">{error}</div>
-          )}
-          {posts.length > 0
-            ? postList
-            : !loading && <NoPostsFound className="text-center" />}
-          {loading && hasMorePosts && <LoadingIndicator className="my-4" />}
-          {!hasMorePosts && <LoadMoreButton onClick={handleLoadMore} />}
-        </>
       )}
     </div>
   );
-}
+};
+
+export default Posts;
