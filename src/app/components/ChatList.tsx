@@ -1,49 +1,89 @@
-import React, { useState } from 'react';
-import { User } from "@/app/types/global";
+// src/app/components/ChatList.tsx
+
+import React, { useState } from "react";
+import { User, Chat } from "@/app/types/global";
+import { AiOutlineSearch } from "react-icons/ai";
 
 interface ChatListProps {
   user: User;
-  chats: any;
+  chats: Chat[];
+  selectedChatId: number;
+  setSelectedChatId: (id: string) => void;
 }
 
-export default function ChatList({ chats, user } : ChatListProps) {
-  const [searchQuery, setSearchQuery] = useState('');
+export default function ChatList({
+  chats,
+  user,
+  selectedChatId,
+  setSelectedChatId,
+}: ChatListProps) {
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredChats = chats.filter((chat : any) =>
-    chat.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Фильтрация чатов по запросу
+  const filteredChats = Array.isArray(chats)
+    ? chats.filter((chat: Chat) =>
+        chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
+
+  const handleChatClick = (chat: Chat) => {
+    setSelectedChatId(chat.id);
+  };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col h-full">
+      <div className="relative mb-4">
+        <AiOutlineSearch className="absolute top-3 left-3 text-gray-400" />
         <input
           type="text"
-          placeholder="Search"
+          placeholder="Search..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full p-2 rounded-md bg-gray-500 text-white"
+          className="w-full pl-10 pr-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
-      <div className="flex flex-col gap-2">
+      </div>
+
+      <div className="flex flex-col gap-2 overflow-y-auto">
         {filteredChats.length > 0 ? (
-          filteredChats.map((chat : any) => (
+          filteredChats.map((chat: Chat) => (
             <div
               key={chat.id}
-              className="bg-gray-500 bg-opacity-30 hover:bg-opacity-50 cursor-pointer rounded-md text-center flex flex-row gap-2"
+              onClick={() => handleChatClick(chat)}
+              className={`flex items-center p-3 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors ${
+                selectedChatId === chat.id ? "border-l-4 border-yellow-500" : ""
+              }`}
             >
-              <img className="w-12 h-12 rounded-full" src={chat?.image} alt={chat.name} />
-              <div>
-                <p className="font-bold text-left">{chat.name}</p>
-                {chat?.lastMessage ? (
-                  <p>
-                    {chat?.lastMessage?.author}: {chat?.lastMessage?.message}
-                  </p>
-                ) : (
-                  'no messages yet'
-                )}
+              {chat.avatar ? (
+                <img
+                  className="w-12 h-12 rounded-full object-cover"
+                  src={chat.avatar}
+                  alt={chat.name}
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center">
+                  <span className="text-Пxl text-gray-300">
+                    {chat.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+
+              <div className="ml-4 flex flex-col">
+                <span className="text-lg font-semibold text-white">
+                  {chat.name}
+                </span>
+                <span className="text-sm text-gray-400">
+                  {chat.lastMessage
+                    ? `${chat.lastMessage.author.name}: ${chat.lastMessage.message}`
+                    : "Нет сообщений"}
+                </span>
               </div>
             </div>
           ))
         ) : (
-          <p className="text-center">No chats found</p>
+          <div className="flex flex-col items-center justify-center text-gray-400 mt-10">
+            <AiOutlineSearch className="text-4xl mb-2" />
+            <p>Чатов не найдено</p>
+          </div>
         )}
       </div>
     </div>

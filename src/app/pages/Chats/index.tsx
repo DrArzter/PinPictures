@@ -1,12 +1,14 @@
-// components/Chats.js
+// src/app/components/Chats.tsx
+
 import React, { useEffect, useState } from "react";
 import { useSocketContext } from "@/app/contexts/SocketContext";
 import { User } from "@/app/types/global";
 
 import ChatList from "@/app/components/ChatList";
 import Chat from "@/app/components/Chat";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
 
-interface ChatsProprs {
+interface ChatsProps {
   windowHeight: number;
   windowWidth: number;
   windowId: number;
@@ -18,28 +20,59 @@ export default function Chats({
   windowWidth,
   windowId,
   user,
-}: ChatsProprs) {
+}: ChatsProps) {
   const { socket } = useSocketContext();
-  const [chats, setChats] = useState([]);
-  const [activeChat, setActiveChat] = useState(null);
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [selectedChatId, setSelectedChatId] = useState<string | undefined>(undefined);
+  const [activeChat, setActiveChat] = useState<FullChat | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isActiveChatLoading, setIsActiveChatLoading] = useState(false);
 
+  // Fetch the list of chats
   useEffect(() => {
     if (socket) {
-      // Emit an event to request chats data
       socket.emit("getChats");
 
-      // Listen for the response from the server
-      socket.on("chatsData", (data) => {
+      socket.on("chatsList", (data: Chat[]) => {
         console.log("Received chats data:", data);
-        setChats(data); // Update state with received chats
+        setChats(data);
+        setIsLoading(false);
       });
 
-      // Cleanup the listener on unmount to prevent memory leaks
       return () => {
-        socket.off("chatsData");
+        socket.off("chatsList");
       };
     }
   }, [socket]);
+
+  // Fetch the full details of the selected chat
+  useEffect(() => {
+    if (selectedChatId && socket) {
+      setIsActiveChatLoading(true);
+      socket.emit("getChat", selectedChatId);
+
+      socket.on("chat", (data: FullChat) => {
+        console.log("Received chat data:", data);
+        setActiveChat(data);
+        setIsActiveChatLoading(false);
+      });
+
+      return () => {
+        socket.off("chat");
+      };
+    }
+  }, [selectedChatId, socket]);
+
+  if (isLoading) {
+    return (
+      <div
+        style={{ height: `${windowHeight - 55}px`, width: `${windowWidth}px` }}
+        className="flex flex-col items-center justify-center scrollbar-hidden p-4"
+      >
+        <LoadingIndicator />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -51,13 +84,22 @@ export default function Chats({
           style={{ width: `${(windowWidth / 12) * 3}px` }}
           className="rounded-2xl bg-gray-800 p-2"
         >
-          <ChatList chats={chats} user={user} />
+          <ChatList
+            chats={chats}
+            user={user}
+            selectedChatId={selectedChatId}
+            setSelectedChatId={setSelectedChatId} // Updated prop
+          />
         </div>
         <div
           style={{ width: `${(windowWidth / 12) * 9}px` }}
           className="p-2 rounded-2xl bg-gray-800 "
         >
-          <Chat user={user} chat={activeChat} />
+          <Chat
+            user={user}
+            chat={activeChat}
+            isActiveChatLoading={isActiveChatLoading}
+          />
         </div>
       </div>
     </div>

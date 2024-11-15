@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { verifyToken } from "./src/utils/jwt";
-import { getChatsForUser } from "./services/chatService";
+import { getChatById, getChatsForUser } from "./services/chatService";
 import { acceptFriendRequest, addFriend } from "./services/friendService";
 
 const dev = process.env.NODE_ENV !== "production";
@@ -92,11 +92,20 @@ app.prepare().then(() => {
       }
     });
 
+    socket.on("getChat", async (chatId) => {
+      try {
+        const chat = await getChatById(parseInt(chatId), socket.data.userId);
+        socket.emit("chat", chat);
+      } catch (error) {
+        console.error("Error getting chat:", error);
+        socket.emit("error", "Failed to fetch chat.");
+      }
+    });
+
     socket.on("newMessage", (data) => {
       io.emit("newMessage", data);
     });
 
-    // Обработчик запроса на добавление в друзья
     socket.on("addFriend", async ({ friendId }) => {
       try {
         await addFriend(socket.data.userId, friendId, io);
