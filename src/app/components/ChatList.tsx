@@ -32,7 +32,7 @@ export default function ChatList({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex scrollbar-hidden flex-col h-full border-r border-r pr-4">
       <div className="relative mb-4">
         <AiOutlineSearch className="absolute top-3 left-3 text-gray-400" />
         <input
@@ -40,7 +40,7 @@ export default function ChatList({
           placeholder="Search..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          className="w-full pl-10 pr-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
         />
       </div>
 
@@ -50,7 +50,7 @@ export default function ChatList({
             <div
               key={chat.id}
               onClick={() => handleChatClick(chat)}
-              className={`flex items-center p-3 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors ${
+              className={`flex items-center p-3 rounded-lg cursor-pointer hover:bg-yellow-500 transition-colors ${
                 selectedChatId === chat.id ? "border-l-4 border-yellow-500" : ""
               }`}
             >
@@ -87,9 +87,9 @@ export default function ChatList({
             </div>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center text-gray-400 mt-10">
+          <div className="flex flex-col items-center justify-center mt-10">
             <AiOutlineSearch className="text-4xl mb-2" />
-            <p>Чатов не найдено</p>
+            <p>No chats found</p>
           </div>
         )}
       </div>

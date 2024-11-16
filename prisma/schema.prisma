@@ -108,7 +108,7 @@ model MessagesInChats {
   chatId    Int
   message   String
   createdAt DateTime           @default(now())
-  images    ImagesInMessages[]
+  images    ImagesInMessages[] @relation("MessageImages")
   chat      Chats              @relation(fields: [chatId], references: [id])
   author    User               @relation(fields: [userId], references: [id])
 
@@ -121,7 +121,7 @@ model ImagesInMessages {
   messageId Int
   picpath   String
   bucketkey String
-  messages  MessagesInChats @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  message   MessagesInChats @relation("MessageImages", fields: [messageId], references: [id], onDelete: Cascade)
 
   @@index([messageId], map: "ImagesInMessages_messageId_fkey")
 }

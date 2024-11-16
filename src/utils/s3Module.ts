@@ -1,23 +1,25 @@
-import * as aws from "aws-sdk";
-require("aws-sdk/lib/maintenance_mode_message").suppress = true;
-const { env } = require("process");
+// src/utils/s3Module.ts
 
-// Set up AWS S3 client
-const s3 = new aws.S3({
-  accessKeyId: process.env.S3_ID,
-  secretAccessKey: process.env.S3_PRIVATE,
+import AWS from "aws-sdk";
+
+require("aws-sdk/lib/maintenance_mode_message").suppress = true;
+
+const { S3_ID, S3_PRIVATE } = process.env;
+
+const s3 = new AWS.S3({
+  accessKeyId: S3_ID,
+  secretAccessKey: S3_PRIVATE,
   endpoint: "https://storage.yandexcloud.net",
   region: "ru-central1",
   s3ForcePathStyle: true,
 });
 
-// Define the type for the file object
-interface File {
+export interface File {
   filename: string;
-  content: Buffer | string;  // Content can be a buffer or string
+  content: Buffer | string;
 }
 
-interface UploadData {
+export interface UploadData {
   ETag: string;
   Location: string;
   Bucket: string;
@@ -25,45 +27,35 @@ interface UploadData {
   VersionId?: string;
 }
 
-// Typing the uploadFiles function
-const uploadFiles = function uploadFiles(files: File[]): Promise<UploadData[]> {
+export const uploadFiles = async (files: File[]): Promise<UploadData[]> => {
   return Promise.all(
     files.map((file) => {
       const uploadParams = {
         Bucket: "pinpictures",
         Key: file.filename,
         Body: file.content,
+        ACL: "public-read",
       };
 
-      return s3
-        .upload(uploadParams)
-        .promise()
-        .then((data: UploadData) => {
-          return data;
-        })
-        .catch((err: Error) => {
-          throw err;
-        });
+      return s3.upload(uploadParams).promise();
     })
   );
 };
 
-// Typing the deleteFiles function
-const deleteFiles = function deleteFiles(paths: string[]): void {
-  paths.forEach((path) => {
+export const deleteFiles = async (paths: string[]): Promise<void> => {
+  const deletePromises = paths.map((path) => {
     const deleteParams = {
       Bucket: "pinpictures",
       Key: path,
     };
 
-    s3.deleteObject(deleteParams, function (err: Error, data: aws.S3.DeleteObjectOutput) {
-      if (err) {
-        console.error("Error deleting file:", err);
-      } else {
-        console.log("File deleted successfully:", data);
-      }
-    });
+    return s3
+      .deleteObject(deleteParams)
+      .promise()
+      .catch((err) => {
+        console.error(`Error deleting file ${path}:`, err);
+      });
   });
-};
 
-module.exports = { uploadFiles, deleteFiles };
+  await Promise.all(deletePromises);
+};

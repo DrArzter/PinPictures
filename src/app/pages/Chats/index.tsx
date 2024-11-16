@@ -82,7 +82,7 @@ export default function Chats({
       <div className="flex flex-row w-full h-full gap-2">
         <div
           style={{ width: `${(windowWidth / 12) * 3}px` }}
-          className="rounded-2xl bg-gray-800 p-2"
+          className="rounded-2xl p-2"
         >
           <ChatList
             chats={chats}
@@ -94,12 +94,13 @@ export default function Chats({
         </div>
         <div
           style={{ width: `${(windowWidth / 12) * 9}px` }}
-          className="p-2 rounded-2xl bg-gray-800 "
+          className="p-2 rounded-2xl "
         >
           <Chat
             user={user}
             chat={activeChat}
             isActiveChatLoading={isActiveChatLoading}
+            socket={socket}
           />
         </div>
       </div>

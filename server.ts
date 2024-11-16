@@ -1,4 +1,5 @@
 // server.ts
+
 import express from "express";
 import next from "next";
 import http from "http";
@@ -8,7 +9,11 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { verifyToken } from "./src/utils/jwt";
-import { getChatById, getChatsForUser } from "./services/chatService";
+import {
+  getChatById,
+  getChatsForUser,
+  handleNewMessage,
+} from "./services/chatService";
 import { acceptFriendRequest, addFriend } from "./services/friendService";
 
 const dev = process.env.NODE_ENV !== "production";
@@ -37,7 +42,7 @@ app.prepare().then(() => {
 
   io.on("connection", (socket) => {
     console.log("New client connected:", socket.id);
-    
+
     const cookies = socket.handshake.headers?.cookie;
 
     if (!cookies) {
@@ -102,8 +107,18 @@ app.prepare().then(() => {
       }
     });
 
-    socket.on("newMessage", (data) => {
-      io.emit("newMessage", data);
+    socket.on("joinChat", (chatId) => {
+      socket.join(`chat_${chatId}`);
+      console.log(`User ${socket.data.userId} joined chat ${chatId}`);
+    });
+
+    socket.on("newMessage", async (data) => {
+      try {
+        await handleNewMessage(socket, data);
+      } catch (error) {
+        console.error("Error sending message:", error);
+        socket.emit("error", "Failed to send message.");
+      }
     });
 
     socket.on("addFriend", async ({ friendId }) => {

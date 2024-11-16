@@ -1,6 +1,119 @@
-// ./services/chatService.ts
+// services/chatService.ts
+
 import { prisma } from "../src/utils/prisma";
 import { UsersInChats, User } from "@prisma/client";
+import { Socket } from "socket.io";
+import { uploadFiles } from "../src/utils/s3Module";
+
+interface NewMessageData {
+  chatId: number;
+  message: string;
+  images?: string[];
+}
+
+export async function handleNewMessage(socket: Socket, data: any) {
+  try {
+    const userId = socket.data.userId;
+    const { chatId, message, images } = data;
+
+    if (!chatId || (!message.trim() && (!images || images.length === 0))) {
+      socket.emit("error", "Chat ID and message or images are required.");
+      return;
+    }
+
+    const newMessage = await prisma.messagesInChats.create({
+      data: {
+        chatId: chatId,
+        userId: userId,
+        message: message.trim(),
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+          },
+        },
+        images: true,
+      },
+    });
+
+    let completeMessage = newMessage;
+
+    if (images && images.length > 0) {
+      const filesToUpload = [];
+
+      for (const image of images) {
+        const matches = image.match(/^data:(image\/\w+);base64,(.+)$/);
+        if (!matches) {
+          socket.emit("error", "Invalid image format.");
+          return;
+        }
+        const mimeType = matches[1];
+        const imageData = matches[2];
+        const buffer = Buffer.from(imageData, "base64");
+        const extension = mimeType.split("/")[1];
+
+        const filename = `messages/${newMessage.id}-${Date.now()}.${extension}`;
+
+        filesToUpload.push({
+          filename: filename,
+          content: buffer,
+        });
+      }
+
+      const uploadResult = await uploadFiles(filesToUpload);
+
+      if (!uploadResult || uploadResult.length === 0) {
+        socket.emit("error", "Failed to upload images.");
+        return;
+      }
+
+      for (const uploadedImage of uploadResult) {
+        await prisma.imagesInMessages.create({
+          data: {
+            messageId: newMessage.id,
+            picpath: uploadedImage.Location,
+            bucketkey: uploadedImage.Key,
+          },
+        });
+      }
+
+      const foundMessage = await prisma.messagesInChats.findUnique({
+        where: { id: newMessage.id },
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              avatar: true,
+            },
+          },
+          images: {
+            select: {
+              id: true,
+              picpath: true,
+              messageId: true,
+              bucketkey: true,
+            },
+          },
+        },
+      });
+
+      if (!foundMessage) {
+        throw new Error("Message not found after creation.");
+      }
+
+      completeMessage = foundMessage;
+    }
+
+    global.io.to(`chat_${chatId}`).emit("newMessage", completeMessage);
+  } catch (error) {
+    console.error("Error creating message:", error);
+    socket.emit("error", "Failed to send message.");
+  }
+}
 
 export async function getChatsForUser(userId: number) {
   try {
@@ -94,13 +207,19 @@ export async function getChatById(chatId: number, userId: number) {
         },
         messages: {
           orderBy: {
-            createdAt: "asc", // Изменено на "asc" для упорядочивания сообщений по времени
+            createdAt: "asc",
           },
           include: {
             author: {
               select: {
                 name: true,
                 avatar: true,
+              },
+            },
+            images: {
+              select: {
+                id: true,
+                picpath: true,
               },
             },
           },
@@ -149,6 +268,10 @@ export async function getChatById(chatId: number, userId: number) {
           name: msg.author?.name || "Unknown",
           avatar: msg.author?.avatar || "default-avatar-url",
         },
+        images: msg.images.map((image) => ({
+          id: image.id,
+          picpath: image.picpath,
+        })),
       })),
     };
 
