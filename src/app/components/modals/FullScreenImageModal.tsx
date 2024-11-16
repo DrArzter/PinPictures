@@ -1,3 +1,4 @@
+// ./src/app/components/modals/FullScreenImageModal.tsx
 import React, { useEffect } from 'react';
 
 export default function FullScreenImage({ imageUrl, onClose }: any) {

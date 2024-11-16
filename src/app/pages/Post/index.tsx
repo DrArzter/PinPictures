@@ -8,6 +8,9 @@ import { useWindowContext } from "@/app/contexts/WindowContext";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import * as api from "@/app/api";
 
+import CommentList from "@/app/components/CommentList";
+import FullScreenImage from "@/app/components/modals/FullScreenImageModal";
+
 import { Post as PostType, User } from "@/app/types/global";
 
 interface PostProps {
@@ -36,6 +39,10 @@ export default function Post({
   const [commentsCount, setCommentsCount] = useState(0);
   const [newComment, setNewComment] = useState("");
 
+  // Fullscreen modal state
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState("");
+
   useEffect(() => {
     const fetchPostData = async () => {
       try {
@@ -51,7 +58,7 @@ export default function Post({
         console.error("Error fetching post:", error);
         addNotification({
           type: "error",
-          message: "Failed to load post.",
+          message: "Failed to fetch post.",
         });
       } finally {
         setLoading(false);
@@ -60,11 +67,14 @@ export default function Post({
     fetchPostData();
   }, [dynamicProps.id, user, addNotification]);
 
-  const handleLikeClick = async () => {
+  const handleLikeClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!user) {
       addNotification({
         type: "error",
-        message: "You must be logged in to like posts.",
+        message: "You have to be authorized to like posts.",
+        clickable: true,
+        link_to: "/authentication",
       });
       return;
     }
@@ -80,15 +90,20 @@ export default function Post({
       console.error("Error updating like:", error);
       addNotification({
         type: "error",
-        message: "Failed to update like.",
+        message: "Не удалось обновить лайк.",
       });
     }
   };
 
   const handleImageClick = () => {
-    setCurrentImage((prevIndex) =>
-      prevIndex === post!.images.length - 1 ? 0 : prevIndex + 1
-    );
+    const imageUrl = post!.images[currentImage].picpath;
+    setModalImageUrl(imageUrl);
+    setIsImageModalOpen(true);
+  };
+
+  const closeImageModal = () => {
+    setIsImageModalOpen(false);
+    setModalImageUrl("");
   };
 
   const handlePrevImage = (e: React.MouseEvent) => {
@@ -110,7 +125,9 @@ export default function Post({
     if (!user) {
       addNotification({
         type: "error",
-        message: "You must be logged in to add a comment.",
+        message: "You have to be authorized to leave a comment.",
+        clickable: true,
+        link_to: "/authentication",
       });
       return;
     }
@@ -118,7 +135,7 @@ export default function Post({
     if (newComment.trim() === "") {
       addNotification({
         type: "error",
-        message: "Comment cannot be empty.",
+        message: "Комментарий не может быть пустым.",
       });
       return;
     }
@@ -130,22 +147,23 @@ export default function Post({
           type: response.status,
           message: response.message,
         });
+        const addedComment = {
+          id: Date.now(),
+          author: {
+            name: user.name,
+            avatar: user.avatar,
+          },
+          text: newComment,
+          createdAt: new Date().toISOString(),
+        };
+        setComments([...comments, addedComment]);
+        setNewComment("");
+        setCommentsCount(commentsCount + 1);
       }
-      const addedComment = {
-        id: Date.now(),
-        author: {
-          name: user.name,
-          avatar: user.avatar,
-        },
-        text: newComment,
-        createdAt: new Date().toISOString(),
-      };
-      setComments([...comments, addedComment]);
-      setNewComment("");
     } catch (error) {
       addNotification({
         type: "error",
-        message: "An error occurred while adding the comment.",
+        message: "Произошла ошибка при добавлении комментария.",
       });
     }
   };
@@ -161,7 +179,7 @@ export default function Post({
   if (!post) {
     return (
       <div className="flex justify-center items-center h-full">
-        <p>Post not found</p>
+        <p>Пост не найден</p>
       </div>
     );
   }
@@ -171,19 +189,23 @@ export default function Post({
 
   return (
     <div
-      className={`flex ${isWideScreen ? "flex-row" : "flex-col"} items-center justify-center`}
+      className={`flex ${
+        isWideScreen ? "flex-row" : "flex-col"
+      } items-center justify-center`}
       style={{ height: `${windowHeight - 55}px` }}
     >
       <div
         className={`${
           isWideScreen ? "w-1/2 h-full" : "w-full"
         } relative flex items-center justify-center overflow-hidden`}
-        style={isWideScreen ? { height: "100%" } : {}}
+        style={{
+          height: isWideScreen ? "100%" : `${windowHeight * 0.5}px`,
+        }}
       >
         <img
           src={post.images[currentImage].picpath}
           alt="Post Image"
-          className="object-cover w-full h-full cursor-pointer"
+          className="w-full h-full object-cover cursor-pointer"
           loading="lazy"
           onClick={handleImageClick}
         />
@@ -222,43 +244,62 @@ export default function Post({
               <p className="text-sm text-gray-500">{post.createdAt}</p>
             </div>
           </div>
-          <button onClick={handleLikeClick} className="flex items-center gap-1">
-            {isLiked ? <BsHeartFill className="text-red-500" /> : <BsHeart />}
+        </div>
+
+        <div className="mt-4">
+          <h1 className="font-bold text-4xl mb-4 text-yellow-500">
+            {post.name}
+          </h1>
+          <p className="text-gray-700">{post.description}</p>
+        </div>
+
+        <div className="flex items-center gap-4 mt-4">
+          <button
+            className="flex items-center gap-1 text-yellow-500"
+            onClick={handleLikeClick}
+          >
+            {isLiked ? (
+              <BsHeartFill className="text-yellow-500" size={20} />
+            ) : (
+              <BsHeart size={20} />
+            )}
             <span>{likeCount}</span>
           </button>
+          <button
+            className="flex items-center gap-1 text-yellow-500"
+            onClick={() => console.log("Comment button clicked")}
+          >
+            <BsChatDots size={20} />
+            <span>{commentsCount}</span>
+          </button>
         </div>
+
         <div className="mt-4">
-          <p>{post.name}</p>
-          <p>{post.description}</p>
-        </div>
-        <div className="mt-4">
-          <p className="font-bold">Comments:</p>
-          {comments.map((comment) => (
-            <div key={comment.id} className="flex flex-row gap-2 items-center mt-2">
-              <img
-                src={comment.author.avatar}
-                alt="Comment Author Avatar"
-                className="w-12 h-12 rounded-full"
-              />
-              <div>
-                <p className="font-bold">{comment.author.name}</p>
-                <p>{comment.comment}</p>
-                <p className="text-sm text-gray-500">{comment.createdAt}</p>
-              </div>
-            </div>
-          ))}
+          <CommentList comments={comments} windowHeight={windowHeight} />
           <form onSubmit={handleAddComment} className="mt-4">
-            <input
-              type="text"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              className="border rounded w-full p-2"
-              placeholder="Add a comment..."
-            />
-            <button type="submit" className="btn-primary mt-2">Submit</button>
+            <div className="flex flex-row gap-2 items-center w-full">
+              <input
+                type="text"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="border rounded w-full p-2 text-base outline-none focus:ring-2 focus:ring-yellow-500"
+                placeholder="Add a comment..."
+              />
+              <button
+                type="submit"
+                className="btn-primary bg-yellow-500 text-white font-semibold rounded px-4"
+              >
+                Send
+              </button>
+            </div>
           </form>
         </div>
       </div>
+
+      {/* FullScreen Modal */}
+      {isImageModalOpen && (
+        <FullScreenImage imageUrl={modalImageUrl} onClose={closeImageModal} />
+      )}
     </div>
   );
 }

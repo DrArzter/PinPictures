@@ -37,7 +37,11 @@ export default function Post({
   }`;
 
   useEffect(() => {
-    if (user && post.likes && post.likes.some((like) => like.userId === user.id)) {
+    if (
+      user &&
+      post.likes &&
+      post.likes.some((like) => like.userId === user.id)
+    ) {
       setIsLiked(true);
     }
   }, [post.likes, user]);
@@ -89,8 +93,10 @@ export default function Post({
   const postDescriptionClassName = "text-sm overflow-hidden line-clamp-3";
   const hasMultipleImages = post.images && post.images.length > 1;
   const postActionsClassName = "flex flex-row items-center space-x-4 mt-2";
-  const likeButtonClassName = "flex items-center space-x-1 hover:text-yellow-500";
-  const commentButtonClassName = "flex items-center space-x-1 hover:text-yellow-500";
+  const likeButtonClassName =
+    "flex items-center space-x-1 hover:text-yellow-500";
+  const commentButtonClassName =
+    "flex items-center space-x-1 hover:text-yellow-500";
 
   return (
     <div
@@ -110,7 +116,13 @@ export default function Post({
             />
             <div className="absolute top-0 left-0 right-0 flex justify-between items-center p-4 bg-gradient-to-b from-black/70 to-transparent">
               <p className="text-lg font-semibold text-white">{post.name}</p>
-              <div className="flex items-center">
+              <div
+                className="flex items-center"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openWindowByPath(`/profile/${post.author.name}`);
+                }}
+              >
                 <p className="mr-2 text-white">{post.author.name}</p>
                 <img
                   src={post.author.avatar}
@@ -122,7 +134,11 @@ export default function Post({
           </div>
         )}
 
-        <div className={`${isDarkMode ? "bg-gray-700" : "bg-gray-300"} h-[1px] w-full`} />
+        <div
+          className={`${
+            isDarkMode ? "bg-gray-700" : "bg-gray-300"
+          } h-[1px] w-full`}
+        />
 
         <div className={postContentClassName} onClick={handleChildClick}>
           <p className={postDescriptionClassName}>{post.description}</p>
