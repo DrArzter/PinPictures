@@ -1,5 +1,3 @@
-// src/app/components/ChatList.tsx
-
 import React, { useState } from "react";
 import { User, Chat } from "@/app/types/global";
 import { AiOutlineSearch } from "react-icons/ai";
@@ -9,6 +7,7 @@ interface ChatListProps {
   chats: Chat[];
   selectedChatId: number;
   setSelectedChatId: (id: string) => void;
+  windowWidth: number;
 }
 
 export default function ChatList({
@@ -16,8 +15,10 @@ export default function ChatList({
   user,
   selectedChatId,
   setSelectedChatId,
+  windowWidth,
 }: ChatListProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const wideWindow = windowWidth > 768;
 
   // Фильтрация чатов по запросу
   const filteredChats = Array.isArray(chats)
@@ -53,30 +54,36 @@ export default function ChatList({
                 selectedChatId === chat.id ? "border-l-4 border-yellow-500" : ""
               }`}
             >
-              {chat.avatar ? (
-                <img
-                  className="w-12 h-12 rounded-full object-cover"
-                  src={chat.avatar}
-                  alt={chat.name}
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center">
-                  <span className="text-Пxl text-gray-300">
-                    {chat.name.charAt(0).toUpperCase()}
+              {/* Обертка для аватара */}
+              <div className="flex-shrink-0">
+                {chat.avatar ? (
+                  <img
+                    className="w-12 h-12 rounded-full object-cover"
+                    src={chat.avatar}
+                    alt={chat.name}
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center">
+                    <span className="text-xl text-gray-300">
+                      {chat.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Текстовая часть */}
+              {wideWindow && (
+                <div className="ml-4 flex-1 flex flex-col justify-center">
+                  <span className="text-lg font-semibold text-white">
+                    {chat.name}
+                  </span>
+                  <span className="text-sm text-gray-400">
+                    {chat.lastMessage
+                      ? `${chat.lastMessage.author.name}: ${chat.lastMessage.message}`
+                      : "Нет сообщений"}
                   </span>
                 </div>
               )}
-
-              <div className="ml-4 flex flex-col">
-                <span className="text-lg font-semibold text-white">
-                  {chat.name}
-                </span>
-                <span className="text-sm text-gray-400">
-                  {chat.lastMessage
-                    ? `${chat.lastMessage.author.name}: ${chat.lastMessage.message}`
-                    : "Нет сообщений"}
-                </span>
-              </div>
             </div>
           ))
         ) : (

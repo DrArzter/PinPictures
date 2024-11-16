@@ -88,7 +88,8 @@ export default function Chats({
             chats={chats}
             user={user}
             selectedChatId={selectedChatId}
-            setSelectedChatId={setSelectedChatId} // Updated prop
+            setSelectedChatId={setSelectedChatId}
+            windowWidth={windowWidth}
           />
         </div>
         <div

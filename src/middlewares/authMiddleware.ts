@@ -1,56 +1,60 @@
+// middlewares/authMiddleware.ts
+
 import { verifyToken } from "@/utils/jwt";
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
+import { parse } from "cookie";
 
 interface DecodedToken {
-  userId: number; // Преобразуем в число, если это число в базе данных
+  userId: number;
   iat: number;
   exp: number;
 }
 
+interface CustomNextApiRequest extends NextApiRequest {
+  user?: any;
+}
+
 export async function authMiddleware(
-  req: any,
-  res: NextApiResponse,
-  next: () => void
+  req: CustomNextApiRequest,
+  res: NextApiResponse
 ) {
-  const cookieStore = req.cookies;
-  const token = cookieStore.token;
+  return new Promise<void>(async (resolve, reject) => {
+    const cookieStore = req.cookies || parse(req.headers.cookie || "");
+    const token = cookieStore.token;
 
-  if (!token) {
-    return res
-      .status(401)
-      .json({ status: "error", message: "No token provided" });
-  }
-
-  try {
-    const decoded = verifyToken(token) as DecodedToken;
-
-    if (!decoded) {
-      return res
-        .status(401)
-        .json({ status: "error", message: "Invalid token" });
+    if (!token) {
+      res.status(401).json({ status: "error", message: "No token provided" });
+      return reject(new Error("No token provided"));
     }
 
-    // Преобразуем userId в число, если это необходимо
-    const userId = decoded.userId;
+    try {
+      const decoded = verifyToken(token) as DecodedToken;
 
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+      if (Date.now() >= decoded.exp * 1000) {
+        res.status(401).json({ status: "error", message: "Token expired" });
+        return reject(new Error("Token expired"));
+      }
 
-    if (!user) {
-      return res
-        .status(404)
-        .json({ status: "error", message: "User not found" });
+      const userId = decoded.userId;
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        res.status(404).json({ status: "error", message: "User not found" });
+        return reject(new Error("User not found"));
+      }
+
+      const { password, bananaLevel, ...userWithoutSensitiveInfo } = user;
+
+      req.user = userWithoutSensitiveInfo;
+      resolve();
+    } catch (err) {
+      console.error("Authentication Error:", err);
+      res.status(500).json({ status: "error", message: "Server error" });
+      reject(err);
     }
-
-    const { password, bananaLevel, ...userWithoutSensitiveInfo } = user;
-
-    req.user = userWithoutSensitiveInfo;
-    next();
-  } catch (err) {
-    return res.status(401).json({ status: "error", message: "Server error" });
-  }
+  });
 }
