@@ -11,6 +11,8 @@ dotenv.config();
 import { verifyToken } from "./src/utils/jwt";
 import {
   getChatById,
+  getChatDetails,
+  getChatMessages,
   getChatsForUser,
   handleNewMessage,
 } from "./services/chatService";
@@ -104,6 +106,39 @@ app.prepare().then(() => {
       } catch (error) {
         console.error("Error getting chat:", error);
         socket.emit("error", "Failed to fetch chat.");
+      }
+    });
+
+    socket.on("getChatDetails", async (chatId) => {
+      try {
+        const chatDetails = await getChatDetails(
+          Number(chatId),
+          socket.data.userId
+        );
+        socket.emit("chatDetails", chatDetails);
+      } catch (error) {
+        console.error("Error fetching chat details:", error);
+        socket.emit("error", "Failed to fetch chat details.");
+      }
+    });
+
+    socket.on("getChatMessages", async ({ chatId, page, limit }) => {
+      try {
+        console.log(
+          `Request to get chat messages: chatId=${chatId}, page=${page}, limit=${limit}`
+        );
+        const messages = await getChatMessages(
+          Number(chatId),
+          Number(page),
+          Number(limit)
+        );
+        console.log(
+          `Отправка ${messages.length} сообщений для страницы ${page}`
+        );
+        socket.emit("chatMessages", messages);
+      } catch (error) {
+        console.error("Error fetching chat messages:", error);
+        socket.emit("error", "Failed to fetch chat messages.");
       }
     });
 

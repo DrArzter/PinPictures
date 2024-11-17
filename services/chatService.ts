@@ -281,3 +281,97 @@ export async function getChatById(chatId: number, userId: number) {
     throw error;
   }
 }
+
+export async function getChatDetails(chatId: number, userId: number) {
+  try {
+    if (!chatId) throw new Error("Chat ID is required");
+
+    const chat = await prisma.chats.findUnique({
+      where: { id: chatId },
+      include: {
+        users: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (!chat) {
+      throw new Error(`Chat with ID ${chatId} not found.`);
+    }
+
+    const getInterlocutorName = (
+      usersInChat: Array<UsersInChats & { user: User }>,
+      currentUserId: number
+    ): string => {
+      const interlocutor = usersInChat.find((u) => u.userId !== currentUserId);
+      return interlocutor?.user?.name || "Unknown";
+    };
+
+    const getInterlocutorAvatar = (
+      usersInChat: Array<UsersInChats & { user: User }>,
+      currentUserId: number
+    ): string => {
+      const interlocutor = usersInChat.find((u) => u.userId !== currentUserId);
+      return interlocutor?.user?.avatar || "default-avatar-url";
+    };
+
+    const isGroupChat = chat.ChatType === "group";
+
+    return {
+      id: chat.id,
+      name: isGroupChat ? chat.name : getInterlocutorName(chat.users, userId),
+      avatar: isGroupChat
+        ? chat.picpath
+        : getInterlocutorAvatar(chat.users, userId),
+      users: chat.users.map((u) => ({
+        id: u.user.id,
+        name: u.user.name,
+        avatar: u.user.avatar,
+      })),
+    };
+  } catch (error) {
+    console.error("Error fetching chat details:", error);
+    throw error;
+  }
+}
+
+// Постраничная загрузка сообщений
+export async function getChatMessages(
+  chatId: number,
+  page: number,
+  limit: number
+) {
+  try {
+    if (!chatId) throw new Error("Chat ID is required");
+
+    const offset = (page - 1) * limit;
+
+    const messages = await prisma.messagesInChats.findMany({
+      where: { chatId },
+      orderBy: { createdAt: "desc" },
+      skip: offset,
+      take: limit,
+      include: {
+        author: {
+          select: {
+            name: true,
+            avatar: true,
+          },
+        },
+        images: {
+          select: {
+            id: true,
+            picpath: true,
+          },
+        },
+      },
+    });
+
+    return messages.reverse();
+  } catch (error) {
+    console.error("Error fetching chat messages:", error);
+    throw error;
+  }
+}
