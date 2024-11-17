@@ -40,7 +40,7 @@ export default async function handler(
         avatar: `https://ui-avatars.com/api/?name=${name}&background=ACACAC&color=fff`,
         background: `https://ui-avatars.com/api/?name=${name}&background=ACACAC&color=fff`,
         settings: {
-          bgColor: "#ffffff",
+          bgColor: "#ffffff00",
         },
       },
     });
