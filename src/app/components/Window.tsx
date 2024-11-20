@@ -1,38 +1,39 @@
 // Window.tsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, memo, useMemo } from "react";
 import { FaRegWindowClose, FaRegMinusSquare } from "react-icons/fa";
 import { BsArrowsFullscreen } from "react-icons/bs";
 import { RiDraggable } from "react-icons/ri";
 
 import { useWindowContext } from "@/app/contexts/WindowContext";
-import { getComponentByPath } from "@/app/utils/getComponentByPath";
 import { useUserContext } from "@/app/contexts/UserContext";
+import { getComponentByPath } from "@/app/utils/getComponentByPath";
 import { componentRegistry } from "@/app/utils/componentRegistry";
 
 import IconList from "./IconList";
-import { Window as WindowType } from "@/app/types/global"; // Импорт интерфейса
+import { Window as WindowType } from "@/app/types/global";
 
 interface WindowProps {
-  windowData: WindowType;
-  mouseDown: boolean;
-  mousePosition: { clientX: number; clientY: number };
+  initialWindowData: WindowType;
 }
 
-
-// TODO TRY TO IMPLEMENT HISTORY TO GO BACK AND FORWARD
-export default function Window({
-  windowData: initialWindowData,
-  mouseDown,
-  mousePosition,
-}: WindowProps) {
+const Window = memo(({ initialWindowData }: WindowProps) => {
   const { user } = useUserContext();
-  const { windows, setWindows, removeWindow, updateWindowPath } =
-    useWindowContext();
+  const { windows, setWindows, removeWindow, updateWindowPath } = useWindowContext();
 
-  const windowData =
-    windows.find((w) => w.id === initialWindowData.id) || initialWindowData;
+  // Локальное состояние для позиции и размеров
+  const [windowData, setWindowData] = useState(initialWindowData);
+  const [mouseDown, setMouseDown] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+  const [resizeStart, setResizeStart] = useState({
+    width: initialWindowData.width || 800,
+    height: initialWindowData.height || 600,
+    x: 0,
+    y: 0,
+  });
 
-  const [pathInput, setPathInput] = useState(windowData.path);
+  const [pathInput, setPathInput] = useState(windowData.path || "");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -46,6 +47,43 @@ export default function Window({
       return { width, height };
     }
     return { width: 800, height: 600 };
+  };
+
+  // Перемещение окна
+  const handleDragMouseDown = (event: React.MouseEvent) => {
+    if (event.button === 0) {
+      setIsDragging(true);
+      setMouseDown(true);
+      setStartPosition({
+        x: event.clientX - windowData.x,
+        y: event.clientY - windowData.y,
+      });
+    }
+  };
+
+  // Изменение размеров окна
+  const handleResizeStart = (event: React.MouseEvent) => {
+    if (event.button === 0) {
+      setIsResizing(true);
+      setMouseDown(true);
+      setResizeStart({
+        width: windowData.width,
+        height: windowData.height,
+        x: event.clientX,
+        y: event.clientY,
+      });
+    }
+  };
+
+  const bringToFront = () => {
+    const maxLayer = Math.max(...windows.map((w) => w.layer || 0));
+    setWindows((prevWindows) =>
+      prevWindows.map((w) =>
+        w.id !== windowData.id
+          ? { ...w, layer: Math.max(0, (w.layer || 0) - 1) }
+          : { ...w, layer: maxLayer + 1 }
+      )
+    );
   };
 
   const handlePathChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,36 +122,6 @@ export default function Window({
     setPathInput(suggestion);
     setShowSuggestions(false);
     updateWindowPath(windowData.id, suggestion);
-  };
-
-  const [isDragging, setIsDragging] = useState(false);
-  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
-  const [isResizing, setIsResizing] = useState(false);
-  const [resizeStart, setResizeStart] = useState({
-    width: windowData.width,
-    height: windowData.height,
-    x: 0,
-    y: 0,
-  });
-
-  const handleDragMouseDown = (event: React.MouseEvent) => {
-    if (event.button === 0) {
-      setIsDragging(true);
-      setStartPosition({
-        x: event.clientX - windowData.x,
-        y: event.clientY - windowData.y,
-      });
-    }
-  };
-
-  const handleResizeStart = (event: React.MouseEvent) => {
-    setIsResizing(true);
-    setResizeStart({
-      width: windowData.width,
-      height: windowData.height,
-      x: event.clientX,
-      y: event.clientY,
-    });
   };
 
   useEffect(() => {
@@ -163,46 +171,44 @@ export default function Window({
   }, [windowData.path]);
 
   useEffect(() => {
-    if (!mouseDown) {
+    const handleMouseMove = (event: MouseEvent) => {
+      if (mouseDown) {
+        if (isDragging) {
+          setWindowData((prev) => ({
+            ...prev,
+            x: event.clientX - startPosition.x,
+            y: event.clientY - startPosition.y,
+          }));
+        } else if (isResizing) {
+          const newWidth = resizeStart.width + (event.clientX - resizeStart.x);
+          const newHeight =
+            resizeStart.height + (event.clientY - resizeStart.y);
+
+          const { width: maxWidth, height: maxHeight } = getWindowDimensions();
+
+          setWindowData((prev) => ({
+            ...prev,
+            width: Math.min(Math.max(newWidth, prev.minWidth), maxWidth),
+            height: Math.min(Math.max(newHeight, prev.minHeight), maxHeight),
+          }));
+        }
+      }
+    };
+
+    const handleMouseUp = () => {
+      setMouseDown(false);
       setIsDragging(false);
       setIsResizing(false);
-    }
-  }, [mouseDown]);
+    };
 
-  useEffect(() => {
-    if (isDragging && mouseDown) {
-      setWindows(
-        windows.map((w) =>
-          w.id === windowData.id
-            ? {
-                ...w,
-                x: mousePosition.clientX - startPosition.x,
-                y: mousePosition.clientY - startPosition.y,
-              }
-            : w
-        )
-      );
-    } else if (isResizing && mouseDown) {
-      const newWidth =
-        resizeStart.width + (mousePosition.clientX - resizeStart.x);
-      const newHeight =
-        resizeStart.height + (mousePosition.clientY - resizeStart.y);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
-      const { width: maxWidth, height: maxHeight } = getWindowDimensions();
-
-      setWindows(
-        windows.map((w) =>
-          w.id === windowData.id
-            ? {
-                ...w,
-                width: Math.min(Math.max(newWidth, w.minWidth), maxWidth),
-                height: Math.min(Math.max(newHeight, w.minHeight), maxHeight),
-              }
-            : w
-        )
-      );
-    }
-  }, [mousePosition]);
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [mouseDown, isDragging, isResizing, startPosition, resizeStart]);
 
   const iconList = [
     {
@@ -224,11 +230,7 @@ export default function Window({
           className="w-8 h-8 text-white hover:scale-110 hover:cursor-pointer transition duration-300"
           onClick={(event) => {
             event.stopPropagation();
-            setWindows(
-              windows.map((w) =>
-                w.id === windowData.id ? { ...w, isOpen: !w.isOpen } : w
-              )
-            );
+            setWindowData((prev) => ({ ...prev, isOpen: !prev.isOpen }));
           }}
         />
       ),
@@ -242,41 +244,29 @@ export default function Window({
             event.stopPropagation();
             const { width: windowWidth, height: windowHeight } =
               getWindowDimensions();
-            setWindows(
-              windows.map((w) =>
-                w.id === windowData.id
-                  ? w.fullscreen
-                    ? {
-                        ...w,
-                        x: 100,
-                        y: 100,
-                        width: w.minWidth,
-                        height: w.minHeight,
-                        fullscreen: false,
-                      }
-                    : {
-                        ...w,
-                        x:
-                          (document.documentElement.clientWidth - windowWidth) /
-                          2,
-                        y:
-                          (document.documentElement.clientHeight -
-                            windowHeight) *
-                          0.05,
-                        width: windowWidth,
-                        height: windowHeight,
-                        fullscreen: true,
-                      }
-                  : w
-              )
-            );
+            setWindowData((prev) => ({
+              ...prev,
+              x: prev.fullscreen
+                ? 100
+                : (document.documentElement.clientWidth - windowWidth) / 2,
+              y: prev.fullscreen
+                ? 100
+                : (document.documentElement.clientHeight - windowHeight) * 0.05,
+              width: prev.fullscreen ? prev.minWidth : windowWidth,
+              height: prev.fullscreen ? prev.minHeight : windowHeight,
+              fullscreen: !prev.fullscreen,
+            }));
           }}
         />
       ),
     },
   ];
 
-  const backgroundColor = user?.settings?.bgColor || "#FFFFFF5";
+  const ContentComponent = windowData.componentType;
+
+  const layer = useMemo(() => {
+    return windows.find((w) => w.id === windowData.id)?.layer || 0;
+  }, [windows, windowData.id]);
 
   if (!windowData.isOpen) {
     return (
@@ -284,60 +274,35 @@ export default function Window({
         style={{
           top: `${windowData.y}px`,
           left: `${windowData.x}px`,
-          backgroundColor,
+          backgroundColor: user?.settings?.bgColor || "#FFFFFF5",
         }}
-        className={`absolute bg-white bg-opacity-30 backdrop-blur-xl border-2 rounded-lg shadow-2xl ${
-          mouseDown ? "select-none pointer-events-none" : ""
-        }`}
-        onMouseDown={handleDragMouseDown}
+        className="absolute bg-white bg-opacity-30 backdrop-blur-xl border-2 rounded-lg shadow-2xl"
+        onMouseDown={bringToFront}
       >
-        <div className="w-full flex flex-row justify-between items-center border-b-2 border-dotted">
-          <div className="w-full text-end">
-            <h1
-              className="cursor-pointer select-auto pointer-events-auto"
-              onClick={(event) => {
-                event.stopPropagation();
-                setWindows(
-                  windows.map((w) =>
-                    w.id === windowData.id ? { ...w, isOpen: !w.isOpen } : w
-                  )
-                );
-              }}
-            >
-              {windowData.title}
-            </h1>
-          </div>
+        <div
+          className="w-full flex justify-end items-center p-2 cursor-pointer"
+          onClick={() =>
+            setWindowData((prev) => ({ ...prev, isOpen: true }))
+          }
+        >
+          <h1>{windowData.title}</h1>
         </div>
       </div>
     );
   }
 
-  const ContentComponent = windowData.componentType;
-
   return (
     <div
-      key={windowData.path}
       style={{
         width: `${windowData.width}px`,
         height: `${windowData.height}px`,
         top: `${windowData.y}px`,
         left: `${windowData.x}px`,
-        zIndex: windowData.layer,
-        backgroundColor,
+        zIndex: layer,
+        backgroundColor: user?.settings?.bgColor || "#FFFFFF5",
       }}
       className="absolute bg-white bg-opacity-30 backdrop-blur-3xl border-2 rounded-lg shadow-2xl"
-      onMouseDown={(event) => {
-        setWindows(
-          windows.map((w) =>
-            w.id !== windowData.id
-              ? { ...w, layer: Math.max(0, w.layer - 1) }
-              : {
-                  ...w,
-                  layer: Math.max(...windows.map((w2) => w2.layer)) + 1,
-                }
-          )
-        );
-      }}
+      onMouseDown={bringToFront}
     >
       <div
         className="w-full flex flex-row justify-between items-center border-b-2 border-dotted cursor-move"
@@ -406,4 +371,6 @@ export default function Window({
       </div>
     </div>
   );
-}
+});
+
+export default Window;
