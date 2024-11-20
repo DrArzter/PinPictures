@@ -28,12 +28,7 @@ model Notifications {
   category        String   @default("general")
   sourceId        Int?
   sourceType      NotificationSourceType
-  actionType      String?
-  actionUrl       String?
-  relatedEntityId Int?
-  relatedEntity   String?
   createdAt       DateTime @default(now())
-  expiresAt       DateTime?
   seen            Boolean  @default(false)
   seenAt          DateTime?
   user            User     @relation("UserNotifications")
