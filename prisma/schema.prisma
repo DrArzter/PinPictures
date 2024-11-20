@@ -7,6 +7,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum NotificationType{
+  error
+  success
+  info
+}
+
+enum NotificationSourceType{
+  post
+  user
+  comment
+  message
+  friendship
+}
+
+model Notifications {
+  id              Int      @id @default(autoincrement())
+  type            String
+  message         String
+  category        String   @default("general")
+  sourceId        Int?
+  sourceType      NotificationSourceType
+  actionType      String?
+  actionUrl       String?
+  relatedEntityId Int?
+  relatedEntity   String?
+  createdAt       DateTime @default(now())
+  expiresAt       DateTime?
+  seen            Boolean  @default(false)
+  seenAt          DateTime?
+  user            User     @relation("UserNotifications")
+
+  @@index([createdAt], map: "Notifications_createdAt_fkey")
+  @@index([seen], map: "Notifications_seen_fkey")
+}
+
+
 model User {
   id           Int               @id @default(autoincrement())
   name         String            @unique
@@ -27,6 +63,7 @@ model User {
   messages     MessagesInChats[]
   posts        Post[]
   usersinchats UsersInChats[]
+  Notifications Notifications[]
 }
 
 model Post {

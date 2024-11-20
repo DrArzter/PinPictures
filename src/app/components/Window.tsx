@@ -18,6 +18,8 @@ interface WindowProps {
   mousePosition: { clientX: number; clientY: number };
 }
 
+
+// TODO TRY TO IMPLEMENT HISTORY TO GO BACK AND FORWARD
 export default function Window({
   windowData: initialWindowData,
   mouseDown,

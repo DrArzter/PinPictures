@@ -21,7 +21,6 @@ export default function Profile({ dynamicProps, windowWidth, windowHeight }: Pro
 
     getProfile(name)
       .then((profile) => {
-        console.log(profile);
         setUserProfile(profile);
       })
       .catch((err) => {

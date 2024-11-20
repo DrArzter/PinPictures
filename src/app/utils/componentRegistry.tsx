@@ -7,6 +7,7 @@ import Settings from "@/app/pages/Settings";
 import Search from "@/app/pages/Search";
 import Chats from "@/app/pages/Chats";
 import Profile from "@/app/pages/Profile";
+import Friends from "@/app/pages/Friends";
 
 interface ComponentProps {
   width: number;
@@ -97,6 +98,17 @@ export const componentRegistry: ComponentRegistry = {
   },
   "/post/[id]": {
     component: Post,
+    defaultProps: {
+      width: 600,
+      height: 800,
+      minWidth: 600,
+      minHeight: 800,
+      initialX: 200,
+      initialY: 200,
+    },
+  },
+  "/friends/[name]": {
+    component: Friends,
     defaultProps: {
       width: 600,
       height: 800,
