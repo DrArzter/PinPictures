@@ -26,7 +26,7 @@ export default function Post({
   const { addNotification } = useNotificationContext();
 
   const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState<number>(post._count.likes);
+  const [likeCount, setLikeCount] = useState<number>(post._count.Likes);
 
   const postHeight = windowHeight * 0.4;
 
@@ -91,7 +91,7 @@ export default function Post({
   const layersIconClassName = "absolute top-2 right-2 text-2xl text-yellow-500";
   const postContentClassName = "p-4 flex flex-row items-center justify-between";
   const postDescriptionClassName = "text-sm overflow-hidden line-clamp-3";
-  const hasMultipleImages = post.images && post.images.length > 1;
+  const hasMultipleImages = post.ImageInPost && post.ImageInPost.length > 1;
   const postActionsClassName = "flex flex-row items-center space-x-4 mt-2";
   const likeButtonClassName =
     "flex items-center space-x-1 hover:text-yellow-500";
@@ -106,11 +106,11 @@ export default function Post({
       onClick={handlePostClick}
     >
       <div className="flex flex-col h-full">
-        {post.images && (
+        {post.ImageInPost && (
           <div className={imageContainerClassName}>
             {hasMultipleImages && <FiLayers className={layersIconClassName} />}
             <img
-              src={post.images[0].picpath}
+              src={post.ImageInPost[0].picpath}
               alt={post.name}
               className="w-full h-full object-cover"
             />
@@ -120,14 +120,14 @@ export default function Post({
                 className="flex items-center"
                 onClick={(e) => {
                   e.stopPropagation();
-                  openWindowByPath(`/profile/${post.author.name}`);
+                  openWindowByPath(`/profile/${post.User.name}`);
                 }}
               >
-                <p className="mr-2 text-white">{post.author.name}</p>
+                <p className="mr-2 text-white">{post.User.name}</p>
                 <img
-                  src={post.author.avatar}
+                  src={post.User.avatar}
                   className="w-10 h-10 rounded-full"
-                  alt={post.author.name}
+                  alt={post.User.name}
                 />
               </div>
             </div>
@@ -155,7 +155,7 @@ export default function Post({
               }}
             >
               <BsChatDots size={20} />
-              <span>{post._count.comments}</span>
+              <span>{post._count.Comments}</span>
             </button>
           </div>
         </div>

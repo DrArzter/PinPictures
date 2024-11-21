@@ -28,23 +28,23 @@ export default async function handler(
     const post = await prisma.post.findFirst({
       where: { id: postId },
       include: {
-        author: {
+        User: {
           select: {
             name: true,
             avatar: true,
           },
         },
-        images: true,
-        likes: {
+        ImageInPost: true,
+        Likes: {
           select: {
             userId: true,
           },
         },
-        comments: {
+        Comments: {
           select: {
             comment: true,
             createdAt: true,
-            author: {
+            User: {
               select: {
                 name: true,
                 avatar: true,
@@ -54,8 +54,8 @@ export default async function handler(
         },
         _count: {
           select: {
-            comments: true,
-            likes: true,
+            Comments: true,
+            Likes: true,
           },
         },
       },

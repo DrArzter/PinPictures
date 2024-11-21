@@ -48,10 +48,10 @@ export default function Post({
       try {
         const fetchedPost = await fetchPost(dynamicProps.id);
         setPost(fetchedPost);
-        setLikeCount(fetchedPost._count ? fetchedPost._count.likes : 0);
-        setComments(fetchedPost.comments || []);
-        setCommentsCount(fetchedPost._count ? fetchedPost._count.comments : 0);
-        if (user && fetchedPost.likes.some((like) => like.userId === user.id)) {
+        setLikeCount(fetchedPost._count ? fetchedPost._count.Likes : 0);
+        setComments(fetchedPost.Comments || []);
+        setCommentsCount(fetchedPost._count ? fetchedPost._count.Comments : 0);
+        if (user && fetchedPost.Likes.some((like) => like.userId === user.id)) {
           setIsLiked(true);
         }
       } catch (error) {
@@ -149,7 +149,7 @@ export default function Post({
         });
         const addedComment = {
           id: Date.now(),
-          author: {
+          User: {
             name: user.name,
             avatar: user.avatar,
           },
@@ -203,7 +203,7 @@ export default function Post({
         }}
       >
         <img
-          src={post.images[currentImage].picpath}
+          src={post.ImageInPost[currentImage].picpath}
           alt="Post Image"
           className="w-full h-full object-cover cursor-pointer"
           loading="lazy"
@@ -235,12 +235,12 @@ export default function Post({
         <div className="flex justify-between items-center">
           <div className="flex flex-row gap-2 items-center">
             <img
-              src={post.author.avatar}
+              src={post.User.avatar}
               alt="Author Avatar"
               className="w-12 h-12 rounded-full"
             />
             <div>
-              <p className="font-bold">{post.author.name}</p>
+              <p className="font-bold">{post.User.name}</p>
               <p className="text-sm text-gray-500">{post.createdAt}</p>
             </div>
           </div>

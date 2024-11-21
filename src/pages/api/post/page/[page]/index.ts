@@ -23,26 +23,32 @@ export default async function handler(
       take: limit,
       orderBy: { createdAt: "desc" },
       include: {
-        author: {
+        User: {
           select: {
             name: true,
             avatar: true,
           },
         },
-        images: true,
-        likes: {
+        ImageInPost: { // Use the correct relation name
+          select: {
+            id: true,
+            picpath: true,
+          },
+        },
+        Likes: {
           select: {
             userId: true,
           },
         },
         _count: {
           select: {
-            comments: true,
-            likes: true,
+            Comments: true,
+            Likes: true,
           },
         },
       },
     });
+    
 
     const totalPosts = await prisma.post.count();
 

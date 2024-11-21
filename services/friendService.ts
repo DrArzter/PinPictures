@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { prisma } from "../src/utils/prisma";
-import { Friendships, User, Status } from "@prisma/client"; // Импортируем Status
+import { Friendships, User, Friendships_status } from "@prisma/client"; // Updated import
 
 export async function getFriends(userId: number) {
   try {
@@ -8,12 +8,24 @@ export async function getFriends(userId: number) {
       where: {
         OR: [{ user1Id: userId }, { user2Id: userId }],
         AND: {
-          status: Status.confirmed,
+          status: Friendships_status.confirmed, // Updated enum usage
         },
       },
       include: {
-        user1: true,
-        user2: true,
+        User_Friendships_user1IdToUser: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+          },
+        },
+        User_Friendships_user2IdToUser: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+          },
+        },
       },
     });
     return friends;
@@ -27,13 +39,13 @@ export async function addFriend(userId: number, friendId: number, io: Server) {
   try {
     const friendRequest = await prisma.friendships.create({
       data: {
-        user1: { connect: { id: userId } },
-        user2: { connect: { id: friendId } },
-        status: Status.pending,
+        user1Id: userId, // Updated field name
+        user2Id: friendId, // Updated field name
+        status: Friendships_status.pending, // Updated enum usage
       },
     });
 
-    // Отправка уведомления пользователю, которому отправлен запрос
+    // Send notification to the user who received the friend request
     io.to(`user_${friendId}`).emit("notification", {
       status: "info",
       message: "You have a new friend request!",
@@ -58,12 +70,12 @@ export async function acceptFriendRequest(
     const friendRequest = await prisma.friendships.update({
       where: {
         user1Id_user2Id: {
-          user1Id: userId,
-          user2Id: friendId,
+          user1Id: friendId, // Swapped user IDs
+          user2Id: userId,
         },
       },
       data: {
-        status: Status.confirmed,
+        status: Friendships_status.confirmed, // Updated enum usage
       },
     });
 

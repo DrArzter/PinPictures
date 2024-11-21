@@ -7,83 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum NotificationType{
-  error
-  success
-  info
-}
-
-enum NotificationSourceType{
-  post
-  user
-  comment
-  message
-  friendship
-}
-
-model Notifications {
-  id              Int      @id @default(autoincrement())
-  type            String
-  message         String
-  category        String   @default("general")
-  sourceId        Int?
-  sourceType      NotificationSourceType
-  createdAt       DateTime @default(now())
-  seen            Boolean  @default(false)
-  seenAt          DateTime?
-  user            User     @relation("UserNotifications")
-
-  @@index([createdAt], map: "Notifications_createdAt_fkey")
-  @@index([seen], map: "Notifications_seen_fkey")
-}
-
-
-model User {
-  id           Int               @id @default(autoincrement())
-  name         String            @unique
-  bananaLevel  Int               @default(0)
-  email        String            @unique
-  password     String
-  avatar       String
-  background   String
-  uiBackground String            @default("https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg")
-  createdAt    DateTime          @default(now())
-  lastLoginAt  DateTime          @default(now())
-  banned       Boolean           @default(false)
-  settings     Json
-  comments     Comments[]
-  friendships  Friendships[]     @relation("User1Friendship")
-  friendships2 Friendships[]     @relation("User2Friendship")
-  likes        Likes[]
-  messages     MessagesInChats[]
-  posts        Post[]
-  usersinchats UsersInChats[]
-  Notifications Notifications[]
-}
-
-model Post {
-  id          Int           @id @default(autoincrement())
-  name        String
-  description String
-  createdAt   DateTime      @default(now())
-  authorId    Int
-  likesCount  Int           @default(0)
-  comments    Comments[]
-  images      ImageInPost[]
-  likes       Likes[]
-  author      User          @relation(fields: [authorId], references: [id])
-
-  @@index([authorId], map: "Post_authorId_fkey")
-}
-
-model ImageInPost {
-  id        Int    @id @default(autoincrement())
-  picpath   String
-  bucketkey String
-  postId    Int
-  post      Post   @relation(fields: [postId], references: [id])
-
-  @@index([postId], map: "ImageInPost_postId_fkey")
+model Chats {
+  id              Int               @id @default(autoincrement())
+  name            String            @default("Unnamed")
+  createdAt       DateTime          @default(now())
+  picpath         String            @default("uploads/chats/default_avatar.jpg")
+  ChatType        Chats_ChatType    @default(private)
+  MessagesInChats MessagesInChats[]
+  UsersInChats    UsersInChats[]
 }
 
 model Comments {
@@ -93,11 +24,44 @@ model Comments {
   comment   String
   picpath   String?
   createdAt DateTime @default(now())
-  post      Post     @relation(fields: [postId], references: [id])
-  author    User     @relation(fields: [userId], references: [id])
+  Post      Post     @relation(fields: [postId], references: [id])
+  User      User     @relation(fields: [userId], references: [id])
 
   @@index([postId], map: "Comments_postId_fkey")
   @@index([userId], map: "Comments_userId_fkey")
+}
+
+model Friendships {
+  id                             Int                @id @default(autoincrement())
+  user1Id                        Int
+  user2Id                        Int
+  createdAt                      DateTime           @default(now())
+  status                         Friendships_status @default(pending)
+  User_Friendships_user1IdToUser User               @relation("Friendships_user1IdToUser", fields: [user1Id], references: [id])
+  User_Friendships_user2IdToUser User               @relation("Friendships_user2IdToUser", fields: [user2Id], references: [id])
+
+  @@unique([user1Id, user2Id])
+  @@index([user2Id], map: "Friendships_user2Id_fkey")
+}
+
+model ImageInPost {
+  id        Int    @id @default(autoincrement())
+  picpath   String
+  bucketkey String
+  postId    Int
+  Post      Post   @relation(fields: [postId], references: [id])
+
+  @@index([postId], map: "ImageInPost_postId_fkey")
+}
+
+model ImagesInMessages {
+  id              Int             @id @default(autoincrement())
+  messageId       Int
+  picpath         String
+  bucketkey       String
+  MessagesInChats MessagesInChats @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId], map: "ImagesInMessages_messageId_fkey")
 }
 
 model Likes {
@@ -105,21 +69,62 @@ model Likes {
   userId    Int
   postId    Int
   createdAt DateTime @default(now())
-  post      Post     @relation(fields: [postId], references: [id])
-  author    User     @relation(fields: [userId], references: [id])
+  Post      Post     @relation(fields: [postId], references: [id])
+  User      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, postId])
   @@index([postId], map: "Likes_postId_fkey")
 }
 
-model Chats {
-  id        Int               @id @default(autoincrement())
-  name      String            @default("Unnamed")
-  createdAt DateTime          @default(now())
-  picpath   String            @default("uploads/chats/default_avatar.jpg")
-  ChatType  ChatType          @default(private)
-  messages  MessagesInChats[]
-  users     UsersInChats[]
+model MessagesInChats {
+  id               Int                @id @default(autoincrement())
+  userId           Int
+  chatId           Int
+  message          String
+  createdAt        DateTime           @default(now())
+  ImagesInMessages ImagesInMessages[]
+  Chats            Chats              @relation(fields: [chatId], references: [id])
+  User             User               @relation(fields: [userId], references: [id])
+
+  @@index([chatId], map: "MessagesInChats_chatId_fkey")
+  @@index([userId], map: "MessagesInChats_userId_fkey")
+}
+
+model Post {
+  id          Int           @id @default(autoincrement())
+  name        String
+  description String
+  createdAt   DateTime      @default(now())
+  authorId    Int
+  likesCount  Int           @default(0)
+  Comments    Comments[]
+  ImageInPost ImageInPost[]
+  Likes       Likes[]
+  User        User          @relation(fields: [authorId], references: [id])
+
+  @@index([authorId], map: "Post_authorId_fkey")
+}
+
+model User {
+  id                                    Int               @id @default(autoincrement())
+  name                                  String            @unique
+  bananaLevel                           Int               @default(0)
+  email                                 String            @unique
+  password                              String
+  createdAt                             DateTime          @default(now())
+  lastLoginAt                           DateTime          @default(now())
+  banned                                Boolean           @default(false)
+  avatar                                String
+  background                            String
+  settings                              Json
+  uiBackground                          String            @default("https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg")
+  Comments                              Comments[]
+  Friendships_Friendships_user1IdToUser Friendships[]     @relation("Friendships_user1IdToUser")
+  Friendships_Friendships_user2IdToUser Friendships[]     @relation("Friendships_user2IdToUser")
+  Likes                                 Likes[]
+  MessagesInChats                       MessagesInChats[]
+  Post                                  Post[]
+  UsersInChats                          UsersInChats[]
 }
 
 model UsersInChats {
@@ -127,56 +132,19 @@ model UsersInChats {
   userId   Int
   chatId   Int
   joinedAt DateTime @default(now())
-  chat     Chats    @relation(fields: [chatId], references: [id])
-  user     User     @relation(fields: [userId], references: [id])
+  Chats    Chats    @relation(fields: [chatId], references: [id])
+  User     User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, chatId])
   @@index([chatId], map: "UsersInChats_chatId_fkey")
 }
 
-model MessagesInChats {
-  id        Int                @id @default(autoincrement())
-  userId    Int
-  chatId    Int
-  message   String
-  createdAt DateTime           @default(now())
-  images    ImagesInMessages[] @relation("MessageImages")
-  chat      Chats              @relation(fields: [chatId], references: [id])
-  author    User               @relation(fields: [userId], references: [id])
-
-  @@index([chatId], map: "MessagesInChats_chatId_fkey")
-  @@index([userId], map: "MessagesInChats_userId_fkey")
-}
-
-model ImagesInMessages {
-  id        Int             @id @default(autoincrement())
-  messageId Int
-  picpath   String
-  bucketkey String
-  message   MessagesInChats @relation("MessageImages", fields: [messageId], references: [id], onDelete: Cascade)
-
-  @@index([messageId], map: "ImagesInMessages_messageId_fkey")
-}
-
-model Friendships {
-  id        Int      @id @default(autoincrement())
-  user1Id   Int
-  user2Id   Int
-  createdAt DateTime @default(now())
-  status    Status   @default(pending)
-  user1     User     @relation("User1Friendship", fields: [user1Id], references: [id])
-  user2     User     @relation("User2Friendship", fields: [user2Id], references: [id])
-
-  @@unique([user1Id, user2Id])
-  @@index([user2Id], map: "Friendships_user2Id_fkey")
-}
-
-enum ChatType {
+enum Chats_ChatType {
   private
   group
 }
 
-enum Status {
+enum Friendships_status {
   pending
   confirmed
   blocked

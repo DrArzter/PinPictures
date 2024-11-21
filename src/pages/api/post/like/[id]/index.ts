@@ -45,7 +45,7 @@ export default async function handler(
 
     const post = await prisma.post.findUnique({
       where: { id: postId },
-      include: { likes: true },
+      include: { Likes: true },
     });
 
     if (!post) {
@@ -62,9 +62,9 @@ export default async function handler(
     });
 
     if (existingLike) {
-      await prisma.likes.delete({ where: { id: existingLike.id } });
+      await prisma.Likes.delete({ where: { id: existingLike.id } });
     } else {
-      await prisma.likes.create({
+      await prisma.Likes.create({
         data: {
           postId,
           userId: user.id,

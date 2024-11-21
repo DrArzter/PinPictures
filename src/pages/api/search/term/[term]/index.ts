@@ -21,20 +21,20 @@ export default async function handler(
         OR: [
           { name: { contains: term as string } },
           { description: { contains: term as string } },
-          { author: { name: { contains: term as string } } },
+          { User: { name: { contains: term as string } } },
         ],
       },
       include: {
-        author: {
+        User: {
           select: {
             name: true,
             avatar: true,
           },
         },
-        images: true,
-        likes: true,
+        ImageInPost: true,
+        Likes: true,
         _count: {
-          select: { comments: true },
+          select: { Comments: true },
         },
       },
     });

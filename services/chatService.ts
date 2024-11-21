@@ -28,14 +28,14 @@ export async function handleNewMessage(socket: Socket, data: any) {
         message: message.trim(),
       },
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
             avatar: true,
           },
         },
-        images: true,
+        ImagesInMessages: true,
       },
     });
 
@@ -83,14 +83,14 @@ export async function handleNewMessage(socket: Socket, data: any) {
       const foundMessage = await prisma.messagesInChats.findUnique({
         where: { id: newMessage.id },
         include: {
-          author: {
+          User: {
             select: {
               id: true,
               name: true,
               avatar: true,
             },
           },
-          images: {
+          ImagesInMessages: {
             select: {
               id: true,
               picpath: true,
@@ -119,25 +119,25 @@ export async function getChatsForUser(userId: number) {
   try {
     const chats = await prisma.chats.findMany({
       where: {
-        users: {
+        UsersInChats: {
           some: {
             userId: userId,
           },
         },
       },
       include: {
-        users: {
+        UsersInChats: {
           include: {
-            user: true,
+            User: true,
           },
         },
-        messages: {
+        MessagesInChats: {
           orderBy: {
             createdAt: "desc",
           },
           take: 1,
           include: {
-            author: {
+            User: {
               select: {
                 name: true,
                 avatar: true,
@@ -149,39 +149,41 @@ export async function getChatsForUser(userId: number) {
     });
 
     const getInterlocutorName = (
-      usersInChat: Array<UsersInChats & { user: User }>,
+      usersInChat: Array<UsersInChats & { User: User }>,
       currentUserId: number
     ): string => {
       const interlocutor = usersInChat.find((u) => u.userId !== currentUserId);
-      return interlocutor?.user?.name || "Unknown";
+      return interlocutor?.User?.name || "Unknown";
     };
 
     const getInterlocutorAvatar = (
-      usersInChat: Array<UsersInChats & { user: User }>,
+      usersInChat: Array<UsersInChats & { User: User }>,
       currentUserId: number
     ): string => {
       const interlocutor = usersInChat.find((u) => u.userId !== currentUserId);
-      return interlocutor?.user?.avatar || "default-avatar-url";
+      return interlocutor?.User?.avatar || "default-avatar-url";
     };
 
-    // Форматирование полученных чатов
+    // Format the retrieved chats
     const formattedChats = chats.map((chat) => {
-      const lastMessage = chat.messages[0];
+      const lastMessage = chat.MessagesInChats[0];
       const isGroupChat = chat.ChatType === "group";
 
       return {
         id: chat.id,
-        name: isGroupChat ? chat.name : getInterlocutorName(chat.users, userId),
+        name: isGroupChat
+          ? chat.name
+          : getInterlocutorName(chat.UsersInChats, userId),
         avatar: isGroupChat
           ? chat.picpath
-          : getInterlocutorAvatar(chat.users, userId),
+          : getInterlocutorAvatar(chat.UsersInChats, userId),
         lastMessage: lastMessage
           ? {
               message: lastMessage.message,
               createdAt: lastMessage.createdAt,
               author: {
-                name: lastMessage.author?.name || "Unknown",
-                avatar: lastMessage.author?.avatar || "default-avatar-url",
+                name: lastMessage.User?.name || "Unknown",
+                avatar: lastMessage.User?.avatar || "default-avatar-url",
               },
             }
           : null,
@@ -200,23 +202,23 @@ export async function getChatById(chatId: number, userId: number) {
     const chat = await prisma.chats.findUnique({
       where: { id: chatId },
       include: {
-        users: {
+        UsersInChats: {
           include: {
-            user: true,
+            User: true,
           },
         },
-        messages: {
+        MessagesInChats: {
           orderBy: {
             createdAt: "asc",
           },
           include: {
-            author: {
+            User: {
               select: {
                 name: true,
                 avatar: true,
               },
             },
-            images: {
+            ImagesInMessages: {
               select: {
                 id: true,
                 picpath: true,
@@ -232,43 +234,45 @@ export async function getChatById(chatId: number, userId: number) {
     }
 
     const getInterlocutorName = (
-      usersInChat: Array<UsersInChats & { user: User }>,
+      usersInChat: Array<UsersInChats & { User: User }>,
       currentUserId: number
     ): string => {
       const interlocutor = usersInChat.find((u) => u.userId !== currentUserId);
-      return interlocutor?.user?.name || "Unknown";
+      return interlocutor?.User?.name || "Unknown";
     };
 
     const getInterlocutorAvatar = (
-      usersInChat: Array<UsersInChats & { user: User }>,
+      usersInChat: Array<UsersInChats & { User: User }>,
       currentUserId: number
     ): string => {
       const interlocutor = usersInChat.find((u) => u.userId !== currentUserId);
-      return interlocutor?.user?.avatar || "default-avatar-url";
+      return interlocutor?.User?.avatar || "default-avatar-url";
     };
 
     const isGroupChat = chat.ChatType === "group";
 
     const formattedChat = {
       id: chat.id,
-      name: isGroupChat ? chat.name : getInterlocutorName(chat.users, userId),
+      name: isGroupChat
+        ? chat.name
+        : getInterlocutorName(chat.UsersInChats, userId),
       avatar: isGroupChat
         ? chat.picpath
-        : getInterlocutorAvatar(chat.users, userId),
-      users: chat.users.map((u) => ({
-        id: u.user.id,
-        name: u.user.name,
-        avatar: u.user.avatar,
+        : getInterlocutorAvatar(chat.UsersInChats, userId),
+      users: chat.UsersInChats.map((u) => ({
+        id: u.User.id,
+        name: u.User.name,
+        avatar: u.User.avatar,
       })),
-      messages: chat.messages.map((msg) => ({
+      messages: chat.MessagesInChats.map((msg) => ({
         id: msg.id,
         message: msg.message,
         createdAt: msg.createdAt,
         author: {
-          name: msg.author?.name || "Unknown",
-          avatar: msg.author?.avatar || "default-avatar-url",
+          name: msg.User?.name || "Unknown",
+          avatar: msg.User?.avatar || "default-avatar-url",
         },
-        images: msg.images.map((image) => ({
+        images: msg.ImagesInMessages.map((image) => ({
           id: image.id,
           picpath: image.picpath,
         })),
@@ -289,9 +293,9 @@ export async function getChatDetails(chatId: number, userId: number) {
     const chat = await prisma.chats.findUnique({
       where: { id: chatId },
       include: {
-        users: {
+        UsersInChats: {
           include: {
-            user: true,
+            User: true,
           },
         },
       },
@@ -302,33 +306,35 @@ export async function getChatDetails(chatId: number, userId: number) {
     }
 
     const getInterlocutorName = (
-      usersInChat: Array<UsersInChats & { user: User }>,
+      usersInChat: Array<UsersInChats & { User: User }>,
       currentUserId: number
     ): string => {
       const interlocutor = usersInChat.find((u) => u.userId !== currentUserId);
-      return interlocutor?.user?.name || "Unknown";
+      return interlocutor?.User?.name || "Unknown";
     };
 
     const getInterlocutorAvatar = (
-      usersInChat: Array<UsersInChats & { user: User }>,
+      usersInChat: Array<UsersInChats & { User: User }>,
       currentUserId: number
     ): string => {
       const interlocutor = usersInChat.find((u) => u.userId !== currentUserId);
-      return interlocutor?.user?.avatar || "default-avatar-url";
+      return interlocutor?.User?.avatar || "default-avatar-url";
     };
 
     const isGroupChat = chat.ChatType === "group";
 
     return {
       id: chat.id,
-      name: isGroupChat ? chat.name : getInterlocutorName(chat.users, userId),
+      name: isGroupChat
+        ? chat.name
+        : getInterlocutorName(chat.UsersInChats, userId),
       avatar: isGroupChat
         ? chat.picpath
-        : getInterlocutorAvatar(chat.users, userId),
-      users: chat.users.map((u) => ({
-        id: u.user.id,
-        name: u.user.name,
-        avatar: u.user.avatar,
+        : getInterlocutorAvatar(chat.UsersInChats, userId),
+      users: chat.UsersInChats.map((u) => ({
+        id: u.User.id,
+        name: u.User.name,
+        avatar: u.User.avatar,
       })),
     };
   } catch (error) {
@@ -337,7 +343,7 @@ export async function getChatDetails(chatId: number, userId: number) {
   }
 }
 
-// Постраничная загрузка сообщений
+// Paginated loading of messages
 export async function getChatMessages(
   chatId: number,
   page: number,
@@ -354,13 +360,13 @@ export async function getChatMessages(
       skip: offset,
       take: limit,
       include: {
-        author: {
+        User: {
           select: {
             name: true,
             avatar: true,
           },
         },
-        images: {
+        ImagesInMessages: {
           select: {
             id: true,
             picpath: true,
