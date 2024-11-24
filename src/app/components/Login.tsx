@@ -20,7 +20,7 @@ export default function Login({
   toggleRegistration,
   toggleForgotPassword,
 }: LoginProps) {
-  const containerClassName = `flex flex-col items-center w-full max-w-md gap-6 p-8 sm:p-16`;
+  const containerClassName = `flex flex-col items-center gap-6 p-8 md:p-36 border rounded-xl shadow-xl`;
 
   const inputClassName = `w-full p-2 border rounded text-black`;
 

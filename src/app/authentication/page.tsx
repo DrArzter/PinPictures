@@ -1,31 +1,20 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import * as api from "@/app/api";
-import Login from "../../components/Login";
-import Registration from "../../components/Registration";
+import Login from "@/app/components/Login";
+import Registration from "@/app/components/Registration";
 
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useUserContext } from "@/app/contexts/UserContext";
-import { useWindowContext } from "@/app/contexts/WindowContext";
 import { useSocketContext } from "@/app/contexts/SocketContext";
 import { io } from "socket.io-client";
 
-interface AuthenticationProps {
-  windowId: number;
-  windowHeight: number;
-  windowWidth: number;
-}
-
-export default function Authentication({
-  windowId,
-  windowHeight,
-  windowWidth,
-}: AuthenticationProps) {
+export default function Authentication({}) {
   const [isRegistration, setIsRegistration] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
 
-  const { removeWindow } = useWindowContext();
   const { setUser, setUserLoading } = useUserContext();
   const { addNotification } = useNotificationContext();
   const { setSocket } = useSocketContext();
@@ -33,6 +22,8 @@ export default function Authentication({
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +36,6 @@ export default function Authentication({
         if (response && response.status === "success") {
           setIsRegistration(false);
           setUser(response.user);
-          removeWindow(windowId);
         }
       } else if (isForgotPassword) {
         response = await api.forgotPassword(email);
@@ -58,13 +48,12 @@ export default function Authentication({
         if (response && response.status === "success") {
           const userData = await api.getUser();
           setUser(userData);
-          removeWindow(windowId);
+          router.push("/posts");
         }
         setUserLoading(false);
       }
 
       if (response && response.status === "success") {
-        // Open socket connection after successful login or registration
         const socketIo = io("http://localhost:3000");
         setSocket(socketIo);
 
@@ -100,13 +89,10 @@ export default function Authentication({
     setPassword("");
   };
 
-  const containerClassName = "flex flex-col items-center justify-center";
-
+  const containerClassName =
+    "mx-auto flex flex-col items-center justify-center h-[90vh]";
   return (
-    <div
-      style={{ height: `${windowHeight - 55}px`, width: `${windowWidth}px` }}
-      className={containerClassName}
-    >
+    <div className={containerClassName}>
       {isRegistration ? (
         <Registration
           username={username}

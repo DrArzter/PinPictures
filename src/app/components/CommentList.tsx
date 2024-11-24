@@ -1,7 +1,12 @@
 import React from "react";
 import Comment from "./Comment";
+import { Comment as CommentType } from "@/app/types/global";
 
-export default function CommentList({ comments }) {
+interface CommentListProps {
+  comments: CommentType[];
+}
+
+export default function CommentList({ comments }: CommentListProps) {
   return (
     <div className="border-t mt-4 pt-4">
       {comments.length > 0 ? (

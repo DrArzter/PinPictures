@@ -1,19 +1,25 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
-import { useUserContext } from "@/app/contexts/UserContext";
-import Home from "@/app/home";
+import { useLoadingContext } from "../contexts/LoadingContext";
+import { useUserContext } from "../contexts/UserContext";
 import LoadingIndicator from "./LoadingIndicator";
+import Artoria from "../resources/Artoria";
+import { User } from "../types/global";
 
-import Artoria from "@/app/resources/Artoria";
-import { User } from "@/app/types/global"; // Предполагаем, что интерфейс User определен в global.d.ts
-
-export default function ContentLoader() {
+export default function GlobalLoading({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
   const [bgImage, setBgImage] = useState<string>("");
 
-  const { user, userLoading } = useUserContext() as { user: User | null; userLoading: boolean };
+  const { isLoading } = useLoadingContext();
+  const { user, userLoading } = useUserContext() as {
+    user: User | null;
+    userLoading: boolean;
+  };
 
   const placeholderSVG = `data:image/svg+xml;base64,${btoa(Artoria())}`;
+  const defaultBgImage =
+    "https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg";
 
   useEffect(() => {
     const loadImage = (imgSrc: string) => {
@@ -27,27 +33,23 @@ export default function ContentLoader() {
 
       img.onerror = () => {
         console.error("Error loading image:", imgSrc);
-        setBgImage(
-          "https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg"
-        );
+        setBgImage(defaultBgImage);
         setLoading(false);
       };
     };
 
-    // Устанавливаем исходное изображение по умолчанию
-    let imgSrc: string = "https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg";
-    if (user && user.uiBackground) {
+    let imgSrc = defaultBgImage;
+    if (user?.uiBackground) {
       imgSrc = user.uiBackground;
     }
 
-    // Загружаем изображение только если userLoading завершен
     if (!userLoading) {
       loadImage(imgSrc);
     }
   }, [user?.uiBackground, userLoading]);
 
   const backgroundStyle = {
-    backgroundImage: bgImage ? `url(${bgImage})` : `url("${placeholderSVG}")`,
+    backgroundImage: `url(${bgImage || placeholderSVG})`,
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
@@ -55,9 +57,12 @@ export default function ContentLoader() {
     transition: "opacity 0.5s ease-in-out",
   };
 
-  if (userLoading || loading) {
+  if (userLoading || isLoading || loading) {
     return (
-      <div style={{ position: "relative", minHeight: "100vh" }}>
+      <div
+        className="w-full h-full flex items-center justify-center"
+        style={{ position: "relative", minHeight: "100vh" }}
+      >
         <div
           style={{
             ...backgroundStyle,
@@ -71,16 +76,12 @@ export default function ContentLoader() {
             zIndex: -1,
           }}
         />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <div className="w-full h-full flex items-center justify-center">
           <LoadingIndicator />
         </div>
       </div>
     );
   }
 
-  return (
-    <div style={backgroundStyle}>
-      <Home />
-    </div>
-  );
+  return <>{children}</>;
 }

@@ -42,6 +42,7 @@ export default async function handler(
         },
         Comments: {
           select: {
+            id: true,
             comment: true,
             createdAt: true,
             User: {

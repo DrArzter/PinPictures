@@ -4,12 +4,9 @@ import { FaSpinner } from "react-icons/fa";
 export default function LoadingIndicator() {
   const spinnerClassName = `text-4xl animate-spin text-yellow-500`;
   return (
-    <div
-      style={{ userSelect: "none" }}
-      className="flex flex-col justify-center items-center w-full gap-4"
-    >
+    <div className="flex flex-col items-center justify-center">
       <FaSpinner className={spinnerClassName} />
-      <span className="text-2xl text-yellow-500">Pin OS</span>
+      <span className="text-2xl text-yellow-500 mt-2">PinPictures</span>
     </div>
   );
 }

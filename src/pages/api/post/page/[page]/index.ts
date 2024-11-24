@@ -14,7 +14,7 @@ export default async function handler(
 
   const { page } = req.query;
   const pageNumber = parseInt(page as string, 10) || 1;
-  const limit = 3;
+  const limit = 20;
   const offset = (pageNumber - 1) * limit;
 
   try {

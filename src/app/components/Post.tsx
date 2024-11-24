@@ -1,54 +1,39 @@
 import React, { useContext, useEffect, useState } from "react";
 import { FiLayers } from "react-icons/fi";
 import { BsHeart, BsHeartFill, BsChatDots } from "react-icons/bs";
-import ThemeContext from "@/app/contexts/ThemeContext";
-import { useWindowContext } from "@/app/contexts/WindowContext";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
-import type { Post as PostType, User } from "@/app/types/global"; // Импортируем интерфейсы с type-only import
+import { useUserContext } from "@/app/contexts/UserContext";
+import type { Post as PostType } from "@/app/types/global";
+import { useRouter } from "next/navigation";
 import * as api from "@/app/api";
 
 interface PostProps {
   post: PostType;
-  windowHeight: number;
-  windowId: number;
-  user: User | null;
 }
 
-export default function Post({
-  post,
-  windowHeight,
-  windowId,
-  user,
-  ...props
-}: PostProps) {
-  const { isDarkMode } = useContext(ThemeContext);
-  const { openWindowByPath } = useWindowContext();
+export default function Post({ post, ...props }: PostProps) {
   const { addNotification } = useNotificationContext();
-
+  const { user } = useUserContext();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState<number>(post._count.Likes);
 
-  const postHeight = windowHeight * 0.4;
+  const router = useRouter();
 
-  const postContainerClassName = `hover:scale-105 border rounded-xl focus:scale-105 transition-transform duration-300 overflow-hidden ${
-    isDarkMode
-      ? "border-gray-700 bg-gray-800 text-white"
-      : "border-gray-300 bg-white text-gray-900"
-  }`;
+  const postContainerClassName = `hover:scale-105 border rounded-xl focus:scale-105 transition-transform duration-300 overflow-hidden`;
 
   useEffect(() => {
     if (
       user &&
-      post.likes &&
-      post.likes.some((like) => like.userId === user.id)
+      post.Likes &&
+      post.Likes.some((like) => like.userId === user.id)
     ) {
       setIsLiked(true);
     }
-  }, [post.likes, user]);
+  }, [post.Likes, user]);
 
   const handlePostClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    openWindowByPath(`/post/${post.id}`);
+    router.push(`/post/${post.id}`);
   };
 
   const handleChildClick = (e: React.MouseEvent) => {
@@ -60,7 +45,7 @@ export default function Post({
 
     if (!user) {
       addNotification({
-        status: "error", // Используем правильное поле `status`
+        status: "error",
         message: "You must be logged in to like posts.",
         time: 5000,
         clickable: true,
@@ -102,7 +87,6 @@ export default function Post({
     <div
       key={post.id}
       className={postContainerClassName}
-      style={{ height: `${postHeight}px` }}
       onClick={handlePostClick}
     >
       <div className="flex flex-col h-full">
@@ -120,7 +104,7 @@ export default function Post({
                 className="flex items-center"
                 onClick={(e) => {
                   e.stopPropagation();
-                  openWindowByPath(`/profile/${post.User.name}`);
+                  console.log("Profile clicked");
                 }}
               >
                 <p className="mr-2 text-white">{post.User.name}</p>
@@ -134,11 +118,7 @@ export default function Post({
           </div>
         )}
 
-        <div
-          className={`${
-            isDarkMode ? "bg-gray-700" : "bg-gray-300"
-          } h-[1px] w-full`}
-        />
+        <div className={`h-[1px] w-full`} />
 
         <div className={postContentClassName} onClick={handleChildClick}>
           <p className={postDescriptionClassName}>{post.description}</p>
@@ -151,7 +131,7 @@ export default function Post({
               className={commentButtonClassName}
               onClick={(e) => {
                 e.stopPropagation();
-                openWindowByPath(`/post/${post.id}`);
+                router.push(`/post/${post.id}`);
               }}
             >
               <BsChatDots size={20} />

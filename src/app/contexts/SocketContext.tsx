@@ -1,4 +1,5 @@
 // ./src/app/contexts/SocketContext.tsx
+"use client";
 import React, {
   createContext,
   useContext,
