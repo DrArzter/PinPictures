@@ -26,11 +26,7 @@ interface PostProps {
 }
 
 /**
- * Component to display author's information including avatar and name.
- *
- * @param {User} user - The user object containing author details.
- * @param {string} createdAt - The creation date of the post, formatted as a locale string.
- * @returns A JSX element displaying the author's avatar, name, and post creation date.
+ * Компонент для отображения информации об авторе.
  */
 const AuthorInfo: React.FC<{ user: User; createdAt: string }> = ({
   user,
@@ -65,8 +61,8 @@ const ImageCarousel: React.FC<{
   const hasMultipleImages = images.length > 1;
 
   return (
-    <div className="w-full xl:w-1/2 relative flex items-center justify-center overflow-hidden rounded-lg">
-      <div className="w-full h-[90vh] flex items-center justify-center">
+    <div className="w-full h-full relative flex items-center justify-center overflow-hidden rounded-lg">
+      <div className="w-full h-full flex items-center justify-center">
         <img
           src={images[currentIndex].picpath}
           alt={`Post Image ${currentIndex + 1}`}
@@ -116,16 +112,15 @@ const LikeButton: React.FC<{
 
 const CommentSection: React.FC<{
   comments: Comment[];
-  commentsCount: number;
   newComment: string;
   setNewComment: React.Dispatch<React.SetStateAction<string>>;
   onAddComment: (e: React.FormEvent) => void;
-}> = ({ comments, commentsCount, newComment, setNewComment, onAddComment }) => {
+}> = ({ comments, newComment, setNewComment, onAddComment }) => {
   return (
-    <div className="mt-6" id="comments-section">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-        Comments ({commentsCount})
-      </h2>
+    <div
+      className="flex flex-col flex-grow overflow-hidden"
+      id="comments-section"
+    >
       <CommentList comments={comments} />
       <form onSubmit={onAddComment} className="mt-4">
         <div className="flex items-center space-x-2">
@@ -134,7 +129,7 @@ const CommentSection: React.FC<{
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             className="flex-1 border rounded p-2 text-base outline-none focus:ring-2 focus:ring-yellow-500 dark:bg-gray-700 dark:text-white"
-            placeholder="Add a comment..."
+            placeholder="Добавить комментарий..."
             aria-label="Add a comment"
           />
           <button
@@ -142,7 +137,7 @@ const CommentSection: React.FC<{
             className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded px-4 py-2 transition-colors duration-200"
             aria-label="Send Comment"
           >
-            Send
+            Отправить
           </button>
         </div>
       </form>
@@ -167,14 +162,12 @@ export default function Post() {
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(0);
   const [comments, setComments] = useState<Comment[]>([]);
-  const [commentsCount, setCommentsCount] = useState<number>(0);
   const [newComment, setNewComment] = useState<string>("");
 
-  // Удаляем локальное состояние для модального окна
-  // const [isImageModalOpen, setIsImageModalOpen] = useState<boolean>(false);
-  // const [modalImageUrl, setModalImageUrl] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<"image" | "details" | "comments">(
+    "image"
+  );
 
-  // Используем контекст модальных окон
   const { openModal } = useContext(ModalsContext);
 
   useEffect(() => {
@@ -188,9 +181,6 @@ export default function Post() {
         setPost(fetchedPost);
         setLikeCount(fetchedPost._count?.Likes ?? fetchedPost.Likes.length);
         setComments(fetchedPost.Comments || []);
-        setCommentsCount(
-          fetchedPost._count?.Comments ?? fetchedPost.Comments.length
-        );
         if (user && fetchedPost.Likes.some((like) => like.userId === user.id)) {
           setIsLiked(true);
         }
@@ -198,7 +188,7 @@ export default function Post() {
         console.error("Error fetching post:", error);
         addNotification({
           type: "error",
-          message: "Failed to fetch post.",
+          message: "Не удалось загрузить пост.",
         });
       } finally {
         setLoading(false);
@@ -213,7 +203,7 @@ export default function Post() {
       if (!user) {
         addNotification({
           status: "error",
-          message: "You need to be logged in to like posts.",
+          message: "Необходимо войти в систему, чтобы ставить лайки.",
           clickable: true,
           link_to: "/authentication",
         });
@@ -233,7 +223,7 @@ export default function Post() {
         console.error("Error updating like:", error);
         addNotification({
           status: "error",
-          message: "Failed to update like.",
+          message: "Не удалось обновить лайк.",
         });
       }
     },
@@ -242,18 +232,11 @@ export default function Post() {
 
   const handleImageClick = useCallback(() => {
     if (post && post.ImageInPost.length > 0) {
-      // Используем контекст для открытия модального окна
       openModal("FULL_SCREEN_IMAGE", {
         imageUrl: post.ImageInPost[currentImage].picpath,
       });
     }
   }, [post, currentImage, openModal]);
-
-  // Удаляем функции закрытия модального окна
-  // const closeImageModal = useCallback(() => {
-  //   setIsImageModalOpen(false);
-  //   setModalImageUrl("");
-  // }, []);
 
   const handlePrevImage = useCallback(
     (e: React.MouseEvent) => {
@@ -283,7 +266,7 @@ export default function Post() {
       if (!user) {
         addNotification({
           status: "error",
-          message: "You need to be logged in to comment.",
+          message: "Необходимо войти в систему, чтобы оставлять комментарии.",
           clickable: true,
           link_to: "/authentication",
         });
@@ -293,7 +276,7 @@ export default function Post() {
       if (newComment.trim() === "") {
         addNotification({
           status: "error",
-          message: "Comment cannot be empty.",
+          message: "Комментарий не может быть пустым.",
         });
         return;
       }
@@ -318,13 +301,12 @@ export default function Post() {
           };
           setComments((prev) => [...prev, addedComment]);
           setNewComment("");
-          setCommentsCount((prev) => prev + 1);
         }
       } catch (error) {
         console.error("Error adding comment:", error);
         addNotification({
           status: "error",
-          message: "Failed to add comment.",
+          message: "Не удалось добавить комментарий.",
         });
       }
     },
@@ -333,7 +315,7 @@ export default function Post() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-[90vh]">
+      <div className="flex justify-center items-center h-screen">
         <LoadingIndicator />
       </div>
     );
@@ -341,70 +323,170 @@ export default function Post() {
 
   if (!post) {
     return (
-      <div className="flex justify-center items-center">
-        <p className="text-gray-700 dark:text-gray-300">Post not found.</p>
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-gray-700 dark:text-gray-300">Пост не найден.</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col xl:flex-row items-center justify-center px-4 py-6 gap-6 h-[90vh]">
-      {/* Image Carousel */}
-      <ImageCarousel
-        images={post.ImageInPost}
-        currentIndex={currentImage}
-        onPrev={handlePrevImage}
-        onNext={handleNextImage}
-        onImageClick={handleImageClick}
-      />
-
-      {/* Content Section */}
-      <div className="w-full xl:w-1/2 flex flex-col rounded-lg shadow-2xl p-6 h-[90vh]">
-        {/* Author Info */}
-        <AuthorInfo user={post.User} createdAt={post.createdAt} />
-
-        {/* Post Title и Description */}
-        <div className="mt-4">
-          <h1 className="font-bold text-3xl mb-4 text-yellow-500">
-            {post.name}
-          </h1>
-          <p className="text-gray-700 dark:text-gray-300">{post.description}</p>
-        </div>
-
-        {/* Like и Comment Buttons */}
-        <div className="flex items-center gap-6 mt-4">
-          <LikeButton
-            isLiked={isLiked}
-            likeCount={likeCount}
-            onLike={handleLikeClick}
-          />
+    <>
+      {/* Мобильная версия */}
+      <div className="flex flex-col items-center justify-center px-4 py-6 gap-6 h-screen md:hidden">
+        {/* Вкладки */}
+        <div className="flex justify-around w-full border-b">
           <button
-            className="flex items-center gap-1 text-yellow-500 hover:text-yellow-600 transition-colors duration-200"
-            onClick={() => {
-              const commentSection =
-                document.getElementById("comments-section");
-              if (commentSection) {
-                commentSection.scrollIntoView({
-                  behavior: "smooth",
-                });
-              }
-            }}
-            aria-label="View Comments"
+            className={`py-2 px-4 ${
+              activeTab === "image"
+                ? "border-b-2 border-yellow-500 text-yellow-500"
+                : ""
+            }`}
+            onClick={() => setActiveTab("image")}
           >
-            <BsChatDots size={20} />
-            <span>{commentsCount}</span>
+            Image
+          </button>
+          <button
+            className={`py-2 px-4 ${
+              activeTab === "details"
+                ? "border-b-2 border-yellow-500 text-yellow-500"
+                : ""
+            }`}
+            onClick={() => setActiveTab("details")}
+          >
+            Details
+          </button>
+          <button
+            className={`py-2 px-4 ${
+              activeTab === "comments"
+                ? "border-b-2 border-yellow-500 text-yellow-500"
+                : ""
+            }`}
+            onClick={() => setActiveTab("comments")}
+          >
+            Comments
           </button>
         </div>
 
-        {/* Comments Section */}
-        <CommentSection
-          comments={comments}
-          commentsCount={commentsCount}
-          newComment={newComment}
-          setNewComment={setNewComment}
-          onAddComment={handleAddComment}
-        />
+        {/* Контент вкладок */}
+        <div className="flex-grow w-full overflow-y-auto">
+          {activeTab === "image" && (
+            <div className="h-full">
+              <ImageCarousel
+                images={post.ImageInPost}
+                currentIndex={currentImage}
+                onPrev={handlePrevImage}
+                onNext={handleNextImage}
+                onImageClick={handleImageClick}
+              />
+            </div>
+          )}
+          {activeTab === "details" && (
+            <div className="p-6">
+              <AuthorInfo user={post.User} createdAt={post.createdAt} />
+              {/* Заголовок и описание */}
+              <div className="mt-4">
+                <h1 className="font-bold text-3xl mb-4 text-yellow-500">
+                  {post.name}
+                </h1>
+                <p className="text-gray-700 dark:text-gray-300">
+                  {post.description}
+                </p>
+              </div>
+              {/* Кнопки лайка и комментариев */}
+              <div className="flex items-center gap-6 mt-4">
+                <LikeButton
+                  isLiked={isLiked}
+                  likeCount={likeCount}
+                  onLike={handleLikeClick}
+                />
+                <button
+                  className="flex items-center gap-1 text-yellow-500 hover:text-yellow-600 transition-colors duration-200"
+                  onClick={() => setActiveTab("comments")}
+                  aria-label="View Comments"
+                >
+                  <BsChatDots size={20} />
+                  <span>{comments.length}</span>
+                </button>
+              </div>
+            </div>
+          )}
+          {activeTab === "comments" && (
+            <div className="p-6 h-full flex flex-col">
+              <CommentSection
+                comments={comments}
+                newComment={newComment}
+                setNewComment={setNewComment}
+                onAddComment={handleAddComment}
+              />
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      {/* Десктопная версия */}
+      <div className="hidden md:flex flex-row items-center justify-center px-4 py-6 gap-6 h-[90vh]">
+        {/* Карусель изображений */}
+        <div className="w-1/2 h-full">
+          <ImageCarousel
+            images={post.ImageInPost}
+            currentIndex={currentImage}
+            onPrev={handlePrevImage}
+            onNext={handleNextImage}
+            onImageClick={handleImageClick}
+          />
+        </div>
+
+        {/* Секция контента */}
+        <div className="w-1/2 h-full flex flex-col rounded-lg shadow-2xl p-6 overflow-hidden">
+          {/* Информация об авторе */}
+          <AuthorInfo user={post.User} createdAt={post.createdAt} />
+
+          {/* Заголовок и описание */}
+          <div className="mt-4">
+            <h1 className="font-bold text-3xl mb-4 text-yellow-500">
+              {post.name}
+            </h1>
+            <p className="text-gray-700 dark:text-gray-300">
+              {post.description}
+            </p>
+          </div>
+
+          {/* Кнопки лайка и комментариев */}
+          <div className="flex items-center gap-6 mt-4">
+            <LikeButton
+              isLiked={isLiked}
+              likeCount={likeCount}
+              onLike={handleLikeClick}
+            />
+            <button
+              className="flex items-center gap-1 text-yellow-500 hover:text-yellow-600 transition-colors duration-200"
+              onClick={() => {
+                const commentSection =
+                  document.getElementById("comments-section");
+                if (commentSection) {
+                  commentSection.scrollIntoView({
+                    behavior: "smooth",
+                  });
+                }
+              }}
+              aria-label="View Comments"
+            >
+              <BsChatDots size={20} />
+              <span>{comments.length}</span>
+            </button>
+          </div>
+
+          {/* Секция комментариев */}
+          <div className="flex-grow flex flex-col overflow-hidden">
+            <CommentSection
+              comments={comments}
+              newComment={newComment}
+              setNewComment={setNewComment}
+              onAddComment={handleAddComment}
+            />
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

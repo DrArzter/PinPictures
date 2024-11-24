@@ -1,7 +1,6 @@
-// ./src/app/components/modals/CreatePostModal.tsx
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { MdClose } from "react-icons/md";
 import { FaSpinner } from "react-icons/fa";
 import { AiOutlineCloudUpload } from "react-icons/ai";
@@ -14,7 +13,7 @@ interface CreatePostModalProps {
   onClose: () => void;
 }
 
-export default function CreatePostModal({ onClose }: CreatePostModalProps) {
+const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [images, setImages] = useState<File[]>([]);
@@ -25,96 +24,105 @@ export default function CreatePostModal({ onClose }: CreatePostModalProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  // Обработчик отправки формы
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault(); // Остановить стандартное действие формы
+      setLoading(true);
 
-    let response: ApiResponse<NewPost> | undefined;
+      let response: ApiResponse<NewPost> | undefined;
 
-    try {
-      response = await createPost({ name, description, images });
-    } catch (err) {
-      console.error(err);
-      addNotification({
-        status: "error",
-        message: "An error occurred",
-        time: 5000,
-        clickable: false,
-      });
-    } finally {
-      setLoading(false);
-      if (response) {
-        const status: "success" | "error" | "info" | "warning" =
-          response.status === "success" || response.status === "error"
-            ? response.status
-            : "info";
-
+      try {
+        response = await createPost({ name, description, images });
+      } catch (err) {
+        console.error(err);
         addNotification({
-          status,
-          message: response.message,
+          status: "error",
+          message: "An error occurred",
           time: 5000,
           clickable: false,
         });
-        if (response.status === "success") {
-          // Сброс полей формы после успешного создания поста
-          setName("");
-          setDescription("");
-          setImages([]);
-          setImagePreviews([]);
-          onClose(); // Закрытие модального окна
+      } finally {
+        setLoading(false);
+        if (response) {
+          addNotification({
+            status: response.status,
+            message: response.message,
+            time: 5000,
+            clickable: false,
+          });
+          if (response.status === "success") {
+            setName("");
+            setDescription("");
+            setImages([]);
+            setImagePreviews([]);
+            onClose();
+          }
         }
       }
-    }
-  };
+    },
+    [name, description, images, addNotification, onClose]
+  );
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length + images.length > 10) {
-      alert("Maximum of 10 images allowed");
-      return;
-    }
+  // Обработчик добавления изображений
+  const handleImageChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = Array.from(e.target.files || []);
+      if (files.length + images.length > 10) {
+        alert("Maximum of 10 images allowed");
+        return;
+      }
 
-    setImages((prevImages) => [...prevImages, ...files]);
+      setImages((prevImages) => [...prevImages, ...files]);
 
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreviews((prevPreviews) => [...prevPreviews, reader.result]);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
+      files.forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreviews((prevPreviews) => [...prevPreviews, reader.result]);
+        };
+        reader.readAsDataURL(file);
+      });
+    },
+    [images]
+  );
 
-  const handleRemoveImage = (index: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
-    setImagePreviews((prevPreviews) =>
-      prevPreviews.filter((_, i) => i !== index)
-    );
-  };
+  // Обработчик удаления изображения
+  const handleRemoveImage = useCallback(
+    (index: number, e: React.MouseEvent) => {
+      e.stopPropagation();
+      setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+      setImagePreviews((prevPreviews) =>
+        prevPreviews.filter((_, i) => i !== index)
+      );
+    },
+    []
+  );
 
-  const handleFileInputClick = () => {
+  const handleFileInputClick = useCallback(() => {
     fileInputRef.current?.click();
-  };
+  }, []);
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length + images.length > 10) {
-      alert("Maximum of 10 images allowed");
-      return;
-    }
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      const files = Array.from(e.dataTransfer.files);
+      if (files.length + images.length > 10) {
+        alert("Maximum of 10 images allowed");
+        return;
+      }
 
-    setImages((prevImages) => [...prevImages, ...files]);
+      setImages((prevImages) => [...prevImages, ...files]);
 
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreviews((prevPreviews) => [...prevPreviews, reader.result]);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
+      files.forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreviews((prevPreviews) => [...prevPreviews, reader.result]);
+        };
+        reader.readAsDataURL(file);
+      });
+    },
+    [images]
+  );
 
   const isSubmitDisabled =
     !name || !description || images.length === 0 || loading;
@@ -144,11 +152,10 @@ export default function CreatePostModal({ onClose }: CreatePostModalProps) {
             </label>
             <motion.input
               type="text"
-              placeholder="Enter post title..."
-              className="w-full p-4 border border-lightModeBorder dark:border-darkModeBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-300"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required
+              placeholder="Enter post title..."
+              className="w-full p-4 border border-lightModeBorder dark:border-darkModeBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-300"
               whileFocus={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             />
@@ -159,10 +166,9 @@ export default function CreatePostModal({ onClose }: CreatePostModalProps) {
             </label>
             <motion.textarea
               placeholder="Enter post description..."
-              className="w-full p-4 border border-lightModeBorder dark:border-darkModeBorder rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-300"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              required
+              className="w-full p-4 border border-lightModeBorder dark:border-darkModeBorder rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-300"
               whileFocus={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             />
@@ -173,9 +179,6 @@ export default function CreatePostModal({ onClose }: CreatePostModalProps) {
               onClick={handleFileInputClick}
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
-              style={{
-                overflowY: "auto",
-              }}
             >
               <AiOutlineCloudUpload className="text-lightModeText dark:text-darkModeText text-6xl mb-4" />
               <p className="text-lightModeText dark:text-darkModeText">
@@ -192,7 +195,6 @@ export default function CreatePostModal({ onClose }: CreatePostModalProps) {
                 className="hidden"
                 onChange={handleImageChange}
               />
-
               {imagePreviews.length > 0 && (
                 <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {imagePreviews.map((preview, index) => (
@@ -244,4 +246,6 @@ export default function CreatePostModal({ onClose }: CreatePostModalProps) {
       </div>
     </div>
   );
-}
+});
+
+export default CreatePostModal;

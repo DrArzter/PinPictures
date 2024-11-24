@@ -4,6 +4,8 @@
 import React, { useEffect, useRef, useContext, useState } from "react";
 import IconList from "../common/IconList";
 
+import { useRouter } from "next/navigation";
+
 import { FaBell } from "react-icons/fa";
 import { CiSquarePlus } from "react-icons/ci";
 import { AiOutlineMessage } from "react-icons/ai";
@@ -23,6 +25,7 @@ interface RightHandMenuProps {
 export default function RightHandMenu({ closeMenu }: RightHandMenuProps) {
   const { user } = useUserContext();
   const { addNotification } = useNotificationContext();
+  const router = useRouter();
   const { openModal } = useContext(ModalsContext);
   const sideBarRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -93,7 +96,7 @@ export default function RightHandMenu({ closeMenu }: RightHandMenuProps) {
     },
     {
       name: "Message",
-      icon: <AiOutlineMessage onClick={() => {}} />,
+      icon: <AiOutlineMessage onClick={() => {router.push("/chats")}} />,
     },
     !user && {
       name: "Authentication",

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { User, Chat } from "@/app/types/global";
 import { AiOutlineSearch } from "react-icons/ai";
+import SearchBar from "../common/SearchBar";
 
 interface ChatListProps {
   user: User;
@@ -33,15 +34,8 @@ export default function ChatList({
 
   return (
     <div className="flex scrollbar-hidden flex-col h-full border-r border-r pr-4">
-      <div className="relative mb-4">
-        <AiOutlineSearch className="absolute top-3 left-3 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
-        />
+      <div className="relative mb-4 w-full border-b pb-5">
+        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       </div>
 
       <div className="flex flex-col gap-2 overflow-y-auto">
@@ -63,27 +57,24 @@ export default function ChatList({
                     alt={chat.name}
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center">
-                    <span className="text-xl text-gray-300">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center">
+                    <span className="text-xl">
                       {chat.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
                 )}
               </div>
 
-              {/* Текстовая часть */}
-              {wideWindow && (
-                <div className="ml-4 flex-1 flex flex-col justify-center">
-                  <span className="text-lg font-semibold text-white">
-                    {chat.name}
-                  </span>
-                  <span className="text-sm text-gray-400">
-                    {chat.lastMessage
-                      ? `${chat.lastMessage.author.name}: ${chat.lastMessage.message}`
-                      : "Нет сообщений"}
-                  </span>
-                </div>
-              )}
+              <div className="ml-4 flex-1 flex flex-col justify-center">
+                <span className="text-lg font-semibold">
+                  {chat.name}
+                </span>
+                <span className="text-sm">
+                  {chat.lastMessage
+                    ? `${chat.lastMessage.author.name}: ${chat.lastMessage.message}`
+                    : "Нет сообщений"}
+                </span>
+              </div>
             </div>
           ))
         ) : (

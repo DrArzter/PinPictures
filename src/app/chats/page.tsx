@@ -1,5 +1,5 @@
 // src/app/components/Chats.tsx
-
+"use client";
 import React, { useEffect, useState } from "react";
 import { useSocketContext } from "@/app/contexts/SocketContext";
 import { User } from "@/app/types/global";
@@ -7,23 +7,16 @@ import { User } from "@/app/types/global";
 import ChatList from "@/app/components/chat/ChatList";
 import Chat from "@/app/components/chat/Chat";
 import LoadingIndicator from "@/app/components/common/LoadingIndicator";
+import { useUserContext } from "../contexts/UserContext";
 
-interface ChatsProps {
-  windowHeight: number;
-  windowWidth: number;
-  windowId: number;
-  user: User;
-}
-
-export default function Chats({
-  windowHeight,
-  windowWidth,
-  windowId,
-  user,
-}: ChatsProps) {
+export default function Chats() {
   const { socket } = useSocketContext();
+
+  const { user } = useUserContext();
   const [chats, setChats] = useState<Chat[]>([]);
-  const [selectedChatId, setSelectedChatId] = useState<string | undefined>(undefined);
+  const [selectedChatId, setSelectedChatId] = useState<string | undefined>(
+    undefined
+  );
   const [activeChat, setActiveChat] = useState<FullChat | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [isActiveChatLoading, setIsActiveChatLoading] = useState(false);
@@ -65,23 +58,16 @@ export default function Chats({
 
   if (isLoading) {
     return (
-      <div
-        style={{ height: `${windowHeight - 55}px`, width: `${windowWidth}px` }}
-        className="flex flex-col items-center justify-center scrollbar-hidden p-4"
-      >
+      <div className="flex flex-col items-center justify-center scrollbar-hidden h-[85vh] md:h-[90vh] w-full">
         <LoadingIndicator />
       </div>
     );
   }
 
   return (
-    <div
-      style={{ height: `${windowHeight - 55}px`, width: `${windowWidth}px` }}
-      className="flex flex-col items-center justify-center scrollbar-hidden p-4"
-    >
-      <div className="flex flex-row w-full h-full gap-2">
+    <div className="flex flex-col items-center justify-center scrollbar-hidden p-4 h-[85vh] md:h-[90vh] w-full">
+      <div className="flex flex-row w-full h-full gap-2 border p-2 rounded-2xl shadow-xl">
         <div
-          style={{ width: `${(windowWidth / 12) * 3}px` }}
           className="rounded-2xl p-2"
         >
           <ChatList
@@ -89,13 +75,9 @@ export default function Chats({
             user={user}
             selectedChatId={selectedChatId}
             setSelectedChatId={setSelectedChatId}
-            windowWidth={windowWidth}
           />
         </div>
-        <div
-          style={{ width: `${(windowWidth / 12) * 9}px` }}
-          className="p-2 rounded-2xl "
-        >
+        <div className="p-2 rounded-2xl w-full">
           <Chat
             user={user}
             chat={activeChat}

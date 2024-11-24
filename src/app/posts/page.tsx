@@ -106,7 +106,7 @@ export default function Posts() {
         !loading && <NoPostsFound />
       )}
       {loading && page === 1 && (
-        <div className="flex justify-center items-center h-[90vh]">
+        <div className="flex justify-center items-center h-[85vh] md:h-[90vh]">
           <LoadingIndicator />
         </div>
       )}

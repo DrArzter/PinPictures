@@ -192,7 +192,8 @@ export default function Chat({
   }
 
   return (
-    <div className="flex flex-col h-full p-4">
+    <div className="flex flex-col h-full">
+      {/* Chat Header */}
       <div className="flex flex-row items-center gap-4 mb-4 border-b pb-4">
         <img
           src={currentChat.avatar}
@@ -201,17 +202,18 @@ export default function Chat({
         />
         <span className="text-xl font-semibold">{currentChat.name}</span>
       </div>
+  
+      {/* Messages List */}
       <div
         ref={messagesContainerRef}
         className="flex flex-col flex-grow overflow-y-auto"
-        style={{ maxHeight: "100%", height: "100%" }}
       >
         {currentChat.messages.map((message, index) => {
           const isCurrentUser = message.author.name === user.name;
           const previousMessage = currentChat.messages[index - 1];
           const showAuthorInfo =
             index === 0 || message.author.name !== previousMessage?.author.name;
-
+  
           return (
             <div
               key={message.id}
@@ -254,15 +256,6 @@ export default function Chat({
                         src={image.picpath}
                         alt="Message Image"
                         className="mt-2 max-w-full h-auto"
-                        onLoad={() => {
-                          // If this is the last image of the last message, scroll to bottom
-                          if (
-                            index === currentChat.messages.length - 1 &&
-                            imgIndex === message.images.length - 1
-                          ) {
-                            scrollToBottom();
-                          }
-                        }}
                       />
                     ))}
                   <div className="text-xs text-gray-400 mt-1">
@@ -276,6 +269,8 @@ export default function Chat({
         {/* Dummy element for scrolling */}
         <div ref={messagesEndRef} />
       </div>
+  
+      {/* Message Input Form */}
       <form onSubmit={handleSendMessage} className="mt-4">
         <div className="flex flex-col gap-2 items-center w-full">
           <div className="flex w-full">
@@ -327,4 +322,5 @@ export default function Chat({
       </form>
     </div>
   );
-}
+};
+  
