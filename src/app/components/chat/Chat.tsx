@@ -2,7 +2,7 @@
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { User } from "@/app/types/global";
-import LoadingIndicator from "./LoadingIndicator";
+import LoadingIndicator from "../common/LoadingIndicator";
 import { Socket } from "socket.io-client";
 import { FaRegFileImage } from "react-icons/fa6";
 import { MdClose } from "react-icons/md";

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Logo from "./Logo";
-import SearchBar from "./SearchBar";
+import SearchBar from "@/app/components/common/SearchBar";
 import UserCard from "./UserCard";
 import ChangeTheme from "./ChangeTheme";
 

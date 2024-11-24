@@ -3,8 +3,7 @@
 import React, { useState } from "react";
 import { SlMagnifier } from "react-icons/sl";
 
-export default function SearchBar() {
-  const [searchTerm, setSearchTerm] = useState("");
+export default function SearchBar({searchTerm, setSearchTerm}: any) {
 
   const handleSearch = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,

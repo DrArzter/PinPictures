@@ -3,8 +3,8 @@
 
 import React, { useContext } from "react";
 import ModalsContext from "@/app/contexts/ModalsContext";
-import CreatePostModal from "./modals/CreatePostModal";
-import FullScreenImage from "./modals/FullScreenImageModal";
+import CreatePostModal from "@/app/components/modals/CreatePostModal";
+import FullScreenImage from "@/app/components/modals/FullScreenImageModal";
 
 const ModalManager: React.FC = () => {
   const { modalType, modalProps, closeModal } = useContext(ModalsContext);

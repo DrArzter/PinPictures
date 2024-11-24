@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useLoadingContext } from "../contexts/LoadingContext";
 import { useUserContext } from "../contexts/UserContext";
-import LoadingIndicator from "./LoadingIndicator";
+import LoadingIndicator from "./common/LoadingIndicator";
 import Artoria from "../resources/Artoria";
 import { User } from "../types/global";
 

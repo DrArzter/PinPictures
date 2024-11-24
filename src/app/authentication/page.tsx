@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import * as api from "@/app/api";
-import Login from "@/app/components/Login";
-import Registration from "@/app/components/Registration";
+import Login from "@/app/components/authentication/Login";
+import Registration from "@/app/components/authentication/Registration";
 
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useUserContext } from "@/app/contexts/UserContext";

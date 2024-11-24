@@ -6,7 +6,9 @@ import { UserProvider } from "./contexts/UserContext";
 import { SocketProvider } from "./contexts/SocketContext";
 import { LoadingProvider } from "./contexts/LoadingContext";
 import { ModalsProvider } from "./contexts/ModalsContext";
-import ModalManager from "./components/ModalManager";
+import { MenuProvider } from "./contexts/MenuContext";
+import ModalManager from "./components/modals/ModalManager";
+import MenuManager from "./components/menu/MenuManager";
 
 type ProvidersProps = {
   children: React.ReactNode;
@@ -14,14 +16,21 @@ type ProvidersProps = {
 
 export default function Providers({ children }: ProvidersProps) {
   return (
-    <NextThemesProvider attribute="class" enableSystem={true} defaultTheme="system">
+    <NextThemesProvider
+      attribute="class"
+      enableSystem={true}
+      defaultTheme="system"
+    >
       <NotificationProvider>
         <SocketProvider>
           <UserProvider>
             <LoadingProvider>
               <ModalsProvider>
-                {children}
-                <ModalManager />
+                <MenuProvider>
+                  {children}
+                  <ModalManager />
+                  <MenuManager />
+                </MenuProvider>
               </ModalsProvider>
             </LoadingProvider>
           </UserProvider>

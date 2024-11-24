@@ -1,8 +1,8 @@
-// ./src/app/components/RightHandMenu.tsx
+// ./src/app/components/menus/RightHandMenu.tsx
 "use client";
 
-import React, { useEffect, useRef, useContext } from "react";
-import IconList from "./IconList";
+import React, { useEffect, useRef, useContext, useState } from "react";
+import IconList from "../common/IconList";
 
 import { FaBell } from "react-icons/fa";
 import { CiSquarePlus } from "react-icons/ci";
@@ -13,24 +13,19 @@ import { BsFillFileEarmarkPostFill } from "react-icons/bs";
 
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useUserContext } from "@/app/contexts/UserContext";
-import { User, Notification } from "@/app/types/global";
-import Logo from "./Logo";
-import { LogoIcon } from "../resources/LogoIcon";
-import ModalsContext from "@/app/contexts/ModalsContext"; // Импортируем ModalsContext
+import { LogoIcon } from "../../resources/LogoIcon";
+import ModalsContext from "@/app/contexts/ModalsContext";
 
 interface RightHandMenuProps {
-  isSidebarOpen: boolean;
-  toggleSidebar: () => void;
+  closeMenu: () => void;
 }
 
-export default function RightHandMenu({
-  isSidebarOpen,
-  toggleSidebar,
-}: RightHandMenuProps) {
+export default function RightHandMenu({ closeMenu }: RightHandMenuProps) {
   const { user } = useUserContext();
   const { addNotification } = useNotificationContext();
-  const { openModal } = useContext(ModalsContext); // Используем useContext для доступа к openModal
+  const { openModal } = useContext(ModalsContext);
   const sideBarRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -38,27 +33,32 @@ export default function RightHandMenu({
       !sideBarRef.current.contains(event.target as Node) &&
       (event.target as HTMLElement).id !== "user-card"
     ) {
-      toggleSidebar();
+      handleClose();
     }
   };
 
   useEffect(() => {
+    setIsVisible(true);
+
+    document.addEventListener("mousedown", handleClickOutside);
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        toggleSidebar();
+        handleClose();
       }
     };
-
-    if (isSidebarOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleKeyDown);
-    }
-
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isSidebarOpen, toggleSidebar]);
+  }, []);
+
+  const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(() => {
+      closeMenu();
+    }, 300);
+  };
 
   const handleNotificationClick = () => {
     addNotification({
@@ -86,7 +86,7 @@ export default function RightHandMenu({
         <CiSquarePlus
           onClick={() => {
             openModal("CREATE_POST");
-            toggleSidebar();
+            handleClose();
           }}
         />
       ),
@@ -103,17 +103,16 @@ export default function RightHandMenu({
       name: "Search",
       icon: <SlMagnifier onClick={() => {}} />,
     },
-  ].filter(
-    (icon): icon is { name: string; icon: JSX.Element } => Boolean(icon)
+  ].filter((icon): icon is { name: string; icon: JSX.Element } =>
+    Boolean(icon)
   );
 
+  const sidebarClassName = `fixed z-[999] top-0 pt-4 right-0 h-full dark:bg-darkModeSecondaryBackground bg-lightModeSecondaryBackground shadow-lg transform transition-transform duration-300 ease-in-out ${
+    isVisible ? "translate-x-0" : "translate-x-full"
+  }`;
+
   return (
-    <div
-      ref={sideBarRef}
-      className={`fixed z-[999] top-0 pt-4 right-0 h-full dark:bg-darkModeSecondaryBackground bg-lightModeSecondaryBackground shadow-lg transform ${
-        isSidebarOpen ? "translate-x-0" : "translate-x-full"
-      } transition-transform duration-300 ease-in-out`}
-    >
+    <div ref={sideBarRef} className={sidebarClassName}>
       <div className="p-4 flex justify-between items-center dark:fill-white fill-black">
         <LogoIcon />
       </div>

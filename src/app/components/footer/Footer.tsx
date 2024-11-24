@@ -9,14 +9,12 @@ export default function Footer() {
   if (isMobile) {
     return(
       <div className="py-4">
-        <p className="text-center">Copyright © 2023 Artoria. All rights reserved.</p>
       </div>
     )
   }
 
   return (
     <footer className="py-4">
-      <p className="text-center">Copyright © 2023 Artoria. All rights reserved.</p>
     </footer>
   );
 }

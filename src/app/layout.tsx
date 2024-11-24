@@ -1,8 +1,8 @@
 // ./src/app/layout.tsx
 import React from "react";
 import Providers from "./providers";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+import Header from "./components/header/Header";
+import Footer from "./components/footer/Footer";
 import GlobalLoading from "./components/GlobalLoading";
 import Notifications from "./components/Notifications";
 import "./globals.css";
@@ -36,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="https://unpkg.com/react-scan/dist/auto.global.js" async />
         <script
           dangerouslySetInnerHTML={{
             __html: `

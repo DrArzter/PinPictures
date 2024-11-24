@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import PostList from "../components/PostList";
+import PostList from "../components/post/PostList";
 import InfiniteScroll from "react-infinite-scroll-component";
-import LoadingIndicator from "../components/LoadingIndicator";
-import NoPostsFound from "../components/NoPostsFound";
+import LoadingIndicator from "../components/common/LoadingIndicator";
+import NoPostsFound from "../components/post/NoPostsFound";
 import * as postUtils from "../utils/postUtils";
 
 export default function Posts() {

@@ -8,14 +8,14 @@ import React, {
   useMemo,
 } from "react";
 import { useParams } from "next/navigation";
-import LoadingIndicator from "@/app/components/LoadingIndicator";
+import LoadingIndicator from "@/app/components/common/LoadingIndicator";
 import { fetchPost } from "@/app/utils/postUtils";
 import { BsHeart, BsHeartFill, BsChatDots } from "react-icons/bs";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import * as api from "@/app/api";
 
-import CommentList from "@/app/components/CommentList";
+import CommentList from "@/app/components/comment/CommentList";
 
 import { Post as PostType, User, Comment } from "@/app/types/global";
 import { useUserContext } from "@/app/contexts/UserContext";
