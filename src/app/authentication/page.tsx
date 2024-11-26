@@ -36,7 +36,9 @@ export default function Authentication({}) {
         if (response && response.status === "success") {
           setIsRegistration(false);
           setUser(response.user);
+          router.push("/posts");
         }
+        setUserLoading(false);
       } else if (isForgotPassword) {
         response = await api.forgotPassword(email);
         if (response && response.status === "success") {
@@ -118,7 +120,7 @@ export default function Authentication({}) {
             />
             <button
               type="submit"
-              className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600"
+              className="bg-blue-500 font-semibold py-2 px-4 rounded hover:bg-blue-600"
             >
               Reset Password
             </button>

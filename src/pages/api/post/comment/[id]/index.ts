@@ -6,25 +6,22 @@ import { authMiddleware } from "@/middlewares/authMiddleware";
 import { handleError } from "@/utils/errorHandler";
 import { z } from "zod";
 
+// Схема валидации комментария
 const commentSchema = z.object({
   comment: z.string().min(1, "Comment is required"),
 });
 
-interface CustomNextApiRequest extends NextApiRequest {
-  user?: any;
-}
-
 export default async function handler(
-  req: CustomNextApiRequest,
+  req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== "POST") {
-    return res
-      .status(405)
-      .json({ status: "error", message: "Unsupported method" });
-  }
-
   try {
+    if (!["POST", "DELETE"].includes(req.method || "")) {
+      return res
+        .status(405)
+        .json({ status: "error", message: "Unsupported method" });
+    }
+
     await authMiddleware(req, res);
     const user = req.user;
 
@@ -33,14 +30,6 @@ export default async function handler(
         .status(404)
         .json({ status: "error", message: "User not found" });
     }
-
-    if (!req.body || typeof req.body !== "object") {
-      return res
-        .status(400)
-        .json({ status: "error", message: "Invalid request body" });
-    }
-
-    const { comment } = commentSchema.parse(req.body);
 
     const postId = parseInt(req.query.id as string, 10);
     if (isNaN(postId)) {
@@ -59,11 +48,47 @@ export default async function handler(
         .json({ status: "error", message: "Post not found" });
     }
 
+    if (req.method === "DELETE") {
+      const commentId = parseInt(req.query.commentId as string, 10);
+      if (isNaN(commentId)) {
+        return res
+          .status(400)
+          .json({ status: "error", message: "Invalid comment ID" });
+      }
+
+      const comment = await prisma.comments.findUnique({
+        where: { id: commentId },
+      });
+
+      if (!comment) {
+        return res
+          .status(404)
+          .json({ status: "error", message: "Comment not found" });
+      }
+
+      if (comment.userId !== user.id) {
+        return res
+          .status(403)
+          .json({ status: "error", message: "Unauthorized" });
+      }
+
+      await prisma.comments.delete({
+        where: { id: commentId },
+      });
+
+      return res.status(200).json({
+        status: "success",
+        message: "Comment deleted successfully",
+      });
+    }
+
+    const { comment } = commentSchema.parse(req.body);
+
     const newComment = await prisma.comments.create({
       data: {
-        comment: comment,
+        comment,
         userId: user.id,
-        postId: postId,
+        postId,
       },
     });
 

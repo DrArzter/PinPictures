@@ -24,11 +24,11 @@ export default function IconList({
         .map((icon, index) => (
           <div
             key={index}
-            className="flex items-center justify-center hover:scale-110 transition-all duration-300 dark:text-white text-black"
+            className="flex items-center justify-center hover:scale-110 transition-all duration-300 dark:text-white text-black cursor-pointer"
           >
             {React.cloneElement(icon.icon, {
               size: size,
-              className: "transition-colors duration-300 hover:fill-yellow-500",
+              className: "transition-colors duration-300 hover:fill-yellow-500 cursor-pointer",
             })}
           </div>
         ))}

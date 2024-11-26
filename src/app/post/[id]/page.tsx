@@ -8,6 +8,7 @@ import React, {
   useMemo,
 } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 import LoadingIndicator from "@/app/components/common/LoadingIndicator";
 import { fetchPost } from "@/app/utils/postUtils";
 import { BsHeart, BsHeartFill, BsChatDots } from "react-icons/bs";
@@ -60,14 +61,21 @@ const ImageCarousel: React.FC<{
 }> = ({ images, currentIndex, onPrev, onNext, onImageClick }) => {
   const hasMultipleImages = images.length > 1;
 
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isImageError, setIsImageError] = useState(false);
+
   return (
     <div className="w-full h-full relative flex items-center justify-center overflow-hidden rounded-lg">
       <div className="w-full h-full flex items-center justify-center">
-        <img
+        <Image
           src={images[currentIndex].picpath}
-          alt={`Post Image ${currentIndex + 1}`}
-          className="max-w-full max-h-full object-contain cursor-pointer"
-          loading="lazy"
+          alt="Post Image"
+          width={0}
+          height={0}
+          sizes="100vw"
+          className="cursor-pointer w-full h-full object-cover"
+          onLoad={() => setIsImageLoaded(true)}
+          onError={() => setIsImageError(true)}
           onClick={onImageClick}
         />
       </div>
@@ -129,15 +137,15 @@ const CommentSection: React.FC<{
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             className="flex-1 border rounded p-2 text-base outline-none focus:ring-2 focus:ring-yellow-500 dark:bg-gray-700 dark:text-white"
-            placeholder="Добавить комментарий..."
-            aria-label="Add a comment"
+            placeholder="Enter a comment..."
+            aria-label="Enter a comment"
           />
           <button
             type="submit"
             className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded px-4 py-2 transition-colors duration-200"
             aria-label="Send Comment"
           >
-            Отправить
+            Send
           </button>
         </div>
       </form>

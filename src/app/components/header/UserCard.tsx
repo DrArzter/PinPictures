@@ -62,10 +62,11 @@ export default function UserCard() {
             </p>
           </>
         ) : (
-          <RxAvatar className="w-10 h-10 rounded-full cursor-pointer hover-transform" />
+          <RxAvatar title="Profile" className="w-10 h-10 rounded-full cursor-pointer hover-transform" />
         )}
       </div>
       <AiOutlineMenu
+        title="Sidebar"
         className="w-10 h-10 rounded-full cursor-pointer hover-transform"
         onClick={toggleSidebar}
       />

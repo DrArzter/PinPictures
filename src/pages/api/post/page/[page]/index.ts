@@ -29,7 +29,7 @@ export default async function handler(
             avatar: true,
           },
         },
-        ImageInPost: { // Use the correct relation name
+        ImageInPost: {
           select: {
             id: true,
             picpath: true,

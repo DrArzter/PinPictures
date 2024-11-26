@@ -6,6 +6,8 @@ import { FaGear } from "react-icons/fa6";
 import { CiBookmarkPlus } from "react-icons/ci";
 import { RiLogoutBoxFill } from "react-icons/ri";
 
+import { useRouter } from "next/navigation";
+
 import { useUserContext } from "@/app/contexts/UserContext";
 import * as api from "@/app/api";
 import { User } from "@/app/types/global";
@@ -21,6 +23,8 @@ export default function DropdownMenu({ closeMenu }: DropdownMenuProps) {
   };
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+
+  const router = useRouter();
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -74,7 +78,7 @@ export default function DropdownMenu({ closeMenu }: DropdownMenuProps) {
       <img
         src={user?.avatar}
         alt="Profile"
-        onClick={() => console.log(user)}
+        onClick={() => router.push("/profile/" + user?.name)}
         className="w-full h-[10vh] object-cover rounded-t-md hover:scale-105 cursor-pointer transition duration-300 
               dark:darkModeSecondaryBackground light:lightModeSecondaryBackground"
       />

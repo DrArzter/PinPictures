@@ -76,17 +76,25 @@ export default function RightHandMenu({ closeMenu }: RightHandMenuProps) {
   const orientation = "col";
   const iconList = [
     {
-      name: "Post",
-      icon: <BsFillFileEarmarkPostFill onClick={() => {}} />,
+      name: "Posts",
+      icon: (
+        <BsFillFileEarmarkPostFill
+          title="Posts"
+          onClick={() => {
+            router.push("/posts");
+          }}
+        />
+      ),
     },
     {
       name: "Bell",
-      icon: <FaBell onClick={handleNotificationClick} />,
+      icon: <FaBell title="Notifications" onClick={handleNotificationClick} />,
     },
     user && {
       name: "Add",
       icon: (
         <CiSquarePlus
+          title="Create Post"
           onClick={() => {
             openModal("CREATE_POST");
             handleClose();
@@ -96,15 +104,27 @@ export default function RightHandMenu({ closeMenu }: RightHandMenuProps) {
     },
     {
       name: "Message",
-      icon: <AiOutlineMessage onClick={() => {router.push("/chats")}} />,
+      icon: (
+        <AiOutlineMessage
+          onClick={() => {
+            router.push("/chats");
+          }}
+        />
+      ),
     },
     !user && {
       name: "Authentication",
-      icon: <RiLoginBoxFill onClick={() => {}} />,
+      icon: (
+        <RiLoginBoxFill
+          title="Login"
+          onClick={() => router.push("/authentication")}
+        />
+      ),
     },
     {
       name: "Search",
-      icon: <SlMagnifier onClick={() => {}} />,
+      icon: <SlMagnifier title="Search"
+      onClick={() => router.push("/search")} />,
     },
   ].filter((icon): icon is { name: string; icon: JSX.Element } =>
     Boolean(icon)

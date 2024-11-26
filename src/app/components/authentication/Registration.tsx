@@ -1,4 +1,5 @@
 "use client";
+import exp from "constants";
 import React from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 
@@ -13,7 +14,7 @@ interface RegistrationProps {
   toggleRegistration: () => void;
 }
 
-const Registration: React.FC<RegistrationProps> = ({
+export default function Registration({
   username,
   setUsername,
   email,
@@ -22,10 +23,10 @@ const Registration: React.FC<RegistrationProps> = ({
   setPassword,
   handleSubmit,
   toggleRegistration,
-}) => {
+}: RegistrationProps) {
   const containerClassName = `flex flex-col items-center gap-6 p-8 md:p-36 border rounded-xl shadow-xl`;
 
-  const inputClassName = `w-full p-2 border rounded text-lightModeText`;
+  const inputClassName = `w-full p-2 border rounded`;
 
   const buttonClassName = `w-full py-2 rounded-3xl bg-red-500`;
 
@@ -83,6 +84,4 @@ const Registration: React.FC<RegistrationProps> = ({
       </form>
     </div>
   );
-};
-
-export default Registration;
+}

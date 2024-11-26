@@ -18,6 +18,7 @@ const ChangeTheme: React.FC = () => {
 
   return (
     <div
+      title="Toggle Theme"
       tabIndex={-1}
       className="flex items-center gap-2 cursor-pointer hover:scale-110 transition-transform duration-300 focus:outline-none focus:ring-0 no-select"
       onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}

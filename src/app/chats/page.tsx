@@ -18,7 +18,7 @@ export default function Chats() {
     undefined
   );
   const [activeChat, setActiveChat] = useState<FullChat | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [isActiveChatLoading, setIsActiveChatLoading] = useState(false);
 
   // Fetch the list of chats
@@ -29,7 +29,7 @@ export default function Chats() {
       socket.on("chatsList", (data: Chat[]) => {
         console.log("Received chats data:", data);
         setChats(data);
-        setIsLoading(false);
+        setLoading(false);
       });
 
       return () => {
@@ -56,7 +56,7 @@ export default function Chats() {
     }
   }, [selectedChatId, socket]);
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="flex flex-col items-center justify-center scrollbar-hidden h-[85vh] md:h-[90vh] w-full">
         <LoadingIndicator />

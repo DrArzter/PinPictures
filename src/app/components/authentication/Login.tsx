@@ -22,7 +22,7 @@ export default function Login({
 }: LoginProps) {
   const containerClassName = `flex flex-col items-center gap-6 p-8 md:p-36 border rounded-xl shadow-xl`;
 
-  const inputClassName = `w-full p-2 border rounded text-black`;
+  const inputClassName = `w-full p-2 border rounded`;
 
   const buttonClassName = `w-full py-2 rounded-3xl bg-red-500`;
 

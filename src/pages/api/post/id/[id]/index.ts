@@ -1,31 +1,76 @@
+// pages/api/post/[id].ts
+
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
+import { authMiddleware } from "@/middlewares/authMiddleware";
 import { handleError } from "@/utils/errorHandler";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== "GET") {
-    return res
-      .status(405)
-      .json({ status: "error", message: "Method not allowed" });
-  }
-
-  const { id } = req.query;
-
   try {
-    // Parse and validate `id`
-    const postId = parseInt(id as string, 10);
-    if (!postId) {
-      return res.status(400).json({
-        status: "error",
-        message: "Invalid post ID",
-      });
+    // Проверка поддерживаемых методов
+    if (!["GET", "DELETE"].includes(req.method || "")) {
+      return res
+        .status(405)
+        .json({ status: "error", message: "Method not allowed" });
     }
 
-    // Fetch post with detailed related data
-    const post = await prisma.post.findFirst({
+    const { id } = req.query;
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Missing post ID" });
+    }
+
+    const postId = parseInt(id as string, 10);
+    if (isNaN(postId)) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Invalid post ID" });
+    }
+
+    // Если метод DELETE, выполнить удаление поста
+    if (req.method === "DELETE") {
+      await authMiddleware(req, res);
+      const user = req.user;
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ status: "error", message: "User not found" });
+      }
+
+      // Проверка существования поста
+      const post = await prisma.post.findUnique({
+        where: { id: postId },
+      });
+
+      if (!post) {
+        return res
+          .status(404)
+          .json({ status: "error", message: "Post not found" });
+      }
+
+      if (post.userId !== user.id) {
+        return res
+          .status(403)
+          .json({ status: "error", message: "Unauthorized" });
+      }
+
+      // Удаление поста
+      await prisma.post.delete({
+        where: { id: postId },
+      });
+
+      return res
+        .status(200)
+        .json({ status: "success", message: "Post deleted" });
+    }
+
+    const post = await prisma.post.findUnique({
       where: { id: postId },
       include: {
         User: {
@@ -70,12 +115,12 @@ export default async function handler(
     }
 
     return res.status(200).json({
-      post,
       status: "success",
       message: "Post retrieved successfully",
+      post,
     });
-  } catch (err) {
-    console.error("Error fetching post:", err); // Log for server-side debugging
-    return handleError(res, err);
+  } catch (error) {
+    console.error("Error handling post:", error);
+    return handleError(res, error);
   }
 }
