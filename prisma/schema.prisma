@@ -108,6 +108,7 @@ model Post {
 model User {
   id                                    Int               @id @default(autoincrement())
   name                                  String            @unique
+  description                           String?
   bananaLevel                           Int               @default(0)
   email                                 String            @unique
   password                              String

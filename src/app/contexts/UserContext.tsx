@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useContext, useEffect, ReactNode } from "react";
 import * as api from "@/app/api";
 import { User, UserContextType } from "@/app/types/global";

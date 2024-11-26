@@ -1,18 +1,16 @@
 // ./src/app/components/Notifications.tsx
+"use client";
 import React, { useEffect } from "react";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
-import { useWindowContext } from "@/app/contexts/WindowContext";
-import { Notification } from "@/app/types/global"; // Импортируем интерфейс Notification из global.ts
-
+import { Notification } from "@/app/types/global";
+import { useRouter } from "next/navigation";
 export default function NotificationComponent() {
   const { notifications, removeNotification } = useNotificationContext() as {
     notifications: Notification[];
     removeNotification: (index: number) => void;
   };
 
-  const { openWindowByPath } = useWindowContext() as {
-    openWindowByPath: (path: string) => void;
-  };
+  const router = useRouter();
 
   useEffect(() => {
     const timers = notifications.map((notification, index) =>
@@ -40,8 +38,8 @@ export default function NotificationComponent() {
         : status === "error"
         ? "bg-red-500"
         : status === "info"
-        ? "bg-white"
-        : "bg-yellow-500"
+        ? "bg-yellow-500"
+        : "bg-zinc-500"
     }`;
 
   return (
@@ -55,10 +53,12 @@ export default function NotificationComponent() {
           className={`${getNotificationClassName(
             notification.status,
             notification.clickable
-          )} backdrop-blur-md bg-opacity-30 rounded-md border-2 text-center py-4 shadow-lg`}
+          )} flex justify-center rounded-md border-2 text-center py-4 shadow-lg`}
           onClick={
             notification.clickable && notification.link_to !== undefined
-              ? () => openWindowByPath(notification.link_to as string)
+              ? () => {
+                  router.push(notification.link_to);
+                }
               : undefined
           }
         >

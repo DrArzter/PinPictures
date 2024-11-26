@@ -1,4 +1,5 @@
 // ./src/app/contexts/NotificationContext.ts
+"use client";
 import React, { useState, useContext, ReactNode } from "react";
 import { Notification } from "@/app/types/global";
 
