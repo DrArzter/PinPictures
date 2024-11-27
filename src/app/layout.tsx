@@ -24,10 +24,10 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Pin OS",
-  description: "Pin OS",
+  title: "PinPictures",
+  description: "PinPictures - The best place to share your photos",
   icons: {
-    icon: "/icons/favicon.ico",
+    icon: "https://storage.yandexcloud.net/pinpictures/otherImages/icon.ico", // Указываем URL для favicon
   },
 };
 
@@ -37,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <script src="https://unpkg.com/react-scan/dist/auto.global.js" async />
+        <link rel="icon" href="https://storage.yandexcloud.net/pinpictures/otherImages/icon.ico" type="image/x-icon" sizes="16x16"/>
         <script
           dangerouslySetInnerHTML={{
             __html: `

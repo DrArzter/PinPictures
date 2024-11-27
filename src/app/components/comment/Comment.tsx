@@ -10,7 +10,7 @@ export default function Comment({ comment }) {
       />
       <div className="flex flex-col">
         <p className="font-bold">{comment.User.name}</p>
-        <p className="text-gray-700">{comment.comment}</p>
+        <p className="">{comment.comment}</p>
         <p className="text-sm text-gray-500">{comment.createdAt}</p>
       </div>
     </div>
