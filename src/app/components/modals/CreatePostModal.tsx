@@ -45,11 +45,13 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
       } finally {
         setLoading(false);
         if (response) {
+          console.log(response.data.data);
           addNotification({
             status: response.status,
             message: response.message,
+            link_to: `/post/${response.data.data}`,
             time: 5000,
-            clickable: false,
+            clickable: true,
           });
           if (response.status === "success") {
             setName("");

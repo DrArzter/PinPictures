@@ -10,11 +10,16 @@ import LoadingIndicator from "@/app/components/common/LoadingIndicator";
 import * as api from "@/app/api";
 import PostList from "@/app/components/post/PostList";
 
-import { motion } from "framer-motion"; // Импорт Framer Motion
+import { motion } from "framer-motion";
+import {
+  AiOutlineMessage,
+  AiOutlineUserAdd,
+  AiOutlineUserDelete,
+} from "react-icons/ai";
 
-// Определение интерфейсов для типов данных
 interface Friend {
   friend: {
+    id: number;
     name: string;
     avatar?: string;
   };
@@ -28,6 +33,7 @@ interface Post {
 }
 
 interface ProfileData {
+  id: number;
   name: string;
   background?: string;
   avatar?: string;
@@ -48,16 +54,26 @@ export default function Profile() {
     () => profileName === user?.name,
     [profileName, user]
   );
+
+  const isFriend = useMemo(
+    () => profile?.friends?.some((friend) => friend.friend.id === user?.id),
+    [profile, user]
+  );
+
+  const isPending = useMemo(
+    () =>
+      profile?.friends?.some(
+        (friend) => friend.friend.id === user?.id && friend.status === "pending"
+      ),
+    [profile, user]
+  );
+
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Константы для расчета колонн
-  const maxColumns = 4; // Максимальное количество колонн
-  const minColumnWidth = 300; // Минимальная ширина одной колонки в пикселях
-
-  // Состояние для хранения количества колонн
+  const maxColumns = 4;
+  const minColumnWidth = 300;
   const [columns, setColumns] = useState<number>(1);
 
-  // Функция для вычисления количества колонн
   const calculateColumns = useCallback(() => {
     if (typeof window !== "undefined") {
       const windowWidth = window.innerWidth;
@@ -69,7 +85,6 @@ export default function Profile() {
     }
   }, [maxColumns, minColumnWidth]);
 
-  // Эффект для первоначального расчета и добавления слушателя события resize
   useEffect(() => {
     calculateColumns();
     window.addEventListener("resize", calculateColumns);
@@ -78,7 +93,6 @@ export default function Profile() {
     };
   }, [calculateColumns]);
 
-  // Эффект для загрузки профиля
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -112,6 +126,24 @@ export default function Profile() {
       </div>
     );
   }
+
+  const handleAddFriendClick = async () => {
+    try {
+      await api.addFriend(profile.id, profile.name);
+      console.log("Friend request sent!");
+    } catch (error) {
+      console.error("Error sending friend request:", error);
+    }
+  };
+
+  const handleDeleteFriendClick = async () => {
+    try {
+      await api.deleteFriend(profile.id);
+      console.log("Friend removed!");
+    } catch (error) {
+      console.error("Error removing friend:", error);
+    }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -168,22 +200,46 @@ export default function Profile() {
 
       {/* Основная информация профиля */}
       <motion.div
-        className="mt-40 px-4 sm:px-6 lg:px-8" // Увеличиваем отступ сверху, чтобы аватар не перекрывал содержимое
+        className="mt-40 px-4 sm:px-6 lg:px-8"
         variants={itemVariants}
       >
         <div className="text-center">
           <h1 className="text-3xl font-semibold">{profile.name}</h1>
-          {isMyProfile && <p className="text-sm mt-2">That's your profile</p>}
+          {isMyProfile ? (
+            <p className="text-sm mt-2">That's your profile</p>
+          ) : (
+            <div className="flex justify-center space-x-4 mt-2">
+              <AiOutlineMessage
+                className="cursor-pointer"
+                onClick={() => console.log("Send message")}
+                size={24}
+                aria-label="Send Message"
+              />
+              {isFriend && !isPending ? (
+                <AiOutlineUserDelete
+                  className="cursor-pointer"
+                  onClick={handleDeleteFriendClick}
+                  size={24}
+                  aria-label="Delete Friend"
+                />
+              ) : (
+                <AiOutlineUserAdd
+                  className="cursor-pointer"
+                  onClick={handleAddFriendClick}
+                  size={24}
+                  aria-label="Add Friend"
+                />
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Описание профиля */}
         <motion.div className="mt-6 max-w-2xl mx-auto" variants={itemVariants}>
           <p className="text-center">
             {profile.description || `We know nothing about ${profile.name}.`}
           </p>
         </motion.div>
 
-        {/* Раздел Друзья */}
         <motion.div className="mt-10" variants={itemVariants}>
           <h2 className="text-2xl font-semibold mb-4">Friends</h2>
           {profile.friends && profile.friends.length > 0 ? (
@@ -211,7 +267,11 @@ export default function Profile() {
                     className="w-20 h-20 rounded-full mx-auto object-cover"
                   />
                   <p className="mt-2 text-sm">{friendObj.friend.name}</p>
-                  <p className="text-xs capitalize">{friendObj.status}</p>
+                  <p className="text-xs capitalize text-gray-600">
+                    {friendObj.status === "pending"
+                      ? "Pending"
+                      : friendObj.status}
+                  </p>
                 </motion.div>
               ))}
             </motion.div>
@@ -220,7 +280,6 @@ export default function Profile() {
           )}
         </motion.div>
 
-        {/* Раздел Посты */}
         <motion.div className="mt-10" variants={itemVariants}>
           {profile.Post && profile.Post.length > 0 ? (
             <PostList posts={profile.Post} columns={columns} />

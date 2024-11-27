@@ -2,7 +2,7 @@ import api from "./axiosApi";
 
 export default async function getProfile(name: string) {
   try {
-    const response = await api.get(`/user/profile/${name}`, {
+    const response = await api.get(`/profile/${name}`, {
       withCredentials: true,
     });
     return response.data.data;

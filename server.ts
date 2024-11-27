@@ -16,7 +16,6 @@ import {
   getChatsForUser,
   handleNewMessage,
 } from "./services/chatService";
-import { acceptFriendRequest, addFriend } from "./services/friendService";
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -153,22 +152,6 @@ app.prepare().then(() => {
       } catch (error) {
         console.error("Error sending message:", error);
         socket.emit("error", "Failed to send message.");
-      }
-    });
-
-    socket.on("addFriend", async ({ friendId }) => {
-      try {
-        await addFriend(socket.data.userId, friendId, io);
-      } catch (error) {
-        console.error("Error adding friend:", error);
-      }
-    });
-
-    socket.on("acceptFriendRequest", async ({ friendId }) => {
-      try {
-        await acceptFriendRequest(socket.data.userId, friendId, io);
-      } catch (error) {
-        console.error("Error accepting friend request:", error);
       }
     });
 

@@ -75,7 +75,7 @@ export default function Post({ post, ...props }: PostProps) {
 
   const postContainerClassName = `hover:scale-105 border rounded-xl focus:scale-105 transition-transform duration-300 overflow-hidden`;
   const imageContainerClassName = "w-full overflow-hidden relative";
-  const layersIconClassName = "absolute top-2 right-2 text-2xl text-yellow-500";
+  const layersIconClassName = "absolute bottom-2 right-2 text-2xl text-yellow-500";
   const postContentClassName = "p-4 flex flex-row items-center justify-between";
   const postDescriptionClassName = "text-sm overflow-hidden line-clamp-3";
   const hasMultipleImages = post.ImageInPost && post.ImageInPost.length > 1;
@@ -94,7 +94,7 @@ export default function Post({ post, ...props }: PostProps) {
       <div className="flex flex-col h-full">
         {post.ImageInPost && (
           <div className={imageContainerClassName}>
-            {hasMultipleImages && <FiLayers className={layersIconClassName} />}
+            {hasMultipleImages && <FiLayers title="Multiple images" className={layersIconClassName} />}
 
             <Image
               src={post.ImageInPost[0].picpath}

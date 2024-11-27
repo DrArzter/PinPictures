@@ -159,7 +159,7 @@ export default async function handler(
     return res.status(201).json({
       status: "success",
       message: "Post created successfully",
-      data: newPost,
+      data: newPostId,
     });
   } catch (error) {
     return handleError(res, error);

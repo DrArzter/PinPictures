@@ -7,7 +7,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import LoadingIndicator from "@/app/components/common/LoadingIndicator";
 import { fetchPost } from "@/app/utils/postUtils";
@@ -33,15 +33,25 @@ const AuthorInfo: React.FC<{ user: User; createdAt: string }> = ({
   user,
   createdAt,
 }) => {
+  const router = useRouter();
   return (
     <div className="flex items-center space-x-4">
-      <img
-        src={user.avatar}
-        alt={`${user.name} avatar`}
-        className="w-12 h-12 rounded-full object-cover"
-      />
+      <div className="rounded-full cursor-pointer border border-yellow-500">
+        <Image
+          onClick={() => router.push(`/profile/${user.name}`)}
+          src={user.avatar}
+          alt={`${user.name} avatar`}
+          width={0}
+          height={0}
+          sizes="100vw"
+          className="w-full h-full rounded-full"
+        />
+      </div>
       <div>
-        <p className="font-semibold text-lg text-gray-900 dark:text-white">
+        <p
+          onClick={() => router.push(`/profile/${user.name}`)}
+          className="font-semibold text-lg cursor-pointer"
+        >
           {user.name}
         </p>
         <p className="text-sm text-gray-500">
@@ -274,7 +284,7 @@ export default function Post() {
       if (!user) {
         addNotification({
           status: "error",
-          message: "Необходимо войти в систему, чтобы оставлять комментарии.",
+          message: "Please log in to add a comment.",
           clickable: true,
           link_to: "/authentication",
         });
@@ -284,7 +294,7 @@ export default function Post() {
       if (newComment.trim() === "") {
         addNotification({
           status: "error",
-          message: "Комментарий не может быть пустым.",
+          message: "Please enter a comment first.",
         });
         return;
       }
@@ -304,7 +314,7 @@ export default function Post() {
               name: user.name,
               avatar: user.avatar,
             },
-            text: newComment.trim(),
+            comment: newComment.trim(),
             createdAt: new Date().toISOString(),
           };
           setComments((prev) => [...prev, addedComment]);
@@ -314,7 +324,7 @@ export default function Post() {
         console.error("Error adding comment:", error);
         addNotification({
           status: "error",
-          message: "Не удалось добавить комментарий.",
+          message: "Failed to add comment.",
         });
       }
     },
@@ -323,7 +333,7 @@ export default function Post() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-[85vh] md:h-[90vh]">
         <LoadingIndicator />
       </div>
     );
@@ -331,8 +341,8 @@ export default function Post() {
 
   if (!post) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-gray-700 dark:text-gray-300">Пост не найден.</p>
+      <div className="flex justify-center items-center h-[85vh] md:h-[90vh]">
+        <p className="text-gray-700 dark:text-gray-300">Post not found.</p>
       </div>
     );
   }
@@ -340,7 +350,7 @@ export default function Post() {
   return (
     <>
       {/* Мобильная версия */}
-      <div className="flex flex-col items-center justify-center px-4 py-6 gap-6 h-screen md:hidden">
+      <div className="flex flex-col items-center justify-center px-4 py-6 gap-6 h-[85vh] md:hidden">
         {/* Вкладки */}
         <div className="flex justify-around w-full border-b">
           <button

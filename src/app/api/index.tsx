@@ -12,4 +12,4 @@ export { default as likePost } from "./likePost";
 export { default as uploadComment } from "./uploadComment";
 
 export { default as search } from "./search";
-export { default as getFriends } from "./getFriends";
+export { default as addFriend } from "./addFriend";

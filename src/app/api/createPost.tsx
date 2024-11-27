@@ -27,7 +27,7 @@ export default async function createPost(
     return {
       status: "success",
       message: "Post created successfully",
-      data: response.data.newPost,
+      data: response.data
     };
   } catch (error: unknown) {
     if (error instanceof AxiosError && error.response) {

@@ -1,13 +1,13 @@
-// ./src/app/contexts/NotificationContext.ts
+// ./src/app/contexts/NotificationContext.tsx
 "use client";
-import React, { useState, useContext, ReactNode } from "react";
+import React, { useState, useContext, ReactNode, useCallback } from "react";
 import { Notification } from "@/app/types/global";
+import { v4 as uuidv4 } from "uuid";
 
-// Создаем контекст для уведомлений
 interface NotificationContextType {
   notifications: Notification[];
-  addNotification: (notification: Notification) => void;
-  removeNotification: (index: number) => void;
+  addNotification: (notification: Omit<Notification, "id">) => void;
+  removeNotification: (id: string) => void;
 }
 
 const NotificationContext = React.createContext<
@@ -23,18 +23,22 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
 }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  const addNotification = (notification: Notification) => {
-    setNotifications((prevNotifications) => [
-      ...prevNotifications,
-      notification,
-    ]);
-  };
+  const addNotification = useCallback(
+    (notification: Omit<Notification, "id">) => {
+      const id = uuidv4();
+      setNotifications((prevNotifications) => [
+        ...prevNotifications,
+        { ...notification, id },
+      ]);
+    },
+    []
+  );
 
-  const removeNotification = (index: number) => {
+  const removeNotification = useCallback((id: string) => {
     setNotifications((prevNotifications) =>
-      prevNotifications.filter((_, i) => i !== index)
+      prevNotifications.filter((notification) => notification.id !== id)
     );
-  };
+  }, []);
 
   return (
     <NotificationContext.Provider

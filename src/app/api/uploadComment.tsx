@@ -6,7 +6,7 @@ export default async function uploadComment(
 ) {
     try {
         const response = await api.post(
-            `/post/comment/${id}`,
+            `/comment/${id}`,
             {
                 comment: comment,
             },

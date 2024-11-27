@@ -3,7 +3,7 @@ import api from "./axiosApi";
 export default async function likePost(id: number) {
   try {
     const response = await api.post(
-      `/post/like/${id}`,
+      `/like/${id}`,
       {
         id: id,
       },

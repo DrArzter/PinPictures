@@ -6,7 +6,6 @@ export default async function forgotPassword(email: string): Promise<ApiResponse
   try {
     console.log(email);
     
-    // Simulate successful response
     return {
       status: "success",
       message: "Password reset email sent",
@@ -15,7 +14,6 @@ export default async function forgotPassword(email: string): Promise<ApiResponse
   } catch (error) {
     console.error("Error during forgot password:", error);
     
-    // Return an error response or rethrow the error if needed
     return {
       status: "error",
       message: "Failed to send password reset email",

@@ -1,5 +1,4 @@
 // pages/api/profile/[name].ts
-
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { parse } from "cookie";
@@ -17,6 +16,12 @@ export default async function handler(
   }
 
   const { name } = req.query;
+
+  if (!name || typeof name !== "string") {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Profile name is required" });
+  }
 
   const cookieStore = req.cookies || parse(req.headers.cookie || "");
   const token = cookieStore.token;
@@ -38,11 +43,6 @@ export default async function handler(
   }
 
   try {
-    if (!name || typeof name !== "string") {
-      return res
-        .status(400)
-        .json({ status: "error", message: "Profile name is required" });
-    }
     const profile = await prisma.user.findUnique({
       where: {
         name: name as string,

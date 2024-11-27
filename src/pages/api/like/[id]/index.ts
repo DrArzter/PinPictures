@@ -16,12 +16,8 @@ const likeSchema = z.object({
   id: z.string().regex(/^\d+$/, "Invalid post ID"),
 });
 
-interface CustomNextApiRequest extends NextApiRequest {
-  user?: any;
-}
-
 export default async function handler(
-  req: CustomNextApiRequest,
+  req: NextApiRequest,
   res: NextApiResponse
 ) {
   if (req.method !== "POST") {
@@ -35,6 +31,13 @@ export default async function handler(
 
     const { id } = likeSchema.parse(req.query);
     const postId = parseInt(id, 10);
+
+    if (isNaN(postId)) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Invalid post ID" });
+    }
+
     const user = req.user;
 
     if (!user) {
