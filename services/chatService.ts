@@ -1,7 +1,7 @@
 // services/chatService.ts
 
 import { prisma } from "../src/utils/prisma";
-import { UsersInChats, User } from "@prisma/client";
+import { UsersInChats, User, Chats } from "@prisma/client";
 import { Socket } from "socket.io";
 import { uploadFiles } from "../src/utils/s3Module";
 
@@ -181,7 +181,7 @@ export async function getChatsForUser(userId: number) {
           ? {
               message: lastMessage.message,
               createdAt: lastMessage.createdAt,
-              author: {
+              User: {
                 name: lastMessage.User?.name || "Unknown",
                 avatar: lastMessage.User?.avatar || "default-avatar-url",
               },
@@ -268,7 +268,7 @@ export async function getChatById(chatId: number, userId: number) {
         id: msg.id,
         message: msg.message,
         createdAt: msg.createdAt,
-        author: {
+        User: {
           name: msg.User?.name || "Unknown",
           avatar: msg.User?.avatar || "default-avatar-url",
         },
@@ -378,6 +378,75 @@ export async function getChatMessages(
     return messages.reverse();
   } catch (error) {
     console.error("Error fetching chat messages:", error);
+    throw error;
+  }
+}
+
+export async function createNewChat(
+  creatorId: number,
+  participantIds: number[],
+  chatName?: string,
+  isGroupChat: boolean = false,
+  avatarBase64?: string | null
+) {
+  try {
+    const allParticipantIds = [creatorId, ...participantIds];
+
+    const filesToUpload: { filename: string; content: Buffer }[] = [];
+
+    let avatarUrl: string = "uploads/chats/default_avatar.jpg";
+    let bucketKey: string | null = null;
+
+    if (isGroupChat && avatarBase64) {
+      const matches = avatarBase64.match(/^data:(image\/\w+);base64,(.+)$/);
+      if (!matches) {
+        throw new Error("Invalid avatar image format.");
+      }
+
+      const mimeType = matches[1];
+      const imageData = matches[2];
+      const buffer = Buffer.from(imageData, "base64");
+      const extension = mimeType.split("/")[1];
+
+      const filename = `chats/${Date.now()}.${extension}`;
+
+      filesToUpload.push({
+        filename: filename,
+        content: buffer,
+      });
+
+      const uploadResult = await uploadFiles(filesToUpload);
+
+      if (!uploadResult || uploadResult.length === 0) {
+        throw new Error("Failed to upload avatar image.");
+      }
+
+      const uploadedAvatar = uploadResult[0];
+      avatarUrl = uploadedAvatar.Location;
+      bucketKey = uploadedAvatar.Key;
+    }
+
+    const newChat = await prisma.chats.create({
+      data: {
+        name: isGroupChat ? chatName || "Unnamed Group" : "Unnamed",
+        ChatType: isGroupChat ? "group" : "private",
+        picpath: avatarUrl,
+        UsersInChats: {
+          create: allParticipantIds.map((userId) => ({ userId })),
+        },
+      },
+      include: {
+        UsersInChats: {
+          include: {
+            User: true,
+          },
+        },
+      },
+    });
+
+    return newChat;
+  } catch (error) {
+    console.error("Error creating new chat:", error);
     throw error;
   }
 }

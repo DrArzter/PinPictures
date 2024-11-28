@@ -32,19 +32,89 @@ export default async function handler(
   try {
     await authMiddleware(req, res);
 
-    const user = req.user;
+    const authenticatedUser = req.user;
 
-    if (!user) {
+    if (!authenticatedUser) {
       return res
         .status(404)
         .json({ status: "error", message: "User not found" });
     }
 
     if (req.method === "GET") {
+      // Fetch the user with friendships
+      const userWithFriends = await prisma.user.findUnique({
+        where: { id: authenticatedUser.id },
+        select: {
+          id: true,
+          avatar: true,
+          background: true,
+          lastLoginAt: true,
+          description: true,
+          name: true,
+          settings: true,
+          uiBackground: true,
+          Friendships_Friendships_user1IdToUser: {
+            select: {
+              status: true,
+              User_Friendships_user2IdToUser: {
+                select: {
+                  id: true,
+                  name: true,
+                  avatar: true,
+                },
+              },
+            },
+          },
+          Friendships_Friendships_user2IdToUser: {
+            select: {
+              status: true,
+              User_Friendships_user1IdToUser: {
+                select: {
+                  id: true,
+                  name: true,
+                  avatar: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!userWithFriends) {
+        return res
+          .status(404)
+          .json({ status: "error", message: "User not found" });
+      }
+
+      const friendsAsUser1 = userWithFriends.Friendships_Friendships_user1IdToUser.map(
+        (friendship) => ({
+          friend: friendship.User_Friendships_user2IdToUser,
+          status: friendship.status,
+        })
+      );
+
+      const friendsAsUser2 = userWithFriends.Friendships_Friendships_user2IdToUser.map(
+        (friendship) => ({
+          friend: friendship.User_Friendships_user1IdToUser,
+          status: friendship.status,
+        })
+      );
+
+      const allFriends = [...friendsAsUser1, ...friendsAsUser2];
+
+      // Construct the final user object with friends
+      const userWithFriendsResponse = {
+        ...userWithFriends,
+        friends: allFriends,
+      };
+
+      delete userWithFriendsResponse.Friendships_Friendships_user1IdToUser;
+      delete userWithFriendsResponse.Friendships_Friendships_user2IdToUser;
+
       return res.status(200).json({
         status: "success",
         message: "User retrieved successfully",
-        data: user,
+        data: userWithFriendsResponse,
       });
     } else if (req.method === "PATCH") {
       const form = formidable({ multiples: true });
@@ -68,13 +138,21 @@ export default async function handler(
 
       try {
         if (type === "uiBgUpdate") {
-          const image = files.image[0];
-          const fileTypes = /jpeg|jpg|png|gif|webp/;
-          const fileExt = image.originalFilename.split(".").pop();
-          const mimeType = fileTypes.test(image.mimetype);
-          const extname = fileTypes.test(fileExt.toLowerCase());
+          const image = Array.isArray(files.image) ? files.image[0] : files.image;
+          if (!image) {
+            return res.status(400).json({ error: "Image file is required" });
+          }
 
-          if (!mimeType || !extname) {
+          const fileTypes = /jpeg|jpg|png|gif|webp/;
+          const originalFilename = image.originalFilename || "";
+          const fileExt = originalFilename.split(".").pop()?.toLowerCase();
+
+          if (!fileExt || !fileTypes.test(fileExt)) {
+            return res.status(400).json({ error: "Wrong file type" });
+          }
+
+          const mimeTypeValid = fileTypes.test(image.mimetype || "");
+          if (!mimeTypeValid) {
             return res.status(400).json({ error: "Wrong file type" });
           }
 
@@ -84,7 +162,7 @@ export default async function handler(
 
           await fs.rename(tempPath, newPath);
 
-          const url = user.uiBackground;
+          const url = userWithFriends.uiBackground;
           const extractedPath = url.split("pinpictures/")[1];
           if (!extractedPath.includes("otherImages/background2")) {
             await deleteFiles([extractedPath]);
@@ -93,16 +171,14 @@ export default async function handler(
           const fileContent = await fs.readFile(newPath);
           const uploadResult = await uploadFiles([
             {
-              filename: `users/${
-                user.id
-              }-${randomString}-${Date.now()}.${fileExt}`,
+              filename: `users/${userWithFriends.id}-${randomString}-${Date.now()}.${fileExt}`,
               content: fileContent,
               path: newPath,
             },
           ]);
 
           const updatedUser = await prisma.user.update({
-            where: { id: user.id },
+            where: { id: userWithFriends.id },
             data: { uiBackground: uploadResult[0].Location },
           });
 
@@ -112,14 +188,21 @@ export default async function handler(
             user: updatedUser,
           });
         } else if (type === "uiColorUpdate") {
-          let { hex } = fields;
+          let hex = fields.hex;
+          if (Array.isArray(hex)) {
+            hex = hex[0];
+          }
+
+          if (!hex || typeof hex !== "string") {
+            return res.status(400).json({ error: "Invalid hex value" });
+          }
 
           const updatedUser = await prisma.user.update({
-            where: { id: user.id },
+            where: { id: userWithFriends.id },
             data: {
               settings: {
-                ...user.settings,
-                bgColor: `${hex[0]}`,
+                ...userWithFriends.settings,
+                bgColor: hex,
               },
             },
           });

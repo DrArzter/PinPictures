@@ -1,8 +1,9 @@
 // src/app/components/Chats.tsx
+
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { useSocketContext } from "@/app/contexts/SocketContext";
-import { User } from "@/app/types/global";
 
 import ChatList from "@/app/components/chat/ChatList";
 import Chat from "@/app/components/chat/Chat";
@@ -20,6 +21,26 @@ export default function Chats() {
   const [activeChat, setActiveChat] = useState<FullChat | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [isActiveChatLoading, setIsActiveChatLoading] = useState(false);
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== "undefined" ? window.innerWidth : 0
+  );
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", handleResize);
+      }
+    };
+  }, []);
 
   // Fetch the list of chats
   useEffect(() => {
@@ -34,6 +55,20 @@ export default function Chats() {
 
       return () => {
         socket.off("chatsList");
+      };
+    }
+  }, [socket]);
+
+  // Listen for new chats created
+  useEffect(() => {
+    if (socket) {
+      socket.on("newChatCreated", (newChat: Chat) => {
+        console.log("New chat created:", newChat);
+        setChats((prevChats) => [...prevChats, newChat]);
+      });
+
+      return () => {
+        socket.off("newChatCreated");
       };
     }
   }, [socket]);
@@ -67,14 +102,14 @@ export default function Chats() {
   return (
     <div className="flex flex-col items-center justify-center scrollbar-hidden p-4 h-[85vh] md:h-[90vh] w-full">
       <div className="flex flex-row w-full h-full gap-2 border p-2 rounded-2xl shadow-xl">
-        <div
-          className="rounded-2xl p-2"
-        >
+        <div className="rounded-2xl p-2">
           <ChatList
             chats={chats}
             user={user}
             selectedChatId={selectedChatId}
             setSelectedChatId={setSelectedChatId}
+            socket={socket}
+            windowWidth={windowWidth}
           />
         </div>
         <div className="p-2 rounded-2xl w-full">

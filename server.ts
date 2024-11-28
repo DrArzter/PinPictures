@@ -15,6 +15,7 @@ import {
   getChatMessages,
   getChatsForUser,
   handleNewMessage,
+  createNewChat,
 } from "./services/chatService";
 
 const dev = process.env.NODE_ENV !== "production";
@@ -132,7 +133,7 @@ app.prepare().then(() => {
           Number(limit)
         );
         console.log(
-          `Отправка ${messages.length} сообщений для страницы ${page}`
+          `Sending ${messages.length} messages for page ${page}`
         );
         socket.emit("chatMessages", messages);
       } catch (error) {
@@ -152,6 +153,32 @@ app.prepare().then(() => {
       } catch (error) {
         console.error("Error sending message:", error);
         socket.emit("error", "Failed to send message.");
+      }
+    });
+
+    // Handle createChat event
+    socket.on("createChat", async (data) => {
+      const { participantIds, chatName, avatar } = data;
+      try {
+        const creatorId = parseInt(socket.data.userId);
+        const isGroupChat = participantIds.length > 1;
+
+        const newChat = await createNewChat(
+          creatorId,
+          participantIds,
+          chatName,
+          isGroupChat,
+          avatar
+        );
+
+        // Notify all participants about the new chat
+        const allParticipantIds = [creatorId, ...participantIds];
+        allParticipantIds.forEach((userId) => {
+          io.to(`user_${userId}`).emit("newChatCreated", newChat);
+        });
+      } catch (error) {
+        console.error("Error creating chat:", error);
+        socket.emit("error", "Failed to create chat.");
       }
     });
 

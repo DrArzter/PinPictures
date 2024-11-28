@@ -1,3 +1,4 @@
+// ./src/app/profile/[name]/page.tsx
 "use client";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams } from "next/navigation";

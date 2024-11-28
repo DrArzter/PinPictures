@@ -1,14 +1,20 @@
-import React, { useState } from "react";
+// src/app/components/chat/ChatList.tsx
+
+"use client";
+
+import React, { useContext, useState } from "react";
 import { User, Chat } from "@/app/types/global";
-import { AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
 import SearchBar from "../common/SearchBar";
+import ModalsContext from "@/app/contexts/ModalsContext";
+import { Socket } from "socket.io-client";
 
 interface ChatListProps {
   user: User;
   chats: Chat[];
-  selectedChatId: number;
+  selectedChatId: string | undefined;
   setSelectedChatId: (id: string) => void;
-  windowWidth: number;
+  socket: Socket | undefined;
 }
 
 export default function ChatList({
@@ -16,12 +22,11 @@ export default function ChatList({
   user,
   selectedChatId,
   setSelectedChatId,
-  windowWidth,
+  socket,
 }: ChatListProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const wideWindow = windowWidth > 768;
+  const { openModal } = useContext(ModalsContext);
 
-  // Фильтрация чатов по запросу
   const filteredChats = Array.isArray(chats)
     ? chats.filter((chat: Chat) =>
         chat.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -33,11 +38,20 @@ export default function ChatList({
   };
 
   return (
-    <div className="flex scrollbar-hidden flex-col h-full border-r border-r pr-4">
-      <div className="relative mb-4 w-full border-b pb-5">
+    <div className="flex flex-col h-full border-r pr-4">
+      {/* Search Bar and New Chat Button */}
+      <div className="flex items-center justify-between mb-4">
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <button
+          onClick={() => openModal("CREATE_CHAT")}
+          className="p-2 rounded-full hover:bg-gray-200"
+          aria-label="Start New Chat"
+        >
+          <AiOutlinePlus size={24} />
+        </button>
       </div>
 
+      {/* Existing Chat List */}
       <div className="flex flex-col gap-2 overflow-y-auto">
         {filteredChats.length > 0 ? (
           filteredChats.map((chat: Chat) => (
@@ -48,7 +62,7 @@ export default function ChatList({
                 selectedChatId === chat.id ? "border-l-4 border-yellow-500" : ""
               }`}
             >
-              {/* Обертка для аватара */}
+              {/* Avatar Wrapper */}
               <div className="flex-shrink-0">
                 {chat.avatar ? (
                   <img
@@ -66,13 +80,11 @@ export default function ChatList({
               </div>
 
               <div className="ml-4 flex-1 flex flex-col justify-center">
-                <span className="text-lg font-semibold">
-                  {chat.name}
-                </span>
+                <span className="text-lg font-semibold">{chat.name}</span>
                 <span className="text-sm">
                   {chat.lastMessage
-                    ? `${chat.lastMessage.author.name}: ${chat.lastMessage.message}`
-                    : "Нет сообщений"}
+                    ? `${chat.lastMessage.User.name}: ${chat.lastMessage.message}`
+                    : "No messages"}
                 </span>
               </div>
             </div>

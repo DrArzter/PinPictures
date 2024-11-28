@@ -5,12 +5,16 @@ import React, { useContext } from "react";
 import { RxAvatar } from "react-icons/rx";
 import { AiOutlineMenu } from "react-icons/ai";
 
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+
 import { useUserContext } from "@/app/contexts/UserContext";
 import MenuContext from "@/app/contexts/MenuContext";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 
 export default function UserCard() {
   const { user } = useUserContext();
+  const router = useRouter();
   const { menuType, openMenu, closeMenu } = useContext(MenuContext);
   const { addNotification } = useNotificationContext();
 
@@ -49,20 +53,26 @@ export default function UserCard() {
       >
         {user ? (
           <>
-            <img
-              src={user.avatar}
-              alt="Profile"
-              loading="lazy"
-              style={{ objectFit: "cover" }}
-              id="user-card"
-              className="w-10 h-10 rounded-full cursor-pointer hover-transform"
-            />
+            <div className="w-12 h-12 rounded-full cursor-pointer hover-transform">
+              <Image
+                src={user.avatar}
+                alt={user.name}
+                width={0}
+                height={0}
+                sizes="100vw"
+                className="w-full h-full rounded-full"
+              />
+            </div>
             <p className="font-bold" id="user-card">
               {user.name}
             </p>
           </>
         ) : (
-          <RxAvatar title="Profile" className="w-10 h-10 rounded-full cursor-pointer hover-transform" />
+          <RxAvatar
+            title="Profile"
+            onClick={router.push("/authentication")}
+            className="w-10 h-10 rounded-full cursor-pointer hover-transform"
+          />
         )}
       </div>
       <AiOutlineMenu

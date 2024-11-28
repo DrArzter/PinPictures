@@ -209,10 +209,10 @@ export default function Chat({
         className="flex flex-col flex-grow overflow-y-auto"
       >
         {currentChat.messages.map((message, index) => {
-          const isCurrentUser = message.author.name === user.name;
+          const isCurrentUser = message.User.name === user.name;
           const previousMessage = currentChat.messages[index - 1];
           const showAuthorInfo =
-            index === 0 || message.author.name !== previousMessage?.author.name;
+            index === 0 || message.User.name !== previousMessage?.User.name;
   
           return (
             <div
