@@ -78,7 +78,7 @@ export default function Posts() {
       className="relative"
     >
       {error && (
-        <div className="text-red-500 text-center mb-4">
+        <div className="flex flex-col items-center justify-center h-[85vh] md:h-[90vh]">
           {error}
           <button onClick={retryFetch} className="ml-2 text-blue-500 underline">
             Try again
@@ -103,7 +103,7 @@ export default function Posts() {
           <PostList posts={posts} columns={columns} />
         </InfiniteScroll>
       ) : (
-        !loading && <NoPostsFound />
+        !loading && !error && <NoPostsFound />
       )}
       {loading && page === 1 && (
         <div className="flex justify-center items-center h-[85vh] md:h-[90vh]">

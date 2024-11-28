@@ -70,7 +70,10 @@ export default function UserCard() {
         ) : (
           <RxAvatar
             title="Profile"
-            onClick={router.push("/authentication")}
+            onClick={(e) => {
+              e.preventDefault();
+              router.push("/authentication");
+            }}
             className="w-10 h-10 rounded-full cursor-pointer hover-transform"
           />
         )}
