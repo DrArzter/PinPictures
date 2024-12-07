@@ -10,12 +10,7 @@ dotenv.config();
 
 import { verifyToken } from "./src/utils/jwt";
 import {
-  getChatById,
-  getChatDetails,
-  getChatMessages,
-  getChatsForUser,
-  handleNewMessage,
-  createNewChat,
+  sayGex,
 } from "./services/chatService";
 
 const dev = process.env.NODE_ENV !== "production";
@@ -78,7 +73,6 @@ app.prepare().then(() => {
       }
 
       socket.data.userId = decoded.userId;
-
       socket.join(`user_${socket.data.userId}`);
       console.log(`User ${socket.data.userId} joined their personal room.`);
     } catch (error) {
@@ -87,99 +81,9 @@ app.prepare().then(() => {
       return;
     }
 
-    socket.on("getChats", async () => {
-      const userId = parseInt(socket.data.userId);
-
-      try {
-        const chats = await getChatsForUser(userId);
-        socket.emit("chatsList", chats);
-      } catch (error) {
-        console.error("Error getting chats:", error);
-        socket.emit("error", "Failed to fetch chat list.");
-      }
-    });
-
-    socket.on("getChat", async (chatId) => {
-      try {
-        const chat = await getChatById(parseInt(chatId), socket.data.userId);
-        socket.emit("chat", chat);
-      } catch (error) {
-        console.error("Error getting chat:", error);
-        socket.emit("error", "Failed to fetch chat.");
-      }
-    });
-
-    socket.on("getChatDetails", async (chatId) => {
-      try {
-        const chatDetails = await getChatDetails(
-          Number(chatId),
-          socket.data.userId
-        );
-        socket.emit("chatDetails", chatDetails);
-      } catch (error) {
-        console.error("Error fetching chat details:", error);
-        socket.emit("error", "Failed to fetch chat details.");
-      }
-    });
-
-    socket.on("getChatMessages", async ({ chatId, page, limit }) => {
-      try {
-        console.log(
-          `Request to get chat messages: chatId=${chatId}, page=${page}, limit=${limit}`
-        );
-        const messages = await getChatMessages(
-          Number(chatId),
-          Number(page),
-          Number(limit)
-        );
-        console.log(
-          `Sending ${messages.length} messages for page ${page}`
-        );
-        socket.emit("chatMessages", messages);
-      } catch (error) {
-        console.error("Error fetching chat messages:", error);
-        socket.emit("error", "Failed to fetch chat messages.");
-      }
-    });
-
     socket.on("joinChat", (chatId) => {
       socket.join(`chat_${chatId}`);
       console.log(`User ${socket.data.userId} joined chat ${chatId}`);
-    });
-
-    socket.on("newMessage", async (data) => {
-      try {
-        await handleNewMessage(socket, data);
-      } catch (error) {
-        console.error("Error sending message:", error);
-        socket.emit("error", "Failed to send message.");
-      }
-    });
-
-    // Handle createChat event
-    socket.on("createChat", async (data) => {
-      const { participantIds, chatName, avatar } = data;
-      try {
-        const creatorId = parseInt(socket.data.userId);
-        const isGroupChat = participantIds.length > 1;
-
-        const newChat = await createNewChat(
-          creatorId,
-          participantIds,
-          chatName,
-          isGroupChat,
-          avatar
-        );
-
-        // Notify all participants about the new chat
-        const allParticipantIds = [creatorId, ...participantIds];
-        allParticipantIds.forEach((userId) => {
-          io.to(`user_${userId}`).emit("newChatCreated", newChat);
-        });
-      } catch (error) {
-        console.error("Error creating chat:", error);
-        socket.emit("error", "Failed to create chat.");
-      }
     });
 
     socket.on("disconnect", () => {

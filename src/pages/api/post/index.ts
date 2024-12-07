@@ -1,25 +1,3 @@
-// pages/api/post/index.ts
-
-import { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "@/utils/prisma";
-import { uploadFiles } from "@/utils/s3Module";
-import { authMiddleware } from "@/middlewares/authMiddleware";
-import formidable from "formidable";
-import fs from "fs/promises";
-import { handleError } from "@/utils/errorHandler";
-
-// Отключаем встроенный парсер тела запроса
-export const config = {
-  api: {
-    bodyParser: false,
-    sizeLimit: "100mb",
-  },
-};
-
-interface CustomNextApiRequest extends NextApiRequest {
-  user?: any;
-}
-
 export default async function handler(
   req: CustomNextApiRequest,
   res: NextApiResponse
@@ -30,7 +8,11 @@ export default async function handler(
       .json({ status: "error", message: "Unsupported method" });
   }
 
+  // Массив для отслеживания временных файлов
+  const tempFiles: string[] = [];
+
   try {
+    // Аутентификация пользователя
     await authMiddleware(req, res);
     const user = req.user;
 
@@ -42,6 +24,7 @@ export default async function handler(
 
     const form = formidable({ multiples: true });
 
+    // Парсинг данных из формы
     const { fields, files } = await new Promise<{
       fields: formidable.Fields;
       files: formidable.Files;
@@ -64,6 +47,7 @@ export default async function handler(
       });
     }
 
+    // Создание нового поста
     const newPost = await prisma.post.create({
       data: {
         name,
@@ -74,6 +58,7 @@ export default async function handler(
 
     const newPostId = newPost.id;
 
+    // Подготовка файлов для загрузки
     const filesToUpload: {
       filename: string;
       content: Buffer;
@@ -81,9 +66,7 @@ export default async function handler(
     }[] = [];
 
     for (const key of Object.keys(files)) {
-      const fileArray = Array.isArray(files[key])
-        ? files[key]
-        : [files[key]];
+      const fileArray = Array.isArray(files[key]) ? files[key] : [files[key]];
 
       if (fileArray.length > 10) {
         return res.status(400).json({
@@ -93,25 +76,41 @@ export default async function handler(
       }
 
       for (const image of fileArray) {
-        const fileTypes = /jpeg|jpg|png|gif|webp/;
-        const fileExt = image.originalFilename
-          ? image.originalFilename.split(".").pop()?.toLowerCase()
-          : null;
-        const mimeType = fileTypes.test(image.mimetype || "");
-        const extname = fileExt ? fileTypes.test(fileExt) : false;
+        // Добавляем файл во временный список для подчистки
+        tempFiles.push(image.filepath);
 
-        if (!mimeType || !extname || !fileExt) {
+        // Список допустимых расширений
+        const allowedExtensions = ["jpeg", "jpg", "png", "gif", "webp"];
+
+        const fileExt = image.originalFilename?.split(".").pop()?.toLowerCase();
+        const mimeType = image.mimetype;
+
+        if (!fileExt || !allowedExtensions.includes(fileExt)) {
+          await prisma.post.delete({ where: { id: newPostId } });
           return res.status(400).json({
             status: "error",
-            message: "Wrong file type",
+            message: "Unsupported file type",
           });
         }
 
+        // Чтение первых байтов файла
+        const buffer = await fs.readFile(image.filepath);
+
+        if (!isValidFileContent(buffer, fileExt)) {
+          await prisma.post.delete({ where: { id: newPostId } });
+          return res.status(400).json({
+            status: "error",
+            message: "File content does not match the file extension",
+          });
+        }
+
+        // Создание уникального пути файла
         const tempPath = image.filepath;
         const randomString = Math.random().toString(36).substr(2, 10);
         const newPath = `${tempPath}.${fileExt}`;
 
         try {
+          // Переименование и чтение файла
           await fs.rename(tempPath, newPath);
 
           const fileContent = await fs.readFile(newPath);
@@ -121,6 +120,9 @@ export default async function handler(
             content: fileContent,
             path: newPath,
           });
+
+          // Обновляем путь в списке временных файлов
+          tempFiles[tempFiles.indexOf(tempPath)] = newPath;
         } catch (error) {
           return handleError(res, error);
         }
@@ -134,18 +136,13 @@ export default async function handler(
       });
     }
 
+    // Загрузка файлов в S3
     const uploadResult = await uploadFiles(filesToUpload);
 
-    await Promise.all(
-      filesToUpload.map(async (file) => {
-        try {
-          await fs.unlink(file.path);
-        } catch (err) {
-          console.error(`Failed to delete file ${file.path}:`, err);
-        }
-      })
-    );
+    // Удаление временных файлов
+    await cleanupFiles(tempFiles);
 
+    // Сохранение данных о загруженных изображениях в БД
     for (const result of uploadResult) {
       await prisma.imageInPost.create({
         data: {
@@ -163,5 +160,19 @@ export default async function handler(
     });
   } catch (error) {
     return handleError(res, error);
+  } finally {
+    // Подчищаем все временные файлы
+    await cleanupFiles(tempFiles);
+  }
+}
+
+// Функция подчистки временных файлов
+async function cleanupFiles(filePaths: string[]) {
+  for (const filePath of filePaths) {
+    try {
+      await fs.unlink(filePath);
+    } catch (err) {
+      console.error(`Failed to delete file ${filePath}:`, err);
+    }
   }
 }

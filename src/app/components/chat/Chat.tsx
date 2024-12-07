@@ -1,93 +1,78 @@
-// src/app/components/Chat.tsx
+// ./app/components/chat/Chat.tsx
+"use client";
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { User } from "@/app/types/global";
+import React, { useEffect, useRef, useState } from "react";
+import { User, FullChat, Message } from "@/app/types/global";
 import LoadingIndicator from "../common/LoadingIndicator";
 import { Socket } from "socket.io-client";
 import { FaRegFileImage } from "react-icons/fa6";
 import { MdClose } from "react-icons/md";
+import InfiniteScroll from "react-infinite-scroll-component";
+
+import Image from "next/image";
 
 interface ChatProps {
   user: User;
   chat: FullChat | undefined;
   isActiveChatLoading: boolean;
   socket: Socket | undefined;
+  otherUserId?: number; // добавили это поле, чтобы знать с кем локально создаём чат
 }
+
+const MESSAGES_PER_PAGE = 20;
 
 export default function Chat({
   user,
   chat,
   isActiveChatLoading,
   socket,
+  otherUserId,
 }: ChatProps) {
-  console.log("Chat component props:", chat);
-
   const [newMessage, setNewMessage] = useState("");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [currentChat, setChat] = useState(chat);
-
-  // Create a ref for the messages container
-  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
-  // Create a ref for a dummy element at the end of the messages list
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [currentChat, setChat] = useState<FullChat | undefined>(chat);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const scrollableDivRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setChat(chat);
+    if (chat && chat.messages) {
+      setMessages([...chat.messages]);
+      setHasMore(chat.messages.length === MESSAGES_PER_PAGE);
+      setTimeout(() => scrollToBottom(), 100);
+    } else if (chat && chat.id === -1) {
+      setMessages([]);
+      setHasMore(false);
+    }
   }, [chat]);
 
-  // Function to scroll to the bottom
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  // Use useLayoutEffect for synchronous scrolling after rendering
-  useLayoutEffect(() => {
-    if (currentChat) {
-      scrollToBottom();
-    }
-  }, [currentChat?.messages]);
-
-  // Additional useEffect to scroll after all images have loaded
   useEffect(() => {
-    if (currentChat) {
-      const images = messagesContainerRef.current?.getElementsByTagName("img");
-      if (images) {
-        let loadedCount = 0;
-        const totalImages = images.length;
+    if (socket && currentChat && currentChat.id !== -1) {
+      socket.emit("joinChat", currentChat.id);
 
-        if (totalImages === 0) {
+      socket.on("newMessage", (newMsg: Message) => {
+        if (newMsg.chatId === currentChat.id) {
+          setMessages((prev) => [...prev, newMsg]);
           scrollToBottom();
-          return;
         }
+      });
 
-        const handleImageLoad = () => {
-          loadedCount += 1;
-          if (loadedCount === totalImages) {
-            scrollToBottom();
-          }
-        };
-
-        for (let img of images) {
-          if (img.complete) {
-            handleImageLoad();
-          } else {
-            img.addEventListener("load", handleImageLoad);
-            img.addEventListener("error", handleImageLoad);
-          }
-        }
-
-        // Clean up listeners on unmount or when messages change
-        return () => {
-          for (let img of images) {
-            img.removeEventListener("load", handleImageLoad);
-            img.removeEventListener("error", handleImageLoad);
-          }
-        };
-      } else {
-        scrollToBottom();
-      }
+      return () => {
+        socket.off("newMessage");
+      };
     }
-  }, [currentChat?.messages]);
+  }, [socket, currentChat]);
+
+  const scrollToBottom = () => {
+    if (scrollableDivRef.current) {
+      scrollableDivRef.current.scrollTo({
+        top: scrollableDivRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  };
 
   const handleSendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -97,7 +82,7 @@ export default function Chat({
       return;
     }
 
-    if (socket && chat) {
+    if (socket && currentChat) {
       let imagesBase64: string[] = [];
 
       if (imageFiles.length > 0) {
@@ -112,11 +97,19 @@ export default function Chat({
         }
       }
 
-      const messageData = {
-        chatId: chat.id,
-        message: newMessage.trim(),
-        images: imagesBase64,
-      };
+      // Если чат не создан на сервере (id === -1), мы не имеем chatId, вместо этого укажем otherUserId
+      const messageData =
+        currentChat.id === -1
+          ? {
+              otherUserId: otherUserId,
+              message: newMessage.trim(),
+              images: imagesBase64,
+            }
+          : {
+              chatId: currentChat.id,
+              message: newMessage.trim(),
+              images: imagesBase64,
+            };
 
       socket.emit("newMessage", messageData);
 
@@ -140,6 +133,10 @@ export default function Chat({
     });
   };
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
@@ -151,27 +148,29 @@ export default function Chat({
     setImageFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
-  useEffect(() => {
-    if (socket && chat) {
-      socket.emit("joinChat", chat.id);
-
-      socket.on("newMessage", (newMessage: any) => {
-        if (newMessage.chatId === chat.id) {
-          setChat((prevChat) => {
-            if (!prevChat) return prevChat;
-            return {
-              ...prevChat,
-              messages: [...prevChat.messages, newMessage],
-            };
-          });
-        }
-      });
-
-      return () => {
-        socket.off("newMessage");
-      };
+  const fetchMoreMessages = () => {
+    if (!socket || !currentChat || currentChat.id === -1) {
+      setHasMore(false);
+      return;
     }
-  }, [socket, chat]);
+
+    const nextPage = page + 1;
+    socket.emit("getChatMessages", {
+      chatId: currentChat.id,
+      page: nextPage,
+      limit: MESSAGES_PER_PAGE,
+    });
+
+    socket.once("chatMessages", (fetchedMessages: Message[]) => {
+      if (fetchedMessages.length === 0) {
+        setHasMore(false);
+      } else {
+        const reversedFetched = [...fetchedMessages].reverse();
+        setMessages((prev) => [...prev, ...reversedFetched]);
+        setPage(nextPage);
+      }
+    });
+  };
 
   if (isActiveChatLoading) {
     return (
@@ -185,7 +184,7 @@ export default function Chat({
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <div className="rounded-xl px-2 py-1">
-          <span className="text-white">No chat selected</span>
+          <span>No chat selected</span>
         </div>
       </div>
     );
@@ -193,7 +192,7 @@ export default function Chat({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Chat Header */}
+      {/* Заголовок чата */}
       <div className="flex flex-row items-center gap-4 mb-4 border-b pb-4">
         <img
           src={currentChat.avatar}
@@ -202,75 +201,91 @@ export default function Chat({
         />
         <span className="text-xl font-semibold">{currentChat.name}</span>
       </div>
-  
-      {/* Messages List */}
+
+      {/* Список сообщений */}
       <div
-        ref={messagesContainerRef}
-        className="flex flex-col flex-grow overflow-y-auto"
+        id="scrollableChat"
+        ref={scrollableDivRef}
+        className="flex-grow overflow-auto border p-2"
       >
-        {currentChat.messages.map((message, index) => {
-          const isCurrentUser = message.User.name === user.name;
-          const previousMessage = currentChat.messages[index - 1];
-          const showAuthorInfo =
-            index === 0 || message.User.name !== previousMessage?.User.name;
-  
-          return (
-            <div
-              key={message.id}
-              className={`flex ${
-                isCurrentUser ? "justify-end" : "justify-start"
-              } mb-2`}
-            >
+        <InfiniteScroll
+          dataLength={messages.length}
+          next={fetchMoreMessages}
+          hasMore={hasMore}
+          loader={<LoadingIndicator />}
+          inverse={true}
+          scrollableTarget="scrollableChat"
+        >
+          {messages.map((message, index) => {
+            const isCurrentUser = message.User.name === user.name;
+            const previousMessage = messages[index - 1];
+            const showAuthorInfo =
+              index === messages.length + 1 ||
+              message.User.name !== previousMessage?.User.name;
+
+            return (
               <div
-                className={`flex flex-col ${
-                  isCurrentUser ? "items-end" : "items-start"
-                } max-w-xs`}
+                key={message.id}
+                className={`flex ${
+                  isCurrentUser ? "justify-end" : "justify-start"
+                } mb-2`}
               >
-                {showAuthorInfo && (
-                  <div className="flex items-center mb-1">
-                    {!isCurrentUser && (
-                      <img
-                        src={message.author.avatar}
-                        alt="Message Author Avatar"
-                        className="w-6 h-6 rounded-full mr-2"
-                      />
-                    )}
-                    <span className="text-sm font-semibold">
-                      {isCurrentUser ? "You" : message.author.name}
-                    </span>
-                  </div>
-                )}
                 <div
-                  className={`px-4 py-2 rounded-lg ${
-                    isCurrentUser
-                      ? "bg-zinc-500 text-white"
-                      : "bg-gray-200 text-black"
-                  }`}
+                  className={`flex flex-col ${
+                    isCurrentUser ? "items-end" : "items-start"
+                  } max-w-xs`}
                 >
-                  <p>{message.message}</p>
-                  {message.images &&
-                    message.images.length > 0 &&
-                    message.images.map((image, imgIndex) => (
-                      <img
-                        key={imgIndex}
-                        src={image.picpath}
-                        alt="Message Image"
-                        className="mt-2 max-w-full h-auto"
-                      />
-                    ))}
-                  <div className="text-xs text-gray-400 mt-1">
-                    {new Date(message.createdAt).toLocaleString()}
+                  {showAuthorInfo && (
+                    <div className="flex items-center mb-1">
+                      {!isCurrentUser && message.User && (
+                        <img
+                          src={message.User.avatar}
+                          alt="Message Author Avatar"
+                          className="w-6 h-6 rounded-full mr-2"
+                        />
+                      )}
+                      <span className="text-sm font-semibold">
+                        {isCurrentUser
+                          ? "You"
+                          : message.User?.name || "Unknown"}
+                      </span>
+                    </div>
+                  )}
+                  <div
+                    className={`px-4 py-2 rounded-lg ${
+                      isCurrentUser
+                        ? "bg-zinc-500 text-white"
+                        : "bg-gray-200 text-black"
+                    }`}
+                  >
+                    <p>{message.message}</p>
+                    {message.images &&
+                      message.images.length > 0 &&
+                      message.images.map((image, imgIndex) => (
+                        <div key={imgIndex} className="h-40 w-40">
+                          <Image
+                            key={imgIndex}
+                            src={image.picpath}
+                            alt="Message Image"
+                            width={0}
+                            height={0}
+                            sizes="100vw"
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                      ))}
+                    <div className="text-xs text-gray-400 mt-1">
+                      {new Date(message.createdAt).toLocaleString()}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-        {/* Dummy element for scrolling */}
-        <div ref={messagesEndRef} />
+            );
+          })}
+        </InfiniteScroll>
       </div>
-  
-      {/* Message Input Form */}
+
+      {/* Форма отправки сообщения */}
       <form onSubmit={handleSendMessage} className="mt-4">
         <div className="flex flex-col gap-2 items-center w-full">
           <div className="flex w-full">
@@ -293,7 +308,7 @@ export default function Chat({
             </label>
             <button
               type="submit"
-              className="btn-primary bg-yellow-500 text-white font-semibold rounded-r px-4"
+              className="bg-yellow-500 text-white font-semibold rounded-r px-4"
             >
               Send
             </button>
@@ -322,5 +337,4 @@ export default function Chat({
       </form>
     </div>
   );
-};
-  
+}

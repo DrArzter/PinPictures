@@ -7,6 +7,10 @@ export default async function getUser(): Promise<User | null> {
     const response = await api.get<{ data: User }>(`/user`, {
       withCredentials: true,
     });
+    if (response.status == 444) {
+      console.log("Suck.");
+      return response.data.data;
+    }
     return response.data.data;
   } catch (error: unknown) {
     if (

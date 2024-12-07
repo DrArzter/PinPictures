@@ -44,15 +44,7 @@ export default async function handler(
       // Fetch the user with friendships
       const userWithFriends = await prisma.user.findUnique({
         where: { id: authenticatedUser.id },
-        select: {
-          id: true,
-          avatar: true,
-          background: true,
-          lastLoginAt: true,
-          description: true,
-          name: true,
-          settings: true,
-          uiBackground: true,
+        include: {
           Friendships_Friendships_user1IdToUser: {
             select: {
               status: true,

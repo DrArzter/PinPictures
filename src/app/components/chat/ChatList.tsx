@@ -3,6 +3,7 @@
 "use client";
 
 import React, { useContext, useState } from "react";
+import { useRouter } from "next/navigation";
 import { User, Chat } from "@/app/types/global";
 import { AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
 import SearchBar from "../common/SearchBar";
@@ -11,7 +12,7 @@ import { Socket } from "socket.io-client";
 
 interface ChatListProps {
   user: User;
-  chats: Chat[];
+  chats: Chat[]; // Теперь Chat содержит ChatType и users
   selectedChatId: string | undefined;
   setSelectedChatId: (id: string) => void;
   socket: Socket | undefined;
@@ -26,6 +27,7 @@ export default function ChatList({
 }: ChatListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const { openModal } = useContext(ModalsContext);
+  const router = useRouter();
 
   const filteredChats = Array.isArray(chats)
     ? chats.filter((chat: Chat) =>
@@ -35,10 +37,24 @@ export default function ChatList({
 
   const handleChatClick = (chat: Chat) => {
     setSelectedChatId(chat.id);
+
+    if (chat.ChatType === "private") {
+      // Находим второго пользователя
+      const otherUser = chat.users.find((u) => u.id !== user.id);
+      if (otherUser) {
+        router.push(`/chats/${otherUser.id}`);
+      } else {
+        // Если почему-то нет второго пользователя, fallback:
+        router.push(`/chats/${chat.id}`);
+      }
+    } else {
+      // Если это группа или другой тип чата — используем chat.id или другую логику
+      router.push(`/chats/${chat.id}`);
+    }
   };
 
   return (
-    <div className="flex flex-col h-full border-r pr-4">
+    <div className="flex flex-col h-full">
       {/* Search Bar and New Chat Button */}
       <div className="flex items-center justify-between mb-4">
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />

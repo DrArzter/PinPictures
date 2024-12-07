@@ -7,167 +7,24 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { useParams, useRouter } from "next/navigation";
-import Image from "next/image";
+import { useParams } from "next/navigation";
 import LoadingIndicator from "@/app/components/common/LoadingIndicator";
 import { fetchPost } from "@/app/utils/postUtils";
-import { BsHeart, BsHeartFill, BsChatDots } from "react-icons/bs";
-import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
+import { BsChatDots } from "react-icons/bs";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import * as api from "@/app/api";
-
-import CommentList from "@/app/components/comment/CommentList";
-
-import { Post as PostType, User, Comment } from "@/app/types/global";
+import { Post as PostType, Comment } from "@/app/types/global";
 import { useUserContext } from "@/app/contexts/UserContext";
 import ModalsContext from "@/app/contexts/ModalsContext";
 
-interface PostProps {
-  user: User | null;
-}
+import AuthorInfo from "@/app/components/Post/AuthorInfo";
+import ImageCarousel from "@/app/components/Post/ImageCarousel";
+import LikeButton from "@/app/components/Post/LikeButton";
+import CommentSection from "@/app/components/Post/CommentSection";
 
-/**
- * Компонент для отображения информации об авторе.
- */
-const AuthorInfo: React.FC<{ user: User; createdAt: string }> = ({
-  user,
-  createdAt,
-}) => {
-  const router = useRouter();
-  return (
-    <div className="flex items-center space-x-4">
-      <div className="rounded-full cursor-pointer border border-yellow-500">
-        <Image
-          onClick={() => router.push(`/profile/${user.name}`)}
-          src={user.avatar}
-          alt={`${user.name} avatar`}
-          width={0}
-          height={0}
-          sizes="100vw"
-          className="w-full h-full rounded-full"
-        />
-      </div>
-      <div>
-        <p
-          onClick={() => router.push(`/profile/${user.name}`)}
-          className="font-semibold text-lg cursor-pointer"
-        >
-          {user.name}
-        </p>
-        <p className="text-sm text-gray-500">
-          {new Date(createdAt).toLocaleString()}
-        </p>
-      </div>
-    </div>
-  );
-};
-
-const ImageCarousel: React.FC<{
-  images: { picpath: string }[];
-  currentIndex: number;
-  onPrev: (e: React.MouseEvent) => void;
-  onNext: (e: React.MouseEvent) => void;
-  onImageClick: () => void;
-}> = ({ images, currentIndex, onPrev, onNext, onImageClick }) => {
-  const hasMultipleImages = images.length > 1;
-
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [isImageError, setIsImageError] = useState(false);
-
-  return (
-    <div className="w-full h-full relative flex items-center justify-center overflow-hidden rounded-lg">
-      <div className="w-full h-full flex items-center justify-center">
-        <Image
-          src={images[currentIndex].picpath}
-          alt="Post Image"
-          width={0}
-          height={0}
-          sizes="100vw"
-          className="cursor-pointer w-full h-full object-cover"
-          onLoad={() => setIsImageLoaded(true)}
-          onError={() => setIsImageError(true)}
-          onClick={onImageClick}
-        />
-      </div>
-      {hasMultipleImages && (
-        <>
-          <button
-            onClick={onPrev}
-            className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white bg-opacity-50 dark:bg-gray-700 dark:bg-opacity-50 rounded-full p-2 focus:outline-none hover:bg-opacity-75 transition"
-            aria-label="Previous Image"
-          >
-            <AiOutlineLeft size={24} />
-          </button>
-          <button
-            onClick={onNext}
-            className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white bg-opacity-50 dark:bg-gray-700 dark:bg-opacity-50 rounded-full p-2 focus:outline-none hover:bg-opacity-75 transition"
-            aria-label="Next Image"
-          >
-            <AiOutlineRight size={24} />
-          </button>
-        </>
-      )}
-    </div>
-  );
-};
-
-const LikeButton: React.FC<{
-  isLiked: boolean;
-  likeCount: number;
-  onLike: (e: React.MouseEvent) => void;
-}> = ({ isLiked, likeCount, onLike }) => {
-  return (
-    <button
-      className="flex items-center gap-1 text-yellow-500 hover:text-yellow-600 transition-colors duration-200"
-      onClick={onLike}
-      aria-label={isLiked ? "Unlike" : "Like"}
-    >
-      {isLiked ? <BsHeartFill size={20} /> : <BsHeart size={20} />}
-      <span>{likeCount}</span>
-    </button>
-  );
-};
-
-const CommentSection: React.FC<{
-  comments: Comment[];
-  newComment: string;
-  setNewComment: React.Dispatch<React.SetStateAction<string>>;
-  onAddComment: (e: React.FormEvent) => void;
-}> = ({ comments, newComment, setNewComment, onAddComment }) => {
-  return (
-    <div
-      className="flex flex-col flex-grow overflow-hidden"
-      id="comments-section"
-    >
-      <CommentList comments={comments} />
-      <form onSubmit={onAddComment} className="mt-4">
-        <div className="flex items-center space-x-2">
-          <input
-            type="text"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            className="flex-1 border rounded p-2 text-base outline-none focus:ring-2 focus:ring-yellow-500 dark:bg-gray-700 dark:text-white"
-            placeholder="Enter a comment..."
-            aria-label="Enter a comment"
-          />
-          <button
-            type="submit"
-            className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded px-4 py-2 transition-colors duration-200"
-            aria-label="Send Comment"
-          >
-            Send
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-};
-
-export default function Post() {
+export default function PostPage() {
   const { addNotification } = useNotificationContext() as any;
-
   const { user } = useUserContext();
-
   const params = useParams();
   const postId = useMemo(
     () => (params.id ? parseInt(params.id, 10) : null),
@@ -180,7 +37,7 @@ export default function Post() {
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(0);
   const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState<string>("");
+  const [tormoz, setTormoz] = useState<boolean>(false);
 
   const [activeTab, setActiveTab] = useState<"image" | "details" | "comments">(
     "image"
@@ -206,7 +63,7 @@ export default function Post() {
         console.error("Error fetching post:", error);
         addNotification({
           type: "error",
-          message: "Не удалось загрузить пост.",
+          message: "Could not fetch post.",
         });
       } finally {
         setLoading(false);
@@ -218,6 +75,7 @@ export default function Post() {
   const handleLikeClick = useCallback(
     async (e: React.MouseEvent) => {
       e.stopPropagation();
+
       if (!user) {
         addNotification({
           status: "error",
@@ -230,22 +88,35 @@ export default function Post() {
 
       if (!post) return;
 
+      if (tormoz) {
+        return;
+      }
+
+      setTormoz(true);
+
+      const previousLikedState = isLiked;
+      const previousLikeCount = likeCount;
+      const newLikeState = !isLiked;
+      setIsLiked(newLikeState);
+      setLikeCount((prev) => (newLikeState ? prev + 1 : prev - 1));
+
       try {
         const response = await api.likePost(post.id);
-        if (response.status === "success") {
-          const newLikeState = !isLiked;
-          setIsLiked(newLikeState);
-          setLikeCount((prev) => (newLikeState ? prev + 1 : prev - 1));
+        if (response.status !== "success") {
+          throw new Error(response.message || "Failed to update like.");
         }
       } catch (error) {
-        console.error("Error updating like:", error);
+        setIsLiked(previousLikedState);
+        setLikeCount(previousLikeCount);
         addNotification({
           status: "error",
-          message: "Не удалось обновить лайк.",
+          message: "Could not update like.",
         });
+      } finally {
+        setTormoz(false);
       }
     },
-    [user, post, isLiked, addNotification]
+    [user, post, isLiked, addNotification, tormoz, likeCount]
   );
 
   const handleImageClick = useCallback(() => {
@@ -279,8 +150,7 @@ export default function Post() {
   );
 
   const handleAddComment = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
+    async (commentText: string) => {
       if (!user) {
         addNotification({
           status: "error",
@@ -291,7 +161,7 @@ export default function Post() {
         return;
       }
 
-      if (newComment.trim() === "") {
+      if (commentText.trim() === "") {
         addNotification({
           status: "error",
           message: "Please enter a comment first.",
@@ -301,34 +171,51 @@ export default function Post() {
 
       if (!post) return;
 
+      const tempId = Date.now();
+
       try {
-        const response = await api.uploadComment(post.id, newComment.trim());
+        const addedComment: Comment = {
+          id: tempId,
+          User: {
+            name: user.name,
+            avatar: user.avatar,
+          },
+          comment: commentText.trim(),
+          createdAt: new Date().toISOString(),
+        };
+
+        setComments((prev) => [...prev, addedComment]);
+
+        const response = await api.uploadComment(post.id, commentText.trim());
+
         if (response.status === "success") {
           addNotification({
             status: "success",
             message: response.message,
           });
-          const addedComment: Comment = {
-            id: Date.now(),
-            User: {
-              name: user.name,
-              avatar: user.avatar,
-            },
-            comment: newComment.trim(),
-            createdAt: new Date().toISOString(),
-          };
-          setComments((prev) => [...prev, addedComment]);
-          setNewComment("");
+
+          setComments((prev) =>
+            prev.map((comment) =>
+              comment.id === tempId
+                ? { ...comment, id: response.data.commentId }
+                : comment
+            )
+          );
+        } else {
+          throw new Error(response.message || "Unknown error");
         }
       } catch (error) {
         console.error("Error adding comment:", error);
+
+        setComments((prev) => prev.filter((comment) => comment.id !== tempId));
+
         addNotification({
           status: "error",
           message: "Failed to add comment.",
         });
       }
     },
-    [user, newComment, post, addNotification]
+    [user, post, addNotification]
   );
 
   if (loading) {
@@ -432,8 +319,6 @@ export default function Post() {
             <div className="p-6 h-full flex flex-col">
               <CommentSection
                 comments={comments}
-                newComment={newComment}
-                setNewComment={setNewComment}
                 onAddComment={handleAddComment}
               />
             </div>
@@ -495,11 +380,12 @@ export default function Post() {
           </div>
 
           {/* Секция комментариев */}
-          <div className="flex-grow flex flex-col overflow-hidden">
+          <div
+            className="flex-grow flex flex-col overflow-hidden"
+            id="comments-section"
+          >
             <CommentSection
               comments={comments}
-              newComment={newComment}
-              setNewComment={setNewComment}
               onAddComment={handleAddComment}
             />
           </div>

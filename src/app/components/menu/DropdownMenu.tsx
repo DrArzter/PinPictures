@@ -8,6 +8,8 @@ import { RiLogoutBoxFill } from "react-icons/ri";
 
 import { useRouter } from "next/navigation";
 
+import Image from "next/image";
+
 import { useUserContext } from "@/app/contexts/UserContext";
 import * as api from "@/app/api";
 import { User } from "@/app/types/global";
@@ -15,6 +17,8 @@ import { User } from "@/app/types/global";
 interface DropdownMenuProps {
   closeMenu: () => void;
 }
+
+{/* TODO: Add gay sex */}
 
 export default function DropdownMenu({ closeMenu }: DropdownMenuProps) {
   const { user, setUser } = useUserContext() as {
@@ -59,7 +63,7 @@ export default function DropdownMenu({ closeMenu }: DropdownMenuProps) {
     }, 300);
   };
 
-  const dropdownClassName = `absolute top-24 right-4 z-[999] md:right-64 w-56 rounded-md shadow-lg transform transition-all duration-300 ease-in-out 
+  const dropdownClassName = `absolute top-24 right-4 z-[999] md:right-72 w-56 rounded-md shadow-lg transform transition-all duration-300 ease-in-out 
         ${isVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"} 
         dark:bg-darkModeBackground bg-lightModeBackground`;
 
@@ -75,25 +79,30 @@ export default function DropdownMenu({ closeMenu }: DropdownMenuProps) {
 
   return (
     <div ref={dropdownRef} className={dropdownClassName}>
-      <img
-        src={user?.avatar}
-        alt="Profile"
-        onClick={() => router.push("/profile/" + user?.name)}
-        className="w-full h-[10vh] object-cover rounded-t-md hover:scale-105 cursor-pointer transition duration-300 
-              dark:darkModeSecondaryBackground light:lightModeSecondaryBackground"
-      />
+      <div>
+        <Image
+          src={user?.avatar}
+          alt="Profile"
+          onClick={() => router.push("/profile/" + user?.name)}
+          className="w-full h-[10vh] object-cover rounded-t-md hover:scale-105 cursor-pointer transition duration-300"
+          width={0}
+          height={0}
+          sizes="100vw"
+          style={{ width: "100%", height: "auto" }}
+        />
+      </div>
 
       <div className={menuItemsClassName}>
         <div
           className="flex items-center gap-2 w-full justify-center cursor-pointer"
-          onClick={() => console.log("Settings")}
+          onClick={(e) => router.push("settings")}
         >
           <FaGear className={iconClassName} />
           <span>Settings</span>
         </div>
 
         <div
-          className="flex items-center gap-2 cursor-pointer hover:scale-105 transition duration-300 w-full justify-center"
+          className="flex items-center gap-2 cursor-pointer w-full justify-center"
           onClick={() => console.log("Bookmark")}
         >
           <CiBookmarkPlus className={iconClassName} />
@@ -101,7 +110,7 @@ export default function DropdownMenu({ closeMenu }: DropdownMenuProps) {
         </div>
 
         <div
-          className="flex items-center gap-2 cursor-pointer hover:scale-105 transition duration-300 w-full justify-center"
+          className="flex items-center gap-2 cursor-pointer w-full justify-center"
           onClick={handleLogout}
         >
           <RiLogoutBoxFill className={iconClassName} />

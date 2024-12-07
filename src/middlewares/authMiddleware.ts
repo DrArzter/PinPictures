@@ -47,9 +47,14 @@ export async function authMiddleware(
         return reject(new Error("User not found"));
       }
 
-      const { password, bananaLevel, ...userWithoutSensitiveInfo } = user;
+      const { password, ...userWithoutSensitiveInfo } = user;
 
       req.user = userWithoutSensitiveInfo;
+
+      if (user.banned) {
+        res.status(444).json({ status: "error", message: "User banned", data: user });
+        return reject(new Error("User banned"));
+      }
       resolve();
     } catch (err) {
       console.error("Authentication Error:", err);

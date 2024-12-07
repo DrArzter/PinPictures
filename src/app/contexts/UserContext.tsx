@@ -19,6 +19,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       setUserLoading(true);
       const response = await api.getUser();
       if (response) {
+        console.log("Fetched user:", response);
         setUser(response);
       } else {
         console.warn("No response from API.");

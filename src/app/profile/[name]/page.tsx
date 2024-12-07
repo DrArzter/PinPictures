@@ -139,7 +139,7 @@ export default function Profile() {
 
   const handleDeleteFriendClick = async () => {
     try {
-      await api.deleteFriend(profile.id);
+      
       console.log("Friend removed!");
     } catch (error) {
       console.error("Error removing friend:", error);

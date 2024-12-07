@@ -21,6 +21,7 @@ export default async function handler(
     const posts = await prisma.post.findMany({
       skip: offset,
       take: limit,
+      where: { User: { banned: false } },
       orderBy: { createdAt: "desc" },
       include: {
         User: {

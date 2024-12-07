@@ -1,4 +1,4 @@
-// src/app/components/chat/NewChatModal.tsx
+// src/app/components/modals/NewChatModal.tsx
 
 "use client";
 

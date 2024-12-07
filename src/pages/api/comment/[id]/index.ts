@@ -1,14 +1,19 @@
-// pages/api/post/comment/[id].ts
-
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { authMiddleware } from "@/middlewares/authMiddleware";
 import { handleError } from "@/utils/errorHandler";
 import { z } from "zod";
+import { RateLimiterMemory } from "rate-limiter-flexible";
 
 // Схема валидации комментария
 const commentSchema = z.object({
   comment: z.string().min(1, "Comment is required"),
+});
+
+// Инициализация rate-limiter
+const rateLimiter = new RateLimiterMemory({
+  points: 1, // 1 запрос
+  duration: 5, // каждые 5 секунд
 });
 
 export default async function handler(
@@ -29,6 +34,15 @@ export default async function handler(
       return res
         .status(404)
         .json({ status: "error", message: "User not found" });
+    }
+
+    // Ограничение частоты запросов на основе user.id
+    try {
+      await rateLimiter.consume(user.id.toString()); // Проверка лимита по user.id
+    } catch {
+      return res
+        .status(429)
+        .json({ status: "error", message: "Too many requests. Please wait." });
     }
 
     const postId = parseInt(req.query.id as string, 10);

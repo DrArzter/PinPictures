@@ -35,16 +35,15 @@ export default function FullScreenImage({
       onClick={handleClick}
       className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-80 z-50"
     >
-      <div className="p-4" onClick={(e) => e.stopPropagation()}>
-        <Image
+        <Image onClick={(e) => e.stopPropagation()}
           src={imageUrl}
           alt="Image"
           width={0}
           height={0}
           sizes="100vw"
+          style={{ width: "90vh", height: "auto" }}
           className="w-full h-auto object-contain rounded-2xl"
         />
-      </div>
     </div>
   );
 }

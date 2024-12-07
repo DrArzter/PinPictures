@@ -26,6 +26,9 @@ module.exports = {
         "14xl": "5120px",
         "15xl": "7680px",
       },
+      zIndex: {
+        '100': '100',
+      },
       maxWidth: {
         xss: "20rem",
         xdd: "24rem",

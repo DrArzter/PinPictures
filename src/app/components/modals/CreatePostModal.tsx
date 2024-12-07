@@ -70,14 +70,35 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
   const handleImageChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(e.target.files || []);
+
+      // Проверяем, что суммарное количество файлов не превышает 10
       if (files.length + images.length > 10) {
-        alert("Maximum of 10 images allowed");
+        addNotification({
+          status: "error",
+          message: "You can upload a maximum of 10 images",
+          time: 2000,
+          clickable: false,
+        });
         return;
       }
 
-      setImages((prevImages) => [...prevImages, ...files]);
+      const allowedTypes = ["image/jpeg", "image/png"]; // Разрешенные MIME-типы
+      const validFiles = files.filter((file) => {
+        if (!allowedTypes.includes(file.type)) {
+          addNotification({
+            status: "error",
+            message: "Only JPEG and PNG images are allowed",
+            time: 2000,
+            clickable: false,
+          });
+          return false;
+        }
+        return true;
+      });
 
-      files.forEach((file) => {
+      setImages((prevImages) => [...prevImages, ...validFiles]);
+
+      validFiles.forEach((file) => {
         const reader = new FileReader();
         reader.onloadend = () => {
           setImagePreviews((prevPreviews) => [...prevPreviews, reader.result]);
@@ -108,14 +129,22 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
     (e: React.DragEvent) => {
       e.preventDefault();
       const files = Array.from(e.dataTransfer.files);
-      if (files.length + images.length > 10) {
-        alert("Maximum of 10 images allowed");
+
+      const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+
+      if (imageFiles.length + images.length > 10) {
+        addNotification({
+          status: "error",
+          message: "You can upload a maximum of 10 images",
+          time: 2000,
+          clickable: false,
+        });
         return;
       }
 
-      setImages((prevImages) => [...prevImages, ...files]);
+      setImages((prevImages) => [...prevImages, ...imageFiles]);
 
-      files.forEach((file) => {
+      imageFiles.forEach((file) => {
         const reader = new FileReader();
         reader.onloadend = () => {
           setImagePreviews((prevPreviews) => [...prevPreviews, reader.result]);
@@ -130,7 +159,7 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
     !name || !description || images.length === 0 || loading;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-lightModeBackground dark:bg-darkModeBackground rounded-3xl p-6 relative w-11/12 max-w-3xl overflow-y-auto scrollbar-hidden">
         <button
           onClick={onClose}
@@ -192,7 +221,7 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/jpeg, image/png, image/jpg"
                 multiple
                 className="hidden"
                 onChange={handleImageChange}

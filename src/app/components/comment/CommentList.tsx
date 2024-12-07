@@ -1,9 +1,8 @@
 import React from "react";
-import Comment from "./Comment";
-import { Comment as CommentType } from "@/app/types/global";
+import CommentItem from "./CommentItem";
 
 interface CommentListProps {
-  comments: CommentType[];
+  comments: any[];
 }
 
 export default function CommentList({ comments }: CommentListProps) {
@@ -11,7 +10,7 @@ export default function CommentList({ comments }: CommentListProps) {
     <div className="flex-grow overflow-y-auto border-t mt-4 pt-4">
       {comments.length > 0 ? (
         comments.map((comment) => (
-          <Comment key={comment.id} comment={comment} />
+          <CommentItem key={String(comment.id)} comment={comment} />
         ))
       ) : (
         <p className="text-gray-500 text-center">
@@ -21,4 +20,3 @@ export default function CommentList({ comments }: CommentListProps) {
     </div>
   );
 }
-

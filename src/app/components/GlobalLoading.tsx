@@ -6,8 +6,17 @@ import { useUserContext } from "../contexts/UserContext";
 import LoadingIndicator from "./common/LoadingIndicator";
 import Artoria from "../resources/Artoria";
 import { User } from "../types/global";
+import { LuBanana } from "react-icons/lu";
+import { motion } from "framer-motion";
+import { useRef } from "react";
 
-export default function GlobalLoading({ children }: { children: React.ReactNode }) {
+
+export default function GlobalLoading({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const audioRef = useRef(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [bgImage, setBgImage] = useState<string>("");
 
@@ -20,6 +29,12 @@ export default function GlobalLoading({ children }: { children: React.ReactNode 
   const placeholderSVG = `data:image/svg+xml;base64,${btoa(Artoria())}`;
   const defaultBgImage =
     "https://storage.yandexcloud.net/pinpictures/otherImages/background2.jpeg";
+
+    const playSound = () => {
+      if (audioRef.current) {
+        audioRef.current.play();
+      }
+    };
 
   useEffect(() => {
     const loadImage = (imgSrc: string) => {
@@ -82,6 +97,34 @@ export default function GlobalLoading({ children }: { children: React.ReactNode 
       </div>
     );
   }
+
+  if (user?.banned) {
+    return (
+      <div className="w-screen h-screen flex items-center justify-center bg-black relative overflow-hidden" onClick={playSound}>
+        {/* Дождь из бананов */}
+        <div className="banana-rain">
+          {Array.from({ length: 50 }).map((_, index) => (
+            <LuBanana
+              key={index}
+              className="banana text-yellow-400 text-4xl"
+              style={{
+                '--x': Math.random(),
+                '--delay': `${Math.random() * 2}s`,
+                '--duration': `${3 + Math.random() * 2}s`,
+              }}
+            />
+          ))}
+        </div>
+        {/* Основной контент */}
+        <span className="fixed text-white ml-4 text-xl font-bold">
+          You have been bananed
+        </span>
+        <audio ref={audioRef} src="https://storage.yandexcloud.net/pinpictures/sounds/banned.mp3" preload="auto" />
+      </div>
+    );
+  }
+  
+  
 
   return <>{children}</>;
 }

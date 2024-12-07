@@ -4,6 +4,8 @@
 import React, { useContext } from "react";
 import { RxAvatar } from "react-icons/rx";
 import { AiOutlineMenu } from "react-icons/ai";
+import { RiLoginBoxLine } from "react-icons/ri";
+
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -68,7 +70,7 @@ export default function UserCard() {
             </p>
           </>
         ) : (
-          <RxAvatar
+          <RiLoginBoxLine 
             title="Profile"
             onClick={(e) => {
               e.preventDefault();

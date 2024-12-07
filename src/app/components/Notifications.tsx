@@ -72,7 +72,7 @@ export default function NotificationComponent() {
   return (
     <div
       id="notification-container"
-      className="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 w-full max-w-sm md:max-w-md"
+      className="fixed bottom-4 right-4 z-72 flex flex-col space-y-2 w-full max-w-sm md:max-w-md"
       aria-live="assertive"
       aria-atomic="true"
     >
