@@ -12,7 +12,7 @@ import { Socket } from "socket.io-client";
 
 interface ChatListProps {
   user: User;
-  chats: Chat[]; // Теперь Chat содержит ChatType и users
+  chats: Chat[];
   selectedChatId: string | undefined;
   setSelectedChatId: (id: string) => void;
   socket: Socket | undefined;
@@ -39,23 +39,19 @@ export default function ChatList({
     setSelectedChatId(chat.id);
 
     if (chat.ChatType === "private") {
-      // Находим второго пользователя
       const otherUser = chat.users.find((u) => u.id !== user.id);
       if (otherUser) {
         router.push(`/chats/${otherUser.id}`);
       } else {
-        // Если почему-то нет второго пользователя, fallback:
         router.push(`/chats/${chat.id}`);
       }
     } else {
-      // Если это группа или другой тип чата — используем chat.id или другую логику
       router.push(`/chats/${chat.id}`);
     }
   };
 
   return (
     <div className="flex flex-col h-full">
-      {/* Search Bar and New Chat Button */}
       <div className="flex items-center justify-between mb-4">
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         <button
@@ -67,7 +63,6 @@ export default function ChatList({
         </button>
       </div>
 
-      {/* Existing Chat List */}
       <div className="flex flex-col gap-2 overflow-y-auto">
         {filteredChats.length > 0 ? (
           filteredChats.map((chat: Chat) => (
@@ -78,7 +73,6 @@ export default function ChatList({
                 selectedChatId === chat.id ? "border-l-4 border-yellow-500" : ""
               }`}
             >
-              {/* Avatar Wrapper */}
               <div className="flex-shrink-0">
                 {chat.avatar ? (
                   <img

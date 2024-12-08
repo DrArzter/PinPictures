@@ -8,7 +8,6 @@ import { Socket } from "socket.io-client";
 import { FaRegFileImage } from "react-icons/fa6";
 import { MdClose } from "react-icons/md";
 import InfiniteScroll from "react-infinite-scroll-component";
-
 import Image from "next/image";
 
 interface ChatProps {
@@ -16,53 +15,71 @@ interface ChatProps {
   chat: FullChat | undefined;
   isActiveChatLoading: boolean;
   socket: Socket | undefined;
-  otherUserId?: number; // добавили это поле, чтобы знать с кем локально создаём чат
+  otherUserId?: number; // для создания чата при первом сообщении
 }
 
 const MESSAGES_PER_PAGE = 20;
 
 export default function Chat({
   user,
-  chat,
+  chat: currentChat,
   isActiveChatLoading,
   socket,
   otherUserId,
 }: ChatProps) {
   const [newMessage, setNewMessage] = useState("");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [currentChat, setChat] = useState<FullChat | undefined>(chat);
   const [messages, setMessages] = useState<Message[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const scrollableDivRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setChat(chat);
-    if (chat && chat.messages) {
-      setMessages([...chat.messages]);
-      setHasMore(chat.messages.length === MESSAGES_PER_PAGE);
+    if (currentChat && currentChat.MessagesInChats) {
+      const initialMessages = [...currentChat.MessagesInChats];
+      setMessages(initialMessages);
+
+      // Если сообщений меньше чем MESSAGES_PER_PAGE, значит грузить нечего
+      setHasMore(initialMessages.length === MESSAGES_PER_PAGE);
       setTimeout(() => scrollToBottom(), 100);
-    } else if (chat && chat.id === -1) {
+    } else if (currentChat && currentChat.id === -1) {
       setMessages([]);
       setHasMore(false);
     }
-  }, [chat]);
+  }, [currentChat]);
 
   useEffect(() => {
-    if (socket && currentChat && currentChat.id !== -1) {
-      socket.emit("joinChat", currentChat.id);
+    if (!socket || !currentChat || currentChat.id === -1) return;
 
-      socket.on("newMessage", (newMsg: Message) => {
-        if (newMsg.chatId === currentChat.id) {
-          setMessages((prev) => [...prev, newMsg]);
-          scrollToBottom();
+    socket.emit("joinChat", currentChat.id);
+
+    socket.on("newMessage", (newMsg: Message) => {
+      if (newMsg.chatId === currentChat.id) {
+        setMessages((prev) => [...prev, newMsg]);
+        scrollToBottom();
+      }
+    });
+
+    socket.on("chatMessages", (fetchedMessages: Message[]) => {
+      if (fetchedMessages.length === 0) {
+        setHasMore(false);
+      } else {
+        // fetchMoreMessages вызывался, значит мы грузим старые сообщения
+        // На сервере они приходят в порядке DESC, развернём их обратно
+        const reversedFetched = [...fetchedMessages].reverse();
+        setMessages((prev) => [...reversedFetched, ...prev]);
+        setPage((prevPage) => prevPage + 1);
+
+        if (fetchedMessages.length < MESSAGES_PER_PAGE) {
+          setHasMore(false);
         }
-      });
+      }
+    });
 
-      return () => {
-        socket.off("newMessage");
-      };
-    }
+    return () => {
+      socket.off("newMessage");
+      socket.off("chatMessages");
+    };
   }, [socket, currentChat]);
 
   const scrollToBottom = () => {
@@ -97,7 +114,6 @@ export default function Chat({
         }
       }
 
-      // Если чат не создан на сервере (id === -1), мы не имеем chatId, вместо этого укажем otherUserId
       const messageData =
         currentChat.id === -1
           ? {
@@ -133,10 +149,6 @@ export default function Chat({
     });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
@@ -154,21 +166,10 @@ export default function Chat({
       return;
     }
 
-    const nextPage = page + 1;
     socket.emit("getChatMessages", {
       chatId: currentChat.id,
-      page: nextPage,
+      page: page + 1,
       limit: MESSAGES_PER_PAGE,
-    });
-
-    socket.once("chatMessages", (fetchedMessages: Message[]) => {
-      if (fetchedMessages.length === 0) {
-        setHasMore(false);
-      } else {
-        const reversedFetched = [...fetchedMessages].reverse();
-        setMessages((prev) => [...prev, ...reversedFetched]);
-        setPage(nextPage);
-      }
     });
   };
 
@@ -190,16 +191,31 @@ export default function Chat({
     );
   }
 
+  // Определяем имя и аватар для чата
+  let chatName = currentChat.name;
+  let chatAvatar = currentChat.picpath;
+
+  if (currentChat.ChatType === "private") {
+    // Найдем собеседника
+    const otherParticipant = currentChat.UsersInChats.find(uic => uic.userId !== user.id);
+    if (otherParticipant && otherParticipant.User) {
+      chatName = otherParticipant.User.name;
+      chatAvatar = otherParticipant.User.avatar;
+    }
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* Заголовок чата */}
       <div className="flex flex-row items-center gap-4 mb-4 border-b pb-4">
-        <img
-          src={currentChat.avatar}
-          alt="Chat Avatar"
-          className="w-12 h-12 rounded-full"
-        />
-        <span className="text-xl font-semibold">{currentChat.name}</span>
+        {chatAvatar && (
+          <img
+            src={chatAvatar}
+            alt="Chat Avatar"
+            className="w-12 h-12 rounded-full"
+          />
+        )}
+        <span className="text-xl font-semibold">{chatName}</span>
       </div>
 
       {/* Список сообщений */}
@@ -217,18 +233,16 @@ export default function Chat({
           scrollableTarget="scrollableChat"
         >
           {messages.map((message, index) => {
-            const isCurrentUser = message.User.name === user.name;
+            const isCurrentUser = message.User.id === user.id;
             const previousMessage = messages[index - 1];
             const showAuthorInfo =
-              index === messages.length + 1 ||
-              message.User.name !== previousMessage?.User.name;
+              index === 0 ||
+              message.User.name !== previousMessage?.User?.name;
 
             return (
               <div
                 key={message.id}
-                className={`flex ${
-                  isCurrentUser ? "justify-end" : "justify-start"
-                } mb-2`}
+                className={`flex ${isCurrentUser ? "justify-end" : "justify-start"} mb-2`}
               >
                 <div
                   className={`flex flex-col ${
@@ -245,9 +259,7 @@ export default function Chat({
                         />
                       )}
                       <span className="text-sm font-semibold">
-                        {isCurrentUser
-                          ? "You"
-                          : message.User?.name || "Unknown"}
+                        {isCurrentUser ? "You" : message.User?.name || "Unknown"}
                       </span>
                     </div>
                   )}
@@ -259,10 +271,10 @@ export default function Chat({
                     }`}
                   >
                     <p>{message.message}</p>
-                    {message.images &&
-                      message.images.length > 0 &&
-                      message.images.map((image, imgIndex) => (
-                        <div key={imgIndex} className="h-40 w-40">
+                    {message.ImagesInMessages &&
+                      message.ImagesInMessages.length > 0 &&
+                      message.ImagesInMessages.map((image, imgIndex) => (
+                        <div key={imgIndex} className="h-40 w-40 mt-2">
                           <Image
                             key={imgIndex}
                             src={image.picpath}

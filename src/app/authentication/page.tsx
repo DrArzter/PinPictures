@@ -34,8 +34,9 @@ export default function Authentication({}) {
       if (isRegistration) {
         response = await api.registration(username, email, password);
         if (response && response.status === "success") {
+          const userData = await api.getUser();
           setIsRegistration(false);
-          setUser(response.user);
+          setUser(userData);
           router.push("/posts");
         }
         setUserLoading(false);

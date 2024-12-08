@@ -1,5 +1,37 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import { prisma } from "@/utils/prisma";
+import { uploadFiles } from "@/utils/s3Module";
+import { authMiddleware } from "@/middlewares/authMiddleware";
+import formidable from "formidable";
+import fs from "fs/promises";
+import { handleError } from "@/utils/errorHandler";
+
+// Карта магических чисел для поддерживаемых форматов
+const magicNumbers: Record<string, string> = {
+  jpeg: "ffd8ff",
+  jpg: "ffd8ff", // То же, что и для jpeg
+  png: "89504e47",
+  gif: "47494638",
+  webp: "52494646",
+};
+
+// Проверка содержимого файла по магическим числам
+async function isValidFileContent(buffer: Buffer, fileExt: string): Promise<boolean> {
+  const magicHex = buffer.slice(0, 4).toString("hex");
+  const expectedMagic = magicNumbers[fileExt];
+  return expectedMagic ? magicHex.startsWith(expectedMagic) : false;
+}
+
+// Отключаем встроенный парсер тела запроса
+export const config = {
+  api: {
+    bodyParser: false,
+    sizeLimit: "100mb",
+  },
+};
+
 export default async function handler(
-  req: CustomNextApiRequest,
+  req: NextApiRequest,
   res: NextApiResponse
 ) {
   if (req.method !== "POST") {
@@ -8,11 +40,9 @@ export default async function handler(
       .json({ status: "error", message: "Unsupported method" });
   }
 
-  // Массив для отслеживания временных файлов
   const tempFiles: string[] = [];
 
   try {
-    // Аутентификация пользователя
     await authMiddleware(req, res);
     const user = req.user;
 
@@ -160,9 +190,13 @@ export default async function handler(
     });
   } catch (error) {
     return handleError(res, error);
+    try {
+      await cleanupFiles(tempFiles);
+    } catch (error) {}
   } finally {
-    // Подчищаем все временные файлы
-    await cleanupFiles(tempFiles);
+    try {
+      await cleanupFiles(tempFiles);
+    } catch (error) {}
   }
 }
 

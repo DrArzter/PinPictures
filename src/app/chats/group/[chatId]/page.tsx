@@ -1,3 +1,4 @@
+// ./app/chats/group/[chatId]/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -20,7 +21,9 @@ export default function GroupChatPage() {
     socket.emit("getChat", Number(chatId));
 
     socket.on("chat", (chatData: FullChat) => {
-      setChat(chatData);
+      if (!chatData.error) {
+        setChat(chatData);
+      }
       setIsLoading(false);
     });
 
@@ -33,6 +36,14 @@ export default function GroupChatPage() {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <LoadingIndicator />
+      </div>
+    );
+  }
+
+  if (!chat) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <span>Chat not found or you are not a member.</span>
       </div>
     );
   }

@@ -22,27 +22,13 @@ export default function UserCard() {
 
   const toggleDropdown = () => {
     if (!user) {
-      addNotification({
-        message: `Please login first`,
-        status: "info",
-        time: 5000,
-        clickable: true,
-        link_to: "/authentication",
-      });
+      //Тут что-то было
     } else {
       if (menuType === "DROPDOWN_MENU") {
         closeMenu();
       } else {
         openMenu("DROPDOWN_MENU");
       }
-    }
-  };
-
-  const toggleSidebar = () => {
-    if (menuType === "RIGHT_HAND_MENU") {
-      closeMenu();
-    } else {
-      openMenu("RIGHT_HAND_MENU");
     }
   };
 
@@ -80,11 +66,6 @@ export default function UserCard() {
           />
         )}
       </div>
-      <AiOutlineMenu
-        title="Sidebar"
-        className="w-10 h-10 rounded-full cursor-pointer hover-transform"
-        onClick={toggleSidebar}
-      />
     </div>
   );
 }

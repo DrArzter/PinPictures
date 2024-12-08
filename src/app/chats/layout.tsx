@@ -14,9 +14,37 @@ export default function ChatsLayout({ children }: { children: React.ReactNode })
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<string | undefined>(undefined);
 
+  useEffect(() => {
+    if (!user || !socket) return;
+
+    // Предположим, что сервер умеет отдавать список чатов пользователя по событию "getUserChats"
+    socket.emit("getUserChats");
+
+    socket.on("userChats", (userChats: Chat[]) => {
+      setChats(userChats);
+    });
+
+    socket.on("newChat", (newChat: Chat) => {
+      // Если приходит событие о новом чате – добавляем или обновляем его в списке
+      setChats((prevChats) => {
+        const existing = prevChats.find((c) => c.id === newChat.id);
+        if (existing) {
+          // Обновляем существующий чат
+          return prevChats.map((c) => (c.id === newChat.id ? newChat : c));
+        }
+        // Добавляем новый чат в список
+        return [...prevChats, newChat];
+      });
+    });
+
+    return () => {
+      socket.off("userChats");
+      socket.off("newChat");
+    };
+  }, [socket, user]);
+
   return (
     <div className="flex flex-row w-full h-[90vh] md:h-[80vh] p-6">
-      {/* Левая колонка (Список чатов) */}
       <div className="w-1/4 h-full p-4 border-r overflow-hidden flex flex-col">
         {user && socket && (
           <ChatList
@@ -29,7 +57,6 @@ export default function ChatsLayout({ children }: { children: React.ReactNode })
         )}
       </div>
 
-      {/* Правая колонка (Выбранный чат) */}
       <div className="flex-grow p-6 overflow-hidden">
         {children}
       </div>
