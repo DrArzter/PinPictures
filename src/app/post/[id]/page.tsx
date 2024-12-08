@@ -17,10 +17,10 @@ import { Post as PostType, Comment } from "@/app/types/global";
 import { useUserContext } from "@/app/contexts/UserContext";
 import ModalsContext from "@/app/contexts/ModalsContext";
 
-import AuthorInfo from "@/app/components/Post/AuthorInfo";
-import ImageCarousel from "@/app/components/Post/ImageCarousel";
-import LikeButton from "@/app/components/Post/LikeButton";
-import CommentSection from "@/app/components/Post/CommentSection";
+import AuthorInfo from "@/app/components/post/AuthorInfo";
+import ImageCarousel from "@/app/components/post/ImageCarousel";
+import LikeButton from "@/app/components/post/LikeButton";
+import CommentSection from "@/app/components/post/CommentSection";
 
 export default function PostPage() {
   const { addNotification } = useNotificationContext() as any;
