@@ -25,7 +25,7 @@ export default function ChatList({
   setSelectedChatId,
   socket,
 }: ChatListProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const { openModal } = useContext(ModalsContext);
   const router = useRouter();
 

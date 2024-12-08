@@ -24,7 +24,7 @@ export default async function handler(
         .json({ status: "error", message: "User not found" });
     }
 
-    if (user.bananLevel < 1) {
+    if (user.bananaLevel < 1) {
       return res
         .status(403)
         .json({ status: "error", message: "Access denied" });
@@ -45,22 +45,16 @@ export default async function handler(
               contains: searchTerm,
             },
           },
-          !isNaN(parseInt(searchTerm, 10))
-            ? {
-                id: parseInt(searchTerm, 10),
-              }
-            : undefined,
-        ].filter(Boolean),
+          !isNaN(parseInt(searchTerm, 10)) && {
+            id: parseInt(searchTerm, 10),
+          },
+        ].filter(Boolean) as any[],
       },
       include: {
         Comments: true,
       },
       take: 20,
     });
-    
-    
-    
-    
 
     return res
       .status(200)

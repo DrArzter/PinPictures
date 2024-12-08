@@ -26,6 +26,7 @@ export default async function handler(
       include: {
         User: {
           select: {
+            id: true,
             name: true,
             avatar: true,
           },
@@ -36,6 +37,8 @@ export default async function handler(
             picpath: true,
           },
         },
+
+        //TODO: Вместо возврата всех пользователей, вернуть только нашего, если он авторизован
         Likes: {
           select: {
             userId: true,

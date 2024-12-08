@@ -1,5 +1,4 @@
-// src/app/components/modals/NewChatModal.tsx
-
+// ./src/app/components/modals/NewChatModal.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -8,13 +7,16 @@ import { motion } from "framer-motion";
 import { useUserContext } from "@/app/contexts/UserContext";
 import { useSocketContext } from "@/app/contexts/SocketContext";
 
+interface NewChatModalProps {
+  onClose: () => void;
+}
 
-const NewChatModal = ({ onClose }: { onClose: () => void }) => {
+const NewChatModal: React.FC<NewChatModalProps> = ({ onClose }) => {
   const { socket } = useSocketContext();
   const { user } = useUserContext();
   const [selectedFriends, setSelectedFriends] = useState<number[]>([]);
-  const [chatName, setChatName] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [chatName, setChatName] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
@@ -70,14 +72,16 @@ const NewChatModal = ({ onClose }: { onClose: () => void }) => {
     isGroupChat: boolean,
     avatarBase64: string | null
   ) => {
-    socket.emit("createChat", {
-      participantIds,
-      chatName: isGroupChat ? chatName : null,
-      avatar: isGroupChat ? avatarBase64 : null,
-    });
+    if (socket) {
+      socket.emit("createChat", {
+        participantIds,
+        chatName: isGroupChat ? chatName : null,
+        avatar: isGroupChat ? avatarBase64 : null,
+      });
 
-    setLoading(false);
-    onClose();
+      setLoading(false);
+      onClose();
+    }
   };
 
   return (
@@ -105,7 +109,7 @@ const NewChatModal = ({ onClose }: { onClose: () => void }) => {
               Select Friends
             </label>
             <div className="max-h-60 overflow-y-auto scrollbar-hidden">
-              {user.friends.map((friendObj) => (
+              {user?.friends.map((friendObj) => (
                 <label
                   key={friendObj.friend.id}
                   className="flex items-center mb-2 cursor-pointer"

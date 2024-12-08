@@ -6,7 +6,7 @@ import { useTheme } from "next-themes";
 
 const ChangeTheme: React.FC = () => {
   const { theme, setTheme, systemTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
     setMounted(true);

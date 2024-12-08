@@ -1,3 +1,4 @@
+// ./src/app/components/modals/CreatePostModal.tsx
 "use client";
 
 import React, { useState, useRef, useCallback } from "react";
@@ -7,7 +8,6 @@ import { AiOutlineCloudUpload } from "react-icons/ai";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { createPost } from "@/app/api";
 import { motion } from "framer-motion";
-import { ApiResponse, NewPost } from "@/app/types/global";
 
 interface CreatePostModalProps {
   onClose: () => void;
@@ -27,10 +27,10 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
   // Обработчик отправки формы
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
-      e.preventDefault(); // Остановить стандартное действие формы
+      e.preventDefault();
       setLoading(true);
 
-      let response: ApiResponse<NewPost> | undefined;
+      let response;
 
       try {
         response = await createPost({ name, description, images });

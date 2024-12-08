@@ -27,11 +27,11 @@ export default function Chat({
   socket,
   otherUserId,
 }: ChatProps) {
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState<string>("");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState<boolean>(true);
   const scrollableDivRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -5,6 +5,11 @@ import { parse } from "cookie";
 import { handleError } from "@/utils/errorHandler";
 import { verifyToken } from "@/utils/jwt";
 
+interface DecodedToken {
+  userId: number;
+  exp: number;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -30,7 +35,7 @@ export default async function handler(
 
   if (token) {
     try {
-      const decoded = verifyToken(token);
+      const decoded = verifyToken(token) as DecodedToken;
 
       if (Date.now() >= decoded.exp * 1000) {
         authenticatedUserId = null;
@@ -155,10 +160,9 @@ export default async function handler(
     const profileWithFriends = {
       ...profile,
       friends: allFriends,
-    };
-
-    delete profileWithFriends.Friendships_Friendships_user1IdToUser;
-    delete profileWithFriends.Friendships_Friendships_user2IdToUser;
+      Friendships_Friendships_user1IdToUser: undefined,
+      Friendships_Friendships_user2IdToUser: undefined,
+    } as any;
 
     return res.status(200).json({
       data: profileWithFriends,

@@ -7,20 +7,18 @@ import type { Post as PostType } from "@/app/types/global";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import * as api from "@/app/api";
-import Loadable from "next/dist/shared/lib/loadable.shared-runtime";
-import LoadingIndicator from "../common/LoadingIndicator";
 
 interface PostProps {
   post: PostType;
 }
 
-export default function Post({ post, ...props }: PostProps) {
+export default function Post({ post }: PostProps) {
   const { addNotification } = useNotificationContext();
   const { user } = useUserContext();
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(post._count.Likes);
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [isImageError, setIsImageError] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState<boolean>(false);
+  const [isImageError, setIsImageError] = useState<boolean>(false);
 
   const router = useRouter();
 

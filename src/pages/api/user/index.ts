@@ -7,6 +7,7 @@ import { authMiddleware } from "@/middlewares/authMiddleware";
 import formidable from "formidable";
 import fs from "fs/promises";
 import { handleError } from "@/utils/errorHandler";
+import { clientSelfUser } from "@/app/types/global";
 
 export const config = {
   api: {
@@ -16,7 +17,7 @@ export const config = {
 };
 
 interface CustomNextApiRequest extends NextApiRequest {
-  user?: any;
+  user: clientSelfUser | null;
 }
 
 export default async function handler(
@@ -98,7 +99,7 @@ export default async function handler(
       const userWithFriendsResponse = {
         ...userWithFriends,
         friends: allFriends,
-      };
+      } as any;
 
       delete userWithFriendsResponse.Friendships_Friendships_user1IdToUser;
       delete userWithFriendsResponse.Friendships_Friendships_user2IdToUser;
@@ -129,6 +130,14 @@ export default async function handler(
       }
 
       try {
+        const userWithFriends = await prisma.user.findUnique({
+          where: { id: authenticatedUser.id },
+        });
+
+        if (!userWithFriends) {
+          return res.status(404).json({ error: "User not found" });
+        }
+
         if (type === "uiBgUpdate") {
           const image = Array.isArray(files.image) ? files.image[0] : files.image;
           if (!image) {
@@ -165,7 +174,6 @@ export default async function handler(
             {
               filename: `users/${userWithFriends.id}-${randomString}-${Date.now()}.${fileExt}`,
               content: fileContent,
-              path: newPath,
             },
           ]);
 
@@ -193,7 +201,7 @@ export default async function handler(
             where: { id: userWithFriends.id },
             data: {
               settings: {
-                ...userWithFriends.settings,
+                ...(userWithFriends.settings as object),
                 bgColor: hex,
               },
             },

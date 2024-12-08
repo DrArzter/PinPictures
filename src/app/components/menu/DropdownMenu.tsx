@@ -12,21 +12,23 @@ import Image from "next/image";
 
 import { useUserContext } from "@/app/contexts/UserContext";
 import * as api from "@/app/api";
-import { User } from "@/app/types/global";
+import { clientSelfUser } from "@/app/types/global";
 
 interface DropdownMenuProps {
   closeMenu: () => void;
 }
 
-{/* TODO: Add gay sex */}
+{
+  /* TODO: Add gay sex */
+}
 
 export default function DropdownMenu({ closeMenu }: DropdownMenuProps) {
   const { user, setUser } = useUserContext() as {
-    user: User | null;
-    setUser: React.Dispatch<React.SetStateAction<User | null>>;
+    user: clientSelfUser | null;
+    setUser: React.Dispatch<React.SetStateAction<clientSelfUser | null>>;
   };
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -80,16 +82,20 @@ export default function DropdownMenu({ closeMenu }: DropdownMenuProps) {
   return (
     <div ref={dropdownRef} className={dropdownClassName}>
       <div>
-        <Image
-          src={user?.avatar}
-          alt="Profile"
-          onClick={() => router.push("/profile/" + user?.name)}
-          className="w-full h-[10vh] object-cover rounded-t-md hover:scale-105 cursor-pointer transition duration-300"
-          width={0}
-          height={0}
-          sizes="100vw"
-          style={{ width: "100%", height: "auto" }}
-        />
+        {user && (
+          <div>
+            <Image
+              src={user.avatar}
+              alt="Profile"
+              onClick={() => router.push("/profile/" + user?.name)}
+              className="w-full h-[10vh] object-cover rounded-t-md hover:scale-105 cursor-pointer transition duration-300"
+              width={0}
+              height={0}
+              sizes="100vw"
+              style={{ width: "100%", height: "auto" }}
+            />
+          </div>
+        )}
       </div>
 
       <div className={menuItemsClassName}>

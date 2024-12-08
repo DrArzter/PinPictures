@@ -3,97 +3,43 @@ import { NextApiRequest } from "next";
 
 declare module "next" {
   interface NextApiRequest {
-    user: User | null;
+    user: clientSelfUser | null;
     notifications: Notification;
   }
 }
 
-// Notification Interfaces
-export interface Notification {
-  message: string;
-  status: "info" | "success" | "warning" | "error";
-  time: number;
-  clickable: boolean;
-  link_to?: string;
-}
-
-// User Interfaces
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  avatar: string;
-  background: string;
-  uiBackground: string;
-  uiBgPicPath: string;
-  createdAt: string;
-  lastLoginAt: string;
-  banned: boolean;
-  settings: {
-    bgColor: string;
-  };
-}
-
-export interface UserContextType {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  fetchUser: () => Promise<void>;
-  userLoading: boolean;
-  setUserLoading: (loading: boolean) => void;
-}
-
-// Window Interfaces
-export interface Window {
-  id: number;
-  title: string;
-  path: string;
-  type: string;
-  isOpen: boolean;
-  fullscreen: boolean;
-  layer: number;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  minWidth: number;
-  minHeight: number;
-  content?: JSX.Element;
-  componentType?: React.ComponentType<any>;
-  componentProps?: Record<string, any>;
-}
-
-export interface WindowContextType {
-  windows: Window[];
-  setWindows: React.Dispatch<React.SetStateAction<Window[]>>;
-  addWindow: (window: Window) => void;
-  removeWindow: (id: number) => void;
-  openWindowByPath: (path: string) => void;
-  updateWindowPath: (windowId: number, newPath: string) => void;
-}
-
-// API Response Interfaces
-export interface ApiResponse<T = any> {
-  status: string;
+export interface ApiResponse<T> {
+  status: "success" | "error";
   message: string;
   data: T;
 }
 
-// Post Interfaces
-export interface Author {
+// Notification Interfaces
+export interface Notification {
+  id: string;
+  message: string;
+  status: "info" | "success" | "warning" | "error";
+  time: number;
+  clickable: boolean;
+  sound?: string;
+  soundRequired?: boolean;
+  link_to?: string;
+}
+
+export interface ShortUser {
+  id: number;
   name: string;
   avatar: string;
 }
 
-export interface PostImage {
+export interface Image {
   id: number;
   picpath: string;
-  bucketkey: string;
-  postId: number;
 }
 
-export interface PostCount {
-  comments: number;
-  likes: number;
+export interface PostCounts {
+  Comments: number;
+  Likes: number;
 }
 
 export interface Post {
@@ -103,35 +49,73 @@ export interface Post {
   createdAt: string;
   authorId: number;
   likesCount: number;
-  author: Author;
-  images: PostImage[];
-  likes: { userId: number }[];
-  _count: PostCount;
+  User: ShortUser;
+  ImageInPost: Image[];
+  Likes: any;
+  _count: PostCounts;
 }
 
-export interface PostData {
-  images: File[];
-  name: string;
-  description: string;
+export interface friends {
+  friend: ShortUser;
+  status: "confirmed" | "pending" | "blocked";
 }
 
-export interface NewPost {
+export interface Friend {
+  id: number;
+  friend: ShortUser;
+  status: "confirmed" | "pending" | "blocked";
+}
+
+export interface clientSelfUser {
   id: number;
   name: string;
+  description: string | null;
+  bananaLevel: number;
+  email: string;
+  password: string;
+  avatar: string;
+  createdAt: Date;
+  lastLoginAt: Date;
+  banned: boolean;
+  background: string;
+  settings: any;
+  uiBackground: string;
+  Friendships_Friendships_user1IdToUser: any[];
+  Friendships_Friendships_user2IdToUser: any[];
+}
+
+export interface clientSelfUserContextType {
+  user: clientSelfUser | undefined;
+  setUser: (user: clientSelfUser | undefined) => void;
+  fetchUser: () => Promise<void>;
+  userLoading: boolean;
+  setUserLoading: (loading: boolean) => void;
+}
+
+export interface FullChat {}
+
+export interface UserInChat {}
+
+export interface Message {}
+export interface Socket {
+  on(event: string, callback: (...args: any[]) => void): void;
+  emit(event: string, ...args: any[]): void;
+  off(event: string): void;
+}
+
+interface FullPost extends Post {
+  Comments: Comment[];
+}
+
+interface NewPost {
+  name: string;
   description: string;
+  images: string[];
+}
+
+export interface Comment {
+  id: number;
+  comment: string;
   createdAt: string;
-  authorId: number;
-  likesCount: number;
-}
-
-export interface CreatePostResponse {
-  status: string;
-  message: string;
-  newPost: NewPost;
-}
-
-export interface GetPostResponse {
-  status: string;
-  message: string;
-  post: Post;
+  User: ShortUser;
 }

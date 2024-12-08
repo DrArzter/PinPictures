@@ -14,7 +14,7 @@ import {
 import { useRef } from "react";
 
 export default function Users() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [users, setUsers] = useState([]);
   const router = useRouter();

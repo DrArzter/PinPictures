@@ -22,7 +22,7 @@ export default function AdminLayout({
   const { user } = useUserContext();
 
   useEffect(() => {
-    if (!user || user?.bananalevel === 0) {
+    if (!user || user?.bananaLevel === 0) {
       Router.push("/posts");
     }
   }, [user, Router]);
@@ -48,9 +48,9 @@ export default function AdminLayout({
             key={index}
             className="banana text-yellow-400 text-4xl"
             style={{
-              '--x': Math.random(),
-              '--delay': `${Math.random() * 2}s`,
-              '--duration': `${3 + Math.random() * 2}s`,
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${3 + Math.random() * 2}s`,
             }}
           />
         ))}

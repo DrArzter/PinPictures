@@ -24,7 +24,7 @@ export default async function handler(
         .json({ status: "error", message: "User not found" });
     }
 
-    if (user.bananLevel < 1) {
+    if (user.bananaLevel < 1) {
       return res
         .status(403)
         .json({ status: "error", message: "Access denied" });

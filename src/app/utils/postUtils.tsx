@@ -1,9 +1,7 @@
-// utils/postUtils.ts
 import * as api from "@/app/api";
+import { NewPost, Post as PostType } from "@/app/types/global";
 
-import { PostData, Post } from "@/app/types/global";
-
-export const fetchPosts = async (page: number): Promise<Post[]> => {
+export const fetchPosts = async (page: number): Promise<PostType[]> => {
   try {
     const fetchedPosts = await api.getPosts(page);
     return fetchedPosts;
@@ -17,7 +15,7 @@ export const fetchPosts = async (page: number): Promise<Post[]> => {
   }
 };
 
-export const fetchPost = async (id: number): Promise<Post | null> => {
+export const fetchPost = async (id: number): Promise<PostType | null> => {
   try {
     const fetchedPost = await api.getPost(id);
     return fetchedPost;
@@ -31,10 +29,15 @@ export const fetchPost = async (id: number): Promise<Post | null> => {
   }
 };
 
-export const createPost = async (post: PostData): Promise<Post | null> => {
+export const createPost = async (post: NewPost): Promise<number | null> => {
   try {
-    const createdPost = await api.createPost(post);
-    return createdPost;
+    const response = await api.createPost(post);
+    if (response.status === "success" && typeof response.data === "number") {
+      return response.data;
+    } else {
+      console.error("Unexpected API response:", response);
+      return null;
+    }
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error("Error creating post:", error.message);

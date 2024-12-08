@@ -14,7 +14,7 @@ export default function GroupChatPage() {
   const { user } = useUserContext();
   const { chatId } = useParams() as { chatId: string };
   const [chat, setChat] = useState<FullChat | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (!socket || !user) return;

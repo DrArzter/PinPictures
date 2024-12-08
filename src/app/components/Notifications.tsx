@@ -1,10 +1,11 @@
 // ./src/app/components/Notifications.tsx
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { Notification } from "@/app/types/global";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRef } from "react";
 import {
   FaTimes,
   FaCheckCircle,
@@ -16,8 +17,24 @@ import {
 export default function NotificationComponent() {
   const { notifications, removeNotification } = useNotificationContext();
   const router = useRouter();
+  const audioRef = useRef(null);
+
+  const playSound = (notification: Notification) => {
+    const link = notification?.sound;
+
+    if (audioRef.current && notification.soundRequired) {
+      notification.soundRequired = false;
+      if (link) {
+        audioRef.current.src = link; //TODO ROMA FIX
+      }
+      audioRef.current.play();
+    }
+  };
 
   useEffect(() => {
+    notifications.forEach((notification) => {
+      playSound(notification);
+    });
     const timers = notifications.map((notification) =>
       setTimeout(
         () => {
@@ -86,6 +103,11 @@ export default function NotificationComponent() {
             variants={variants}
             transition={{ duration: 0.3 }}
           >
+            <audio
+              ref={audioRef}
+              src="https://storage.yandexcloud.net/pinpictures/sounds/notification.wav"
+              preload="auto"
+            />
             <div
               className={`${getNotificationClassName(
                 notification.status,
@@ -94,8 +116,10 @@ export default function NotificationComponent() {
               onClick={
                 notification.clickable && notification.link_to
                   ? () => {
-                      router.push(notification.link_to);
-                      removeNotification(notification.id); // Удаляем уведомление после перехода
+                      if (notification.link_to) {
+                        router.push(notification?.link_to);
+                        removeNotification(notification.id);
+                      }
                     }
                   : undefined
               }

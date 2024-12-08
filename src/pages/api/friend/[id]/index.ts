@@ -17,6 +17,10 @@ export default async function handler(
   try {
     await authMiddleware(req, res);
     const currentUser = req.user;
+    
+    if (!currentUser) {
+      return res.status(401).json({ success: false, error: "Unauthorized" });
+    }
 
     const { friendId, friendName } = req.body;
 
@@ -57,8 +61,8 @@ export default async function handler(
           data: { status: Friendships_status.confirmed },
         });
 
-        global.io.to(`user_${currentUser.id}`).emit("notification", {
-          status: "success",
+        global.io.to(`user_${currentUser?.id}`).emit("notification", {
+          status: "success", 
           message: `You are now friends with ${friendName}!`,
           link_to: `/profile/${friendName}`,
           clickable: true,

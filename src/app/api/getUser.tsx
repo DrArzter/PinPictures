@@ -1,10 +1,9 @@
 import api from "./axiosApi";
-import { User } from "@/app/types/global";
 import { AxiosError } from "axios";
 
-export default async function getUser(): Promise<User | null> {
+export default async function getUser() {
   try {
-    const response = await api.get<{ data: User }>(`/user`, {
+    const response = await api.get(`/user`, {
       withCredentials: true,
     });
     if (response.status == 444) {

@@ -16,7 +16,10 @@ const magicNumbers: Record<string, string> = {
 };
 
 // Проверка содержимого файла по магическим числам
-async function isValidFileContent(buffer: Buffer, fileExt: string): Promise<boolean> {
+async function isValidFileContent(
+  buffer: Buffer,
+  fileExt: string
+): Promise<boolean> {
   const magicHex = buffer.slice(0, 4).toString("hex");
   const expectedMagic = magicNumbers[fileExt];
   return expectedMagic ? magicHex.startsWith(expectedMagic) : false;
@@ -106,10 +109,10 @@ export default async function handler(
       }
 
       for (const image of fileArray) {
-        // Добавляем файл во временный список для подчистки
+        if (!image) continue;
+
         tempFiles.push(image.filepath);
 
-        // Список допустимых расширений
         const allowedExtensions = ["jpeg", "jpg", "png", "gif", "webp"];
 
         const fileExt = image.originalFilename?.split(".").pop()?.toLowerCase();

@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect } from "react";
 import Image from "next/image";
 
@@ -7,10 +8,10 @@ interface FullScreenImageProps {
   onClose: () => void;
 }
 
-export default function FullScreenImage({
+const FullScreenImage: React.FC<FullScreenImageProps> = ({
   imageUrl,
   onClose,
-}: FullScreenImageProps) {
+}) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -33,17 +34,20 @@ export default function FullScreenImage({
     <div
       id="FullScreenImage"
       onClick={handleClick}
-      className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-80 z-50"
+      className="fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center bg-opacity-80 bg-black"
     >
-        <Image onClick={(e) => e.stopPropagation()}
-          src={imageUrl}
-          alt="Image"
-          width={0}
-          height={0}
-          sizes="100vw"
-          style={{ width: "90vh", height: "auto" }}
-          className="w-full h-auto object-contain rounded-2xl"
-        />
+      <Image
+        src={imageUrl}
+        onClick={(e) => e.stopPropagation()}
+        alt="Image"
+        width={0}
+        height={0}
+        sizes="100vw"
+        style={{ width: "90vh", height: "90vh" }}
+        className="w-full h-auto object-contain rounded-2xl cursor-pointer"
+      />
     </div>
   );
-}
+};
+
+export default FullScreenImage;

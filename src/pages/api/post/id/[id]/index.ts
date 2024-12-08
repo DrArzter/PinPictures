@@ -54,7 +54,7 @@ export default async function handler(
           .json({ status: "error", message: "Post not found" });
       }
 
-      if (post.userId !== user.id) {
+      if (post.authorId !== user.id) {
         return res
           .status(403)
           .json({ status: "error", message: "Unauthorized" });
@@ -75,6 +75,7 @@ export default async function handler(
       include: {
         User: {
           select: {
+            id: true,
             name: true,
             avatar: true,
           },

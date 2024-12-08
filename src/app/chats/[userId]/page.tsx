@@ -15,7 +15,7 @@ export default function PrivateChatPage() {
   const { userId } = useParams() as { userId: string };
   const router = useRouter();
   const [chat, setChat] = useState<FullChat | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (!socket || !user) return;
@@ -33,12 +33,12 @@ export default function PrivateChatPage() {
     socket.on("chat", (chatData: FullChat) => {
       if (chatData && !chatData.error) {
         setChat(chatData);
+        socket.emit("getUserChats");
       }
       setIsLoading(false);
     });
 
     socket.on("newChat", (newChatData: FullChat) => {
-      // Если это наш чат, обновим его
       if (newChatData.UsersInChats.some(uic => uic.userId === user.id)) {
         setChat(newChatData);
       }

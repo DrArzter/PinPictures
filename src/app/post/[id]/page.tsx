@@ -13,7 +13,7 @@ import { fetchPost } from "@/app/utils/postUtils";
 import { BsChatDots } from "react-icons/bs";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import * as api from "@/app/api";
-import { Post as PostType, Comment } from "@/app/types/global";
+import { FullPost as PostType, Comment } from "@/app/types/global";
 import { useUserContext } from "@/app/contexts/UserContext";
 import ModalsContext from "@/app/contexts/ModalsContext";
 
@@ -53,11 +53,19 @@ export default function PostPage() {
       }
       try {
         const fetchedPost = await fetchPost(postId);
-        setPost(fetchedPost);
-        setLikeCount(fetchedPost._count?.Likes ?? fetchedPost.Likes.length);
-        setComments(fetchedPost.Comments || []);
-        if (user && fetchedPost.Likes.some((like) => like.userId === user.id)) {
-          setIsLiked(true);
+        if (fetchedPost) {
+          setPost({
+            ...fetchedPost,
+            Comments: fetchedPost.Comments || [],
+          });
+          setLikeCount(fetchedPost._count?.Likes ?? fetchedPost.Likes.length);
+          setComments(fetchedPost.Comments || []);
+          if (
+            user &&
+            fetchedPost.Likes.some((like) => like.userId === user.id)
+          ) {
+            setIsLiked(true);
+          }
         }
       } catch (error) {
         console.error("Error fetching post:", error);
@@ -69,8 +77,10 @@ export default function PostPage() {
         setLoading(false);
       }
     };
+  
     fetchPostData();
   }, [postId, user, addNotification]);
+  
 
   const handleLikeClick = useCallback(
     async (e: React.MouseEvent) => {

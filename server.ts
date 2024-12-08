@@ -135,7 +135,40 @@ app.prepare().then(async () => {
             // Второму пользователю отправляем newChat, чтобы у него появился чат в списке
             for (const uic of chat.UsersInChats) {
               if (uic.userId !== currentUserId) {
-                io.to(`user_${uic.userId}`).emit("newChat", chat);
+                const newChat = await prisma.chats.findUnique({
+                  where: { id: finalChatId },
+                  include: {
+                    UsersInChats: { include: { User: true } },
+                    MessagesInChats: {
+                      include: { User: true, ImagesInMessages: true },
+                      orderBy: { createdAt: "asc" },
+                    },
+                  },
+                });
+
+                const cLastMesage = {
+                  id: newChat?.MessagesInChats[0]?.id,
+                  message: newChat?.MessagesInChats[0]?.message,
+                  User: {
+                    id: newChat?.MessagesInChats[0]?.User?.id,
+                    name: newChat?.MessagesInChats[0]?.User?.name,
+                    avatar: newChat?.MessagesInChats[0]?.User?.avatar,
+                  },
+                }
+
+                const formatedChat = {
+                  ChatType: newChat?.ChatType,
+                  avatar: newChat?.UsersInChats[0]?.User?.avatar,
+                  id: newChat?.id,
+                  name: newChat?.UsersInChats[0]?.User?.name,
+                  UsersInChats: newChat?.UsersInChats.map((uic) => ({
+                    id: uic.userId,
+                    name: uic.User.name,
+                    avatar: uic.User.avatar,
+                  })),
+                  lastMessage: cLastMesage,
+                }
+                io.to(`user_${uic.userId}`).emit("newChat", formatedChat);
               }
             }
 

@@ -28,7 +28,7 @@ export default function RightHandMenu({ closeMenu }: RightHandMenuProps) {
   const router = useRouter();
   const { openModal } = useContext(ModalsContext);
   const sideBarRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -65,11 +65,13 @@ export default function RightHandMenu({ closeMenu }: RightHandMenuProps) {
 
   const handleNotificationClick = () => {
     addNotification({
-      message: `Please login first`,
+      message: `WIP`,
       status: "info",
       time: 5000,
       clickable: true,
       link_to: "/authentication",
+      soundRequired: true,
+      sound: "https://meowpad.pw/cdn/meowpad/sounds/2363e8c0-trenbolon.mp3",
     });
   };
 

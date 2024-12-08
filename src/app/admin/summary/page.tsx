@@ -15,7 +15,7 @@ import { MdPostAdd, MdChatBubbleOutline } from "react-icons/md";
 import LoadingIndicator from "@/app/components/common/LoadingIndicator";
 
 export default function AdminSummary() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
   const [stats, setStats] = useState({
     users: {

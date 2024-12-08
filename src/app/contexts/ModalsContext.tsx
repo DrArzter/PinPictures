@@ -2,16 +2,20 @@
 "use client";
 import React, { createContext, useState, ReactNode } from "react";
 
-type ModalType = "CREATE_POST" | "FULL_SCREEN_IMAGE" | null;
+type ModalType = "CREATE_POST" | "FULL_SCREEN_IMAGE" | "CREATE_CHAT" | null;
 
-interface ModalProps {
-  [key: string]: any;
+interface ModalPropsMap {
+  CREATE_POST: { onClose: () => void };
+  FULL_SCREEN_IMAGE: { imageUrl: string; onClose: () => void };
+  CREATE_CHAT: { onClose: () => void };
 }
+
+type ModalProps<T extends ModalType> = T extends keyof ModalPropsMap ? ModalPropsMap[T] : {};
 
 interface ModalsContextType {
   modalType: ModalType;
-  modalProps: ModalProps;
-  openModal: (type: ModalType, props?: ModalProps) => void;
+  modalProps: ModalProps<ModalType>;
+  openModal: <T extends ModalType>(type: T, props?: ModalProps<T>) => void;
   closeModal: () => void;
 }
 
@@ -28,11 +32,11 @@ interface ModalsProviderProps {
 
 export const ModalsProvider: React.FC<ModalsProviderProps> = ({ children }) => {
   const [modalType, setModalType] = useState<ModalType>(null);
-  const [modalProps, setModalProps] = useState<ModalProps>({});
+  const [modalProps, setModalProps] = useState<ModalProps<ModalType>>({});
 
-  const openModal = (type: ModalType, props: ModalProps = {}) => {
+  const openModal = <T extends ModalType>(type: T, props?: ModalProps<T>) => {
     setModalType(type);
-    setModalProps(props);
+    setModalProps(props ?? {});
   };
 
   const closeModal = () => {

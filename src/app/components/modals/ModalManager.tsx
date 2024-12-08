@@ -1,4 +1,4 @@
-// ./src/app/components/ModalManager.tsx
+// ./src/app/components/modals/ModalManager.tsx
 "use client";
 
 import React, { useContext } from "react";
@@ -20,7 +20,7 @@ const ModalManager: React.FC = () => {
     case "CREATE_POST":
       return <CreatePostModal {...modalProps} onClose={handleClose} />;
     case "FULL_SCREEN_IMAGE":
-      return <FullScreenImage {...modalProps} onClose={handleClose} />;
+      return <FullScreenImage {...modalProps} onClose={handleClose} />; //TODO FIX
     case "CREATE_CHAT":
       return <NewChatModal {...modalProps} onClose={handleClose} />;
     default:

@@ -25,16 +25,8 @@ export default function ChatsLayout({ children }: { children: React.ReactNode })
     });
 
     socket.on("newChat", (newChat: Chat) => {
-      // Если приходит событие о новом чате – добавляем или обновляем его в списке
-      setChats((prevChats) => {
-        const existing = prevChats.find((c) => c.id === newChat.id);
-        if (existing) {
-          // Обновляем существующий чат
-          return prevChats.map((c) => (c.id === newChat.id ? newChat : c));
-        }
-        // Добавляем новый чат в список
-        return [...prevChats, newChat];
-      });
+      newChat.users = newChat.UsersInChats
+      setChats((prevChats) => [...prevChats, newChat]);
     });
 
     return () => {

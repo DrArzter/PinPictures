@@ -12,7 +12,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   comments,
   onAddComment,
 }) => {
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState<string>("");
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();

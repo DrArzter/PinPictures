@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { User } from "@/app/types/global";
 
 export function useBackground(user: User | null, userLoading: boolean) {
-  const [loading, setLoading] = useState(true);
-  const [bgImage, setBgImage] = useState("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [bgImage, setBgImage] = useState<string>("");
 
   useEffect(() => {
     if (!userLoading) {

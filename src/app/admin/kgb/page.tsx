@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import * as api from "@/app/api";
 
 export default function Chats() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedChat, setSelectedChat] = useState(null);
-  const [chats, setChats] = useState([]);
+  const [chats, setChats] = useState<Array<any>>([]); //TODO: Сделай ёпта
   const router = useRouter();
 
   // Открытие модального окна

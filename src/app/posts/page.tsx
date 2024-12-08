@@ -8,15 +8,15 @@ import NoPostsFound from "../components/post/NoPostsFound";
 import * as postUtils from "../utils/postUtils";
 
 export default function Posts() {
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
   const [posts, setPosts] = useState([]);
-  const [hasMorePosts, setHasMorePosts] = useState(true);
+  const [hasMorePosts, setHasMorePosts] = useState<boolean>(true);
   const [error, setError] = useState(null);
 
   const minColumnWidth = 300;
   const maxColumns = 4;
-  const [columns, setColumns] = useState(1);
+  const [columns, setColumns] = useState<number>(1);
 
   const calculateColumns = useCallback(() => {
     if (typeof window !== "undefined") {

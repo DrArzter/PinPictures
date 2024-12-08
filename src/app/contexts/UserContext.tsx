@@ -1,17 +1,18 @@
 "use client";
 import React, { useState, useContext, useEffect, ReactNode } from "react";
 import * as api from "@/app/api";
-import { User, UserContextType } from "@/app/types/global";
+import { clientSelfUser, clientSelfUserContextType, Friend } from "@/app/types/global";
 
-// Создаем UserContext с типом UserContextType
-const UserContext = React.createContext<UserContextType | undefined>(undefined);
+const UserContext = React.createContext<clientSelfUserContextType | undefined>(
+  undefined
+);
 
 interface UserProviderProps {
   children: ReactNode;
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<clientSelfUser | undefined>(undefined);
   const [userLoading, setUserLoading] = useState<boolean>(true);
 
   const fetchUser = async () => {
@@ -37,7 +38,13 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   return (
     <UserContext.Provider
-      value={{ user, setUser, fetchUser, userLoading, setUserLoading }}
+      value={{
+        user: user,
+        setUser: setUser,
+        fetchUser: fetchUser,
+        userLoading: userLoading,
+        setUserLoading: setUserLoading,
+      }}
     >
       {children}
     </UserContext.Provider>

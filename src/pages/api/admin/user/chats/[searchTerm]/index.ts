@@ -22,7 +22,7 @@ export default async function handler(
         .json({ status: "error", message: "User not found" });
     }
 
-    if (user.bananLevel < 1) {
+    if (user.bananaLevel < 1) {
       return res
         .status(403)
         .json({ status: "error", message: "Access denied" });
@@ -33,44 +33,38 @@ export default async function handler(
     const chats = await prisma.chats.findMany({
       where: {
         OR: [
-          searchTerm && !isNaN(parseInt(searchTerm))
-            ? {
-                UsersInChats: {
-                  some: {
-                    User: {
-                      id: parseInt(searchTerm),
-                    },
+          searchTerm && !isNaN(parseInt(searchTerm)) && {
+            UsersInChats: {
+              some: {
+                User: {
+                  id: parseInt(searchTerm),
+                },
+              },
+            },
+          },
+          searchTerm && {
+            UsersInChats: {
+              some: {
+                User: {
+                  name: {
+                    contains: searchTerm,
                   },
                 },
-              }
-            : null,
-          searchTerm
-            ? {
-                UsersInChats: {
-                  some: {
-                    User: {
-                      name: {
-                        contains: searchTerm,
-                      },
-                    },
+              },
+            },
+          },
+          searchTerm && {
+            UsersInChats: {
+              some: {
+                User: {
+                  email: {
+                    contains: searchTerm,
                   },
                 },
-              }
-            : null,
-          searchTerm
-            ? {
-                UsersInChats: {
-                  some: {
-                    User: {
-                      email: {
-                        contains: searchTerm,
-                      },
-                    },
-                  },
-                },
-              }
-            : null,
-        ].filter(Boolean),
+              },
+            },
+          },
+        ].filter(Boolean) as any[],
       },
       include: {
         UsersInChats: {

@@ -9,7 +9,6 @@ export default async function addFriend(friendId: number, friendName: string) {
         withCredentials: true,
       }
     );
-
     return response.data;
   } catch (error) {
     console.error("Error sending friend request:", error);

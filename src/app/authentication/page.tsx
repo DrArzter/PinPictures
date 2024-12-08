@@ -12,16 +12,16 @@ import { useSocketContext } from "@/app/contexts/SocketContext";
 import { io } from "socket.io-client";
 
 export default function Authentication({}) {
-  const [isRegistration, setIsRegistration] = useState(true);
-  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [isRegistration, setIsRegistration] = useState<boolean>(true);
+  const [isForgotPassword, setIsForgotPassword] = useState<boolean>(false);
 
   const { setUser, setUserLoading } = useUserContext();
   const { addNotification } = useNotificationContext();
   const { setSocket } = useSocketContext();
 
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
   const router = useRouter();
 

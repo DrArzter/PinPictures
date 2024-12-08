@@ -4,15 +4,15 @@ import { verifyToken } from "@/utils/jwt";
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { parse } from "cookie";
+import { clientSelfUser } from "@/app/types/global";
 
 interface DecodedToken {
   userId: number;
   iat: number;
   exp: number;
 }
-
 interface CustomNextApiRequest extends NextApiRequest {
-  user?: any;
+  user: clientSelfUser | null;
 }
 
 export async function authMiddleware(
@@ -49,7 +49,12 @@ export async function authMiddleware(
 
       const { password, ...userWithoutSensitiveInfo } = user;
 
-      req.user = userWithoutSensitiveInfo;
+      req.user = {
+        ...userWithoutSensitiveInfo,
+        Friendships_Friendships_user1IdToUser: [],
+        Friendships_Friendships_user2IdToUser: [],
+        password: ''
+      };
 
       if (user.banned) {
         res.status(444).json({ status: "error", message: "User banned", data: user });

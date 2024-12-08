@@ -22,7 +22,7 @@ export default async function handler(
         .json({ status: "error", message: "User not found" });
     }
 
-    if (user.bananLevel < 1) {
+    if (user.bananaLevel < 1) {
       return res
         .status(403)
         .json({ status: "error", message: "Access denied" });
@@ -37,11 +37,10 @@ export default async function handler(
             set: !(await prisma.user.findUnique({
               where: { id: userId },
               select: { banned: true },
-            })).banned,
+            }))?.banned ?? false,
           },
         },
       });
-      
 
     return res
       .status(200)
