@@ -4,7 +4,10 @@ import { parse } from "cookie";
 import { handleError } from "@/utils/errorHandler";
 import { verifyToken } from "@/utils/jwt";
 
-interface DecodedToken {
+import { Friend } from "@/app/types/global";
+
+interface DecodedToken
+ {
   userId: number;
   exp: number;
 }
@@ -27,11 +30,7 @@ interface ProfileWithFriends {
     User: { name: string; avatar: string; };
   }[];
   friends: {
-    friend: {
-      id: number;
-      name: string;
-      avatar: string;
-    };
+    friend: Friend;
     status: string;
   }[];
 }
@@ -167,19 +166,26 @@ export default async function handler(
       }
     }
 
-    const friendsAsUser1 = profile.Friendships_Friendships_user1IdToUser.map(
-      (friendship) => ({
-        friend: friendship.User_Friendships_user2IdToUser,
-        status: friendship.status,
-      })
-    );
+    const friendsAsUser1 =
+    profile.Friendships_Friendships_user1IdToUser?.map((friendship) => ({
+        friend: {
+            id: friendship.User_Friendships_user2IdToUser.id,
+            name: friendship.User_Friendships_user2IdToUser.name,
+            avatar: friendship.User_Friendships_user2IdToUser.avatar,
+        } as unknown as Friend,
+        status: friendship.status as unknown as string, // Force cast if necessary
+    })) || [];
 
-    const friendsAsUser2 = profile.Friendships_Friendships_user2IdToUser.map(
-      (friendship) => ({
-        friend: friendship.User_Friendships_user1IdToUser,
-        status: friendship.status,
-      })
-    );
+const friendsAsUser2 =
+    profile.Friendships_Friendships_user2IdToUser?.map((friendship) => ({
+        friend: {
+            id: friendship.User_Friendships_user1IdToUser.id,
+            name: friendship.User_Friendships_user1IdToUser.name,
+            avatar: friendship.User_Friendships_user1IdToUser.avatar,
+        } as unknown as Friend,
+        status: String(friendship.status), // Cast to string
+    })) || [];
+
 
     const allFriends = [...friendsAsUser1, ...friendsAsUser2];
 
@@ -187,9 +193,6 @@ export default async function handler(
       ...profile,
       friends: allFriends,
     };
-
-    delete (profileWithFriends as ProfileWithFriends).Friendships_Friendships_user1IdToUser;
-    delete (profileWithFriends as ProfileWithFriends).Friendships_Friendships_user2IdToUser;
 
     return res.status(200).json({
       data: profileWithFriends,

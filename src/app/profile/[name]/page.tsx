@@ -11,12 +11,15 @@ import LoadingIndicator from "@/app/components/common/LoadingIndicator";
 import * as api from "@/app/api";
 import PostList from "@/app/components/post/PostList";
 
+import { Post as PostType} from "@/app/types/global";
+
 import { motion } from "framer-motion";
 import {
   AiOutlineMessage,
   AiOutlineUserAdd,
   AiOutlineUserDelete,
 } from "react-icons/ai";
+import { useNotificationContext } from "@/app/contexts/NotificationContext";
 
 interface Friend {
   friend: {
@@ -45,6 +48,7 @@ interface ProfileData {
 
 export default function Profile() {
   const params = useParams();
+  const addNotification = useNotificationContext().addNotification;
   const profileName = useMemo(
     () => (params.name ? params.name : null),
     [params.name]
@@ -96,8 +100,8 @@ export default function Profile() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!profileName || typeof profileName !== 'string') return;
-      
+      if (!profileName || typeof profileName !== "string") return;
+
       try {
         setLoading(true);
         const response = await api.getProfile(profileName);
@@ -140,12 +144,14 @@ export default function Profile() {
   };
 
   const handleDeleteFriendClick = async () => {
-    try {
-      
-      console.log("Friend removed!");
-    } catch (error) {
-      console.error("Error removing friend:", error);
-    }
+    addNotification({
+      message: "This feature is not implemented yet",
+      status: "info",
+      soundRequired: true,
+      clickable: false,
+      sound: "https://storage.yandexcloud.net/pinpictures/sounds/nuhuh.mp3",
+      time: 6000,
+    });
   };
 
   const containerVariants = {
@@ -180,6 +186,8 @@ export default function Profile() {
             alt={`${profile.name} Background`}
             width={0}
             height={0}
+            sizes="100vw"
+            style={{ width: "100%", height: "100%" }}
             className="w-full h-full object-cover"
           />
         </div>
@@ -195,6 +203,8 @@ export default function Profile() {
               alt={`${profile.name} Avatar`}
               width={0}
               height={0}
+              sizes="100vw"
+              style={{ width: "100%", height: "100%" }}
               className="w-full h-full rounded-full object-cover"
             />
           </div>
@@ -285,7 +295,7 @@ export default function Profile() {
 
         <motion.div className="mt-10" variants={itemVariants}>
           {profile.Post && profile.Post.length > 0 ? (
-            <PostList posts={profile.Post} columns={columns} />
+            <PostList posts={profile.Post as unknown as PostType[]} columns={columns} />
           ) : (
             <p className="">{profile?.name} does not have any posts.</p>
           )}

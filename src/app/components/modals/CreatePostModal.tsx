@@ -1,4 +1,3 @@
-// ./src/app/components/modals/CreatePostModal.tsx
 "use client";
 
 import React, { useState, useRef, useCallback } from "react";
@@ -8,6 +7,8 @@ import { AiOutlineCloudUpload } from "react-icons/ai";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { createPost } from "@/app/api";
 import { motion } from "framer-motion";
+import { AxiosResponse } from "axios";
+import { ApiResponse } from "@/app/types/global";
 
 interface CreatePostModalProps {
   onClose: () => void;
@@ -17,20 +18,17 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [images, setImages] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<
-    (string | ArrayBuffer | null)[]
-  >([]);
+  const [imagePreviews, setImagePreviews] = useState<(string | ArrayBuffer | null)[]>([]);
   const { addNotification } = useNotificationContext();
   const [loading, setLoading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Обработчик отправки формы
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
       setLoading(true);
 
-      let response;
+      let response: AxiosResponse<ApiResponse<string>> | undefined;
 
       try {
         response = await createPost({ name, description, images });
@@ -45,15 +43,17 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
       } finally {
         setLoading(false);
         if (response) {
+          // response.data.data должен быть строкой (id нового поста)
           console.log(response.data.data);
+          // Поскольку status в ApiResponse<string> это "success" | "error", он совместим с типом Notification.status
           addNotification({
-            status: response.status,
-            message: response.message,
+            status: response.data.status,
+            message: response.data.message,
             link_to: `/post/${response.data.data}`,
             time: 5000,
             clickable: true,
           });
-          if (response.status === "success") {
+          if (response.data.status === "success") {
             setName("");
             setDescription("");
             setImages([]);
@@ -66,12 +66,9 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
     [name, description, images, addNotification, onClose]
   );
 
-  // Обработчик добавления изображений
   const handleImageChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(e.target.files || []);
-
-      // Проверяем, что суммарное количество файлов не превышает 10
       if (files.length + images.length > 10) {
         addNotification({
           status: "error",
@@ -82,7 +79,7 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
         return;
       }
 
-      const allowedTypes = ["image/jpeg", "image/png"]; // Разрешенные MIME-типы
+      const allowedTypes = ["image/jpeg", "image/png"];
       const validFiles = files.filter((file) => {
         if (!allowedTypes.includes(file.type)) {
           addNotification({
@@ -106,17 +103,14 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
         reader.readAsDataURL(file);
       });
     },
-    [images]
+    [images, addNotification]
   );
 
-  // Обработчик удаления изображения
   const handleRemoveImage = useCallback(
     (index: number, e: React.MouseEvent) => {
       e.stopPropagation();
       setImages((prevImages) => prevImages.filter((_, i) => i !== index));
-      setImagePreviews((prevPreviews) =>
-        prevPreviews.filter((_, i) => i !== index)
-      );
+      setImagePreviews((prevPreviews) => prevPreviews.filter((_, i) => i !== index));
     },
     []
   );
@@ -152,11 +146,10 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
         reader.readAsDataURL(file);
       });
     },
-    [images]
+    [images, addNotification]
   );
 
-  const isSubmitDisabled =
-    !name || !description || images.length === 0 || loading;
+  const isSubmitDisabled = !name || !description || images.length === 0 || loading;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">

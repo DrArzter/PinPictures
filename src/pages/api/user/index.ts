@@ -46,6 +46,18 @@ export default async function handler(
       const userWithFriends = await prisma.user.findUnique({
         where: { id: authenticatedUser.id },
         include: {
+          Post: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              createdAt: true,
+              Likes: { select: { userId: true } },
+              _count: { select: { Comments: true, Likes: true } },
+              ImageInPost: { select: { id: true, picpath: true } },
+              User: { select: { name: true, avatar: true } },
+            },
+          },
           Friendships_Friendships_user1IdToUser: {
             select: {
               status: true,
@@ -98,8 +110,7 @@ export default async function handler(
       const allFriends = [...friendsAsUser1, ...friendsAsUser2];
 
       const finalUserResponse = { ...userWithFriends, friends: allFriends };
-      delete finalUserResponse.Friendships_Friendships_user1IdToUser;
-      delete finalUserResponse.Friendships_Friendships_user2IdToUser;
+
 
       return res.status(200).json({
         status: "success",
@@ -197,7 +208,8 @@ export default async function handler(
             return res.status(400).json({ error: "Invalid hex value" });
           }
 
-          const currentSettings = userWithFriends.settings as Record<string, unknown> || {};
+          const currentSettings =
+            (userWithFriends.settings as Record<string, unknown>) || {};
           const updatedSettings = {
             ...currentSettings,
             bgColor: hex,

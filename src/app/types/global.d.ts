@@ -1,6 +1,8 @@
+/* eslint-disable no-var */
 declare module "next" {
   interface NextApiRequest {
     user: ClientSelfUser | null;
+    friend: Friend;
     notifications: Notification;
   }
 }
@@ -69,6 +71,11 @@ export interface Friends {
   status: "confirmed" | "pending" | "blocked";
 }
 
+export interface MiniFriend {
+  friend: ShortUser;
+  status: "confirmed" | "pending" | "blocked";
+}
+
 export interface Friend {
   id: number;
   friend: ShortUser;
@@ -87,7 +94,7 @@ export interface ClientSelfUser {
   lastLoginAt: Date;
   banned: boolean;
   background: string;
-  settings: Record<string, unknown>;
+  settings: Record<string, unknown> | null; // Allow null here
   uiBackground: string;
   friends: Friends[];
   Friendships_Friendships_user1IdToUser: Array<{
@@ -153,7 +160,13 @@ export interface FullPost extends Post {
 export interface NewPost {
   name: string;
   description: string;
-  images: string[];
+  images: file[];
+}
+
+export interface NewPostRequest {
+  name: string;
+  description: string;
+  images: File[]; // На запрос мы отправляем файлы
 }
 
 export interface Comment {
@@ -162,3 +175,11 @@ export interface Comment {
   createdAt: string;
   User: ShortUser;
 }
+
+import { Server } from "socket.io";
+
+declare global {
+  var io: Server;
+}
+
+export {};

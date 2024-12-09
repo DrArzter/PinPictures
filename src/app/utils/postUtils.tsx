@@ -1,6 +1,8 @@
 import * as api from "@/app/api";
 import { NewPost, FullPost as PostType } from "@/app/types/global";
 
+
+
 export const fetchPosts = async (page: number): Promise<PostType[]> => {
   try {
     const fetchedPosts = await api.getPosts(page);
@@ -31,7 +33,10 @@ export const fetchPost = async (id: number): Promise<PostType | null> => {
 
 export const createPost = async (post: NewPost): Promise<number | null> => {
   try {
-    const response = await api.createPost(post);
+    const response = await api.createPost(post) as unknown as {
+      status: string;
+      data: number;
+    };
     if (response.status === "success" && typeof response.data === "number") {
       return response.data;
     } else {

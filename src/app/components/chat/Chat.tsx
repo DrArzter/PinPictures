@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { clientSelfUser, FullChat, MessageInChat } from "@/app/types/global";
+import { ClientSelfUser, FullChat, MessageInChat } from "@/app/types/global";
 import LoadingIndicator from "../common/LoadingIndicator";
 import { Socket } from "socket.io-client";
 import { FaRegFileImage } from "react-icons/fa6";
@@ -11,7 +11,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import Image from "next/image";
 
 interface ChatProps {
-  user: clientSelfUser;
+  user: ClientSelfUser;
   chat: FullChat | undefined;
   isActiveChatLoading: boolean;
   socket: Socket | undefined;

@@ -20,8 +20,9 @@ const ModalManager: React.FC = () => {
     case "CREATE_POST":
       return <CreatePostModal {...modalProps} onClose={handleClose} />;
     case "FULL_SCREEN_IMAGE":
-      if (!('imageUrl' in modalProps)) return null;
-      return <FullScreenImage {...modalProps} onClose={handleClose} />;
+      if (!("imageUrl" in modalProps) || !modalProps.imageUrl) return null;
+      return <FullScreenImage {...modalProps} imageUrl={`${modalProps.imageUrl}`} onClose={handleClose} />;
+
     case "CREATE_CHAT":
       return <NewChatModal {...modalProps} onClose={handleClose} />;
     default:

@@ -2,8 +2,14 @@
 import React from "react";
 import Post from "./Post";
 import { motion } from "framer-motion";
+import { Post as PostType } from "@/app/types/global";
 
-const PostList = ({ posts, columns }) => {
+interface PostListProps {
+  posts: PostType[];
+  columns: number;
+}
+
+const PostList = ({ posts, columns }: PostListProps) => {
   const postListStyle = {
     columnCount: columns,
     columnGap: "16px",

@@ -2,10 +2,10 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { User } from "@/app/types/global";
+import { ShortUser } from "@/app/types/global";
 
 interface AuthorInfoProps {
-  user: User;
+  user: ShortUser;
   createdAt: string;
 }
 

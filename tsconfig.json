@@ -30,7 +30,7 @@
     ]
   },
   "include": [
-    "server.ts",
+    "src/server.ts",
     "services/**/*",
     "src/**/*",
     ".next/types/**/*.ts"

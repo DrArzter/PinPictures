@@ -37,7 +37,7 @@ export default async function handler(
             set: !(await prisma.user.findUnique({
               where: { id: userId },
               select: { banned: true },
-            }))?.banned ?? false,
+            }))?.banned
           },
         },
       });

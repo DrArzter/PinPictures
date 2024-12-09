@@ -25,7 +25,7 @@ export default function ChatsLayout({ children }: { children: React.ReactNode })
     });
 
     socket.on("newChat", (newChat: AdminChat) => {
-      newChat.UsersInChats = newChat.UsersInChats
+      newChat.usersInChats = newChat.usersInChats
       setChats((prevChats) => [...prevChats, newChat]);
     });
 

@@ -51,8 +51,10 @@ export async function authMiddleware(
 
       req.user = {
         ...userWithoutSensitiveInfo,
+        settings: userWithoutSensitiveInfo.settings as Record<string, unknown>,
         Friendships_Friendships_user1IdToUser: [],
         Friendships_Friendships_user2IdToUser: [],
+        friends: [],
       };
 
       if (user.banned) {
