@@ -1,7 +1,5 @@
-import React from "react";
-
 const Artoria = () => {
-  return (`
+  return `
     <svg
       version="1.0"
       xmlns="http://www.w3.org/2000/svg"
@@ -383,8 +381,7 @@ m685 -2318 c81 -345 206 -580 368 -694 49 -35 66 -41 122 -44 35 -2 78 1 95 6
 29z"
         />
       </g>
-    </svg>`
-  );
+    </svg>`;
 };
 
 export default Artoria;

@@ -2,8 +2,6 @@
 
 import AWS from "aws-sdk";
 
-require("aws-sdk/lib/maintenance_mode_message").suppress = true;
-
 const { S3_ID, S3_PRIVATE } = process.env;
 
 const s3 = new AWS.S3({

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiLayers } from "react-icons/fi";
 import { BsHeart, BsHeartFill, BsChatDots } from "react-icons/bs";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
@@ -17,8 +17,6 @@ export default function Post({ post }: PostProps) {
   const { user } = useUserContext();
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(post._count.Likes);
-  const [isImageLoaded, setIsImageLoaded] = useState<boolean>(false);
-  const [isImageError, setIsImageError] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -61,7 +59,7 @@ export default function Post({ post }: PostProps) {
         setIsLiked(newLikeState);
         setLikeCount((prevCount) => prevCount + (newLikeState ? 1 : -1));
       }
-    } catch (error) {
+    } catch {
       addNotification({
         status: "error",
         message: "Failed to update like.",
@@ -73,7 +71,8 @@ export default function Post({ post }: PostProps) {
 
   const postContainerClassName = `hover:scale-105 border rounded-xl focus:scale-105 transition-transform duration-300 overflow-hidden`;
   const imageContainerClassName = "w-full overflow-hidden relative";
-  const layersIconClassName = "absolute bottom-2 right-2 text-2xl text-yellow-500";
+  const layersIconClassName =
+    "absolute bottom-2 right-2 text-2xl text-yellow-500";
   const postContentClassName = "p-4 flex flex-row items-center justify-between";
   const postDescriptionClassName = "text-sm overflow-hidden line-clamp-3";
   const hasMultipleImages = post.ImageInPost && post.ImageInPost.length > 1;
@@ -92,7 +91,12 @@ export default function Post({ post }: PostProps) {
       <div className="flex flex-col h-full">
         {post.ImageInPost && (
           <div className={imageContainerClassName}>
-            {hasMultipleImages && <FiLayers title="Multiple images" className={layersIconClassName} />}
+            {hasMultipleImages && (
+              <FiLayers
+                title="Multiple images"
+                className={layersIconClassName}
+              />
+            )}
 
             <Image
               src={post.ImageInPost[0].picpath}
@@ -102,14 +106,12 @@ export default function Post({ post }: PostProps) {
               height={0}
               sizes="100vw"
               className="cursor-pointer w-full h-full object-cover"
-              onLoadingComplete={() => setIsImageLoaded(true)}
-              onError={() => setIsImageError(true)}
             />
 
             <div className="absolute top-0 left-0 right-0 flex justify-between items-center p-4 bg-gradient-to-b from-black/70 to-transparent">
               <p className="text-lg font-semibold text-white">{post.name}</p>
               <div
-                title={post.User.name}  
+                title={post.User.name}
                 className="flex items-center cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();

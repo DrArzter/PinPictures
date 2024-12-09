@@ -116,7 +116,6 @@ export default async function handler(
         const allowedExtensions = ["jpeg", "jpg", "png", "gif", "webp"];
 
         const fileExt = image.originalFilename?.split(".").pop()?.toLowerCase();
-        const mimeType = image.mimetype;
 
         if (!fileExt || !allowedExtensions.includes(fileExt)) {
           await prisma.post.delete({ where: { id: newPostId } });
@@ -193,13 +192,12 @@ export default async function handler(
     });
   } catch (error) {
     return handleError(res, error);
-    try {
-      await cleanupFiles(tempFiles);
-    } catch (error) {}
   } finally {
     try {
       await cleanupFiles(tempFiles);
-    } catch (error) {}
+    } catch (error) {
+      return handleError(res, error);
+    }
   }
 }
 

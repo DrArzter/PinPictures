@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { handleError } from "@/utils/errorHandler";
 import { authMiddleware } from "@/middlewares/authMiddleware";
+import { Prisma } from "@prisma/client";
 
 export default async function handler(
   req: NextApiRequest,
@@ -30,41 +31,45 @@ export default async function handler(
 
     const searchTerm = req.query.searchTerm as string;
 
+    // Типизация массива OR
+    const orConditions: Prisma.ChatsWhereInput[] = [
+      searchTerm &&
+        !isNaN(parseInt(searchTerm)) && {
+          UsersInChats: {
+            some: {
+              User: {
+                id: parseInt(searchTerm),
+              },
+            },
+          },
+        },
+      searchTerm && {
+        UsersInChats: {
+          some: {
+            User: {
+              name: {
+                contains: searchTerm,
+              },
+            },
+          },
+        },
+      },
+      searchTerm && {
+        UsersInChats: {
+          some: {
+            User: {
+              email: {
+                contains: searchTerm,
+              },
+            },
+          },
+        },
+      },
+    ].filter(Boolean) as Prisma.ChatsWhereInput[]; // ✅ Убрали any и заменили на тип Prisma.ChatsWhereInput
+
     const chats = await prisma.chats.findMany({
       where: {
-        OR: [
-          searchTerm && !isNaN(parseInt(searchTerm)) && {
-            UsersInChats: {
-              some: {
-                User: {
-                  id: parseInt(searchTerm),
-                },
-              },
-            },
-          },
-          searchTerm && {
-            UsersInChats: {
-              some: {
-                User: {
-                  name: {
-                    contains: searchTerm,
-                  },
-                },
-              },
-            },
-          },
-          searchTerm && {
-            UsersInChats: {
-              some: {
-                User: {
-                  email: {
-                    contains: searchTerm,
-                  },
-                },
-              },
-            },
-          },
-        ].filter(Boolean) as any[],
+        OR: orConditions,
       },
       include: {
         UsersInChats: {
@@ -72,6 +77,7 @@ export default async function handler(
             User: {
               select: {
                 id: true,
+                avatar: true,
                 name: true,
               },
             },

@@ -96,6 +96,8 @@ export default function Profile() {
 
   useEffect(() => {
     const fetchProfile = async () => {
+      if (!profileName || typeof profileName !== 'string') return;
+      
       try {
         setLoading(true);
         const response = await api.getProfile(profileName);
@@ -207,7 +209,7 @@ export default function Profile() {
         <div className="text-center">
           <h1 className="text-3xl font-semibold">{profile.name}</h1>
           {isMyProfile ? (
-            <p className="text-sm mt-2">That's your profile</p>
+            <p className="text-sm mt-2">That is your profile</p>
           ) : (
             <div className="flex justify-center space-x-4 mt-2">
               <AiOutlineMessage

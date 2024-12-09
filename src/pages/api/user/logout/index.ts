@@ -3,10 +3,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { authMiddleware } from "@/middlewares/authMiddleware";
 import { handleError } from "@/utils/errorHandler";
-import { clientSelfUser } from "@/app/types/global";
+import { ClientSelfUser } from "@/app/types/global";
 
 interface CustomNextApiRequest extends NextApiRequest {
-  user: clientSelfUser | null;
+  user: ClientSelfUser | null;
 }
 
 export const config = {

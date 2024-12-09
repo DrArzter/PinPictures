@@ -5,13 +5,13 @@ import React, { useState, useEffect } from "react";
 import ChatList from "@/app/components/chat/ChatList";
 import { useUserContext } from "@/app/contexts/UserContext";
 import { useSocketContext } from "@/app/contexts/SocketContext";
-import { Chat } from "@/app/types/global";
+import { AdminChat } from "@/app/types/global";
 import { Socket } from "socket.io-client";
 
 export default function ChatsLayout({ children }: { children: React.ReactNode }) {
   const { user } = useUserContext();
   const { socket } = useSocketContext();
-  const [chats, setChats] = useState<Chat[]>([]);
+  const [chats, setChats] = useState<AdminChat[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -20,12 +20,12 @@ export default function ChatsLayout({ children }: { children: React.ReactNode })
     // Предположим, что сервер умеет отдавать список чатов пользователя по событию "getUserChats"
     socket.emit("getUserChats");
 
-    socket.on("userChats", (userChats: Chat[]) => {
+    socket.on("userChats", (userChats: AdminChat[]) => {
       setChats(userChats);
     });
 
-    socket.on("newChat", (newChat: Chat) => {
-      newChat.users = newChat.UsersInChats
+    socket.on("newChat", (newChat: AdminChat) => {
+      newChat.UsersInChats = newChat.UsersInChats
       setChats((prevChats) => [...prevChats, newChat]);
     });
 

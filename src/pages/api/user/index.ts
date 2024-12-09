@@ -7,7 +7,7 @@ import { authMiddleware } from "@/middlewares/authMiddleware";
 import formidable from "formidable";
 import fs from "fs/promises";
 import { handleError } from "@/utils/errorHandler";
-import { clientSelfUser } from "@/app/types/global";
+import { ClientSelfUser } from "@/app/types/global";
 
 export const config = {
   api: {
@@ -17,7 +17,7 @@ export const config = {
 };
 
 interface CustomNextApiRequest extends NextApiRequest {
-  user: clientSelfUser | null;
+  user: ClientSelfUser | null;
 }
 
 export default async function handler(
@@ -42,7 +42,7 @@ export default async function handler(
     }
 
     if (req.method === "GET") {
-      // Fetch the user with friendships
+      // Получаем пользователя вместе со списком друзей
       const userWithFriends = await prisma.user.findUnique({
         where: { id: authenticatedUser.id },
         include: {
@@ -79,47 +79,46 @@ export default async function handler(
           .json({ status: "error", message: "User not found" });
       }
 
-      const friendsAsUser1 = userWithFriends.Friendships_Friendships_user1IdToUser.map(
-        (friendship) => ({
-          friend: friendship.User_Friendships_user2IdToUser,
-          status: friendship.status,
-        })
-      );
+      const friendsAsUser1 =
+        userWithFriends.Friendships_Friendships_user1IdToUser.map(
+          (friendship) => ({
+            friend: friendship.User_Friendships_user2IdToUser,
+            status: friendship.status,
+          })
+        );
 
-      const friendsAsUser2 = userWithFriends.Friendships_Friendships_user2IdToUser.map(
-        (friendship) => ({
-          friend: friendship.User_Friendships_user1IdToUser,
-          status: friendship.status,
-        })
-      );
+      const friendsAsUser2 =
+        userWithFriends.Friendships_Friendships_user2IdToUser.map(
+          (friendship) => ({
+            friend: friendship.User_Friendships_user1IdToUser,
+            status: friendship.status,
+          })
+        );
 
       const allFriends = [...friendsAsUser1, ...friendsAsUser2];
 
-      // Construct the final user object with friends
-      const userWithFriendsResponse = {
-        ...userWithFriends,
-        friends: allFriends,
-      } as any;
-
-      delete userWithFriendsResponse.Friendships_Friendships_user1IdToUser;
-      delete userWithFriendsResponse.Friendships_Friendships_user2IdToUser;
+      const finalUserResponse = { ...userWithFriends, friends: allFriends };
+      delete finalUserResponse.Friendships_Friendships_user1IdToUser;
+      delete finalUserResponse.Friendships_Friendships_user2IdToUser;
 
       return res.status(200).json({
         status: "success",
         message: "User retrieved successfully",
-        data: userWithFriendsResponse,
+        data: finalUserResponse,
       });
     } else if (req.method === "PATCH") {
       const form = formidable({ multiples: true });
-
       const { fields, files } = await new Promise<{
-        fields: any;
-        files: any;
+        fields: formidable.Fields;
+        files: formidable.Files;
       }>((resolve, reject) => {
-        form.parse(req, (err: any, fields: any, files: any) => {
-          if (err) reject(err);
-          else resolve({ fields, files });
-        });
+        form.parse(
+          req,
+          (err: Error, fields: formidable.Fields, files: formidable.Files) => {
+            if (err) reject(err);
+            else resolve({ fields, files });
+          }
+        );
       });
 
       const type = fields.type ? fields.type[0] : null;
@@ -139,7 +138,9 @@ export default async function handler(
         }
 
         if (type === "uiBgUpdate") {
-          const image = Array.isArray(files.image) ? files.image[0] : files.image;
+          const image = Array.isArray(files.image)
+            ? files.image[0]
+            : files.image;
           if (!image) {
             return res.status(400).json({ error: "Image file is required" });
           }
@@ -172,7 +173,9 @@ export default async function handler(
           const fileContent = await fs.readFile(newPath);
           const uploadResult = await uploadFiles([
             {
-              filename: `users/${userWithFriends.id}-${randomString}-${Date.now()}.${fileExt}`,
+              filename: `users/${
+                userWithFriends.id
+              }-${randomString}-${Date.now()}.${fileExt}`,
               content: fileContent,
             },
           ]);
@@ -188,22 +191,22 @@ export default async function handler(
             user: updatedUser,
           });
         } else if (type === "uiColorUpdate") {
-          let hex = fields.hex;
-          if (Array.isArray(hex)) {
-            hex = hex[0];
-          }
+          const hex = Array.isArray(fields.hex) ? fields.hex[0] : fields.hex;
 
           if (!hex || typeof hex !== "string") {
             return res.status(400).json({ error: "Invalid hex value" });
           }
 
+          const currentSettings = userWithFriends.settings as Record<string, unknown> || {};
+          const updatedSettings = {
+            ...currentSettings,
+            bgColor: hex,
+          };
+
           const updatedUser = await prisma.user.update({
             where: { id: userWithFriends.id },
             data: {
-              settings: {
-                ...(userWithFriends.settings as object),
-                bgColor: hex,
-              },
+              settings: updatedSettings,
             },
           });
 

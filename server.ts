@@ -274,7 +274,7 @@ app.prepare().then(async () => {
           name,
           ChatType: chat.ChatType,
           avatar,
-          users: chat.UsersInChats.map(uic => ({
+          UsersInChats: chat.UsersInChats.map(uic => ({
             id: uic.userId,
             name: uic.User.name,
             avatar: uic.User.avatar,

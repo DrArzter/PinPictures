@@ -6,13 +6,14 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import LoadingIndicator from "../components/common/LoadingIndicator";
 import NoPostsFound from "../components/post/NoPostsFound";
 import * as postUtils from "../utils/postUtils";
+import { FullPost } from "@/app/types/global";
 
 export default function Posts() {
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<FullPost[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState<boolean>(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const minColumnWidth = 300;
   const maxColumns = 4;
@@ -52,6 +53,7 @@ export default function Posts() {
         setPage((prevPage) => prevPage + 1);
       }
     } catch (err) {
+      console.error("Error fetching posts:", err);
       setError("Error fetching posts");
     } finally {
       setLoading(false);
@@ -94,7 +96,7 @@ export default function Posts() {
           endMessage={
             <div className="flex justify-center items-center text-center">
               <p className="text-lg font-semibold text-yellow-400">
-                That's all for now 😊
+                That is all for now 😊
               </p>
             </div>
           }

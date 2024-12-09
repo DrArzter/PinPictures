@@ -4,15 +4,16 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import * as api from "@/app/api";
+import { AdminChat } from "@/app/types/global";
 
 export default function Chats() {
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [selectedChat, setSelectedChat] = useState(null);
-  const [chats, setChats] = useState<Array<any>>([]); //TODO: Сделай ёпта
+  const [selectedChat, setSelectedChat] = useState<AdminChat | null>(null);
+  const [chats, setChats] = useState<Array<AdminChat>>([]);
   const router = useRouter();
 
   // Открытие модального окна
-  const handleUserClick = (chat) => {
+  const handleUserClick = (chat: AdminChat) => {
     setSelectedChat(chat);
   };
 
@@ -52,14 +53,14 @@ export default function Chats() {
             onClick={() => handleUserClick(chat)}
           >
             <h2 className="text-lg font-semibold">
-              {chat.ChatType == "private" ? (
+              {chat.chatType == "private" ? (
                 <div className="flex flex-row gap-1">
                   <span className="text-red-500">
-                    {chat.UsersInChats[0].User.name}
+                    {chat.usersInChats[0].User.name}
                   </span> 
                   - 
                   <span className="text-red-500">
-                    {chat.UsersInChats[1].User.name}
+                    {chat.usersInChats[1].User.name}
                   </span>
                 </div>
               ) : (
@@ -86,14 +87,14 @@ export default function Chats() {
           >
             <div className="flex flex-row justify-between items-center">
               <h2 className="text-xl font-bold mb-4 cursor-pointer">
-              {selectedChat.ChatType == "private" ? (
+              {selectedChat.chatType == "private" ? (
                 <div className="flex flex-row gap-1">
-                  <span className="text-red-500" onClick={() => router.push(`/profile/${selectedChat.UsersInChats[0].User.name}`)}>
-                    {selectedChat.UsersInChats[0].User.name}
+                  <span className="text-red-500" onClick={() => router.push(`/profile/${selectedChat.usersInChats[0].User.name}`)}>
+                    {selectedChat.usersInChats[0].User.name}
                   </span> 
                   - 
-                  <span className="text-red-500" onClick={() => router.push(`/profile/${selectedChat.UsersInChats[1].User.name}`)}>
-                    {selectedChat.UsersInChats[1].User.name}
+                  <span className="text-red-500" onClick={() => router.push(`/profile/${selectedChat.usersInChats[1].User.name}`)}>
+                    {selectedChat.usersInChats[1].User.name}
                   </span>
                 </div>
               ) : (

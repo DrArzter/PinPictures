@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useContext, useEffect, ReactNode } from "react";
 import * as api from "@/app/api";
-import { clientSelfUser, clientSelfUserContextType, Friend } from "@/app/types/global";
+import { ClientSelfUser, ClientSelfUserContextType } from "@/app/types/global";
 
-const UserContext = React.createContext<clientSelfUserContextType | undefined>(
+const UserContext = React.createContext<ClientSelfUserContextType | undefined>(
   undefined
 );
 
@@ -12,7 +12,7 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<clientSelfUser | undefined>(undefined);
+  const [user, setUser] = useState<ClientSelfUser | undefined>(undefined);
   const [userLoading, setUserLoading] = useState<boolean>(true);
 
   const fetchUser = async () => {

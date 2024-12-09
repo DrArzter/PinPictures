@@ -44,36 +44,42 @@ export default function AdminSummary() {
       value: "7800",
       icon: <FaThumbsUp />,
       color: "text-pink-500",
+      link: "/admin/likes",
     },
     messages: {
       title: "Messages",
       value: "11200",
       icon: <FaRegEnvelope />,
       color: "text-red-500",
+      link: "/admin/messages",
     },
     chats: {
       title: "Chats",
       value: "85",
       icon: <MdChatBubbleOutline />,
       color: "text-indigo-500",
+      link: "/admin/chats",
     },
     newUsers: {
       title: "New users",
       value: "WIP",
       icon: <FaUsers />,
       color: "text-blue-500",
+      link: "/admin/users",
     },
     newPosts: {
       title: "New posts",
       value: "WIP",
       icon: <MdPostAdd />,
       color: "text-green-500",
+      link: "/admin/posts",
     },
     newComments: {
       title: "New comments",
       value: "WIP",
       icon: <FaRegComments />,
       color: "text-purple-500",
+      link: "/admin/comments",
     },
   });
 
@@ -126,8 +132,10 @@ export default function AdminSummary() {
         {Object.values(stats).map((stat, index) => (
           <motion.div
             key={index}
-            className={`bg-gray-800 shadow-md rounded-lg p-6 flex items-center space-x-4 hover:bg-gray-700 ${stat.link ? "cursor-pointer" : ""}`}
-            onClick={() => stat.link && router.push(stat.link) as any}
+            className={`bg-gray-800 shadow-md rounded-lg p-6 flex items-center space-x-4 hover:bg-gray-700 ${
+              stat.link ? "cursor-pointer" : ""
+            }`}
+            onClick={() => stat.link && (router.push(stat.link))}
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
           >

@@ -1,4 +1,3 @@
-// pages/api/profile/[name].ts
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { parse } from "cookie";
@@ -8,6 +7,33 @@ import { verifyToken } from "@/utils/jwt";
 interface DecodedToken {
   userId: number;
   exp: number;
+}
+
+interface ProfileWithFriends {
+  id: number;
+  name: string;
+  description: string | null;
+  lastLoginAt: Date;
+  avatar: string;
+  background: string;
+  Post: {
+    id: number;
+    name: string;
+    description: string;
+    createdAt: Date;
+    Likes: { userId: number; }[];
+    _count: { Comments: number; Likes: number; };
+    ImageInPost: { id: number; picpath: string; }[];
+    User: { name: string; avatar: string; };
+  }[];
+  friends: {
+    friend: {
+      id: number;
+      name: string;
+      avatar: string;
+    };
+    status: string;
+  }[];
 }
 
 export default async function handler(
@@ -42,7 +68,7 @@ export default async function handler(
       } else {
         authenticatedUserId = decoded.userId;
       }
-    } catch (error) {
+    } catch {
       authenticatedUserId = null;
     }
   }
@@ -157,12 +183,13 @@ export default async function handler(
 
     const allFriends = [...friendsAsUser1, ...friendsAsUser2];
 
-    const profileWithFriends = {
+    const profileWithFriends: ProfileWithFriends = {
       ...profile,
       friends: allFriends,
-      Friendships_Friendships_user1IdToUser: undefined,
-      Friendships_Friendships_user2IdToUser: undefined,
-    } as any;
+    };
+
+    delete (profileWithFriends as ProfileWithFriends).Friendships_Friendships_user1IdToUser;
+    delete (profileWithFriends as ProfileWithFriends).Friendships_Friendships_user2IdToUser;
 
     return res.status(200).json({
       data: profileWithFriends,

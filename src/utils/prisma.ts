@@ -1,21 +1,21 @@
-// ./src/utils/prisma.ts
 import { PrismaClient } from "@prisma/client";
 
+// Декларируем глобальный объект для TypeScript
 declare global {
-  var prisma: PrismaClient | undefined;
+  let prisma: PrismaClient | undefined;
 }
 
-const globalAny: any = global;
+const globalNode: typeof globalThis & { prisma?: PrismaClient } = globalThis;
 
 let prisma: PrismaClient;
 
 if (process.env.NODE_ENV === "production") {
   prisma = new PrismaClient();
 } else {
-  if (!globalAny.prisma) {
-    globalAny.prisma = new PrismaClient();
+  if (!globalNode.prisma) {
+    globalNode.prisma = new PrismaClient();
   }
-  prisma = globalAny.prisma;
+  prisma = globalNode.prisma;
 }
 
 export { prisma };

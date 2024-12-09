@@ -21,7 +21,7 @@ export default function GroupChatPage() {
     socket.emit("getChat", Number(chatId));
 
     socket.on("chat", (chatData: FullChat) => {
-      if (!chatData.error) {
+      if (chatData) {
         setChat(chatData);
       }
       setIsLoading(false);
@@ -53,7 +53,7 @@ export default function GroupChatPage() {
       user={user!}
       chat={chat}
       isActiveChatLoading={false}
-      socket={socket}
+      socket={socket || undefined}
     />
   );
 }

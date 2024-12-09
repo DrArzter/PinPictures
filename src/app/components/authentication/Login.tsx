@@ -62,7 +62,7 @@ export default function Login({
           Forgot Password?
         </button>
         <button onClick={toggleRegistration} className="mt-2">
-          Don't have an account? Sign up
+          Do not have an account? Sign up
         </button>
       </form>
     </div>

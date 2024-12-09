@@ -1,9 +1,8 @@
-// Получитть всех пользщователей из БД, проврить, что тот кто отправил запрос имеет в бд bananLevel >= 1, вернуть пользователей
-
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { handleError } from "@/utils/errorHandler";
 import { authMiddleware } from "@/middlewares/authMiddleware";
+import { Prisma } from "@prisma/client";
 
 export default async function handler(
   req: NextApiRequest,
@@ -32,28 +31,32 @@ export default async function handler(
 
     const searchTerm = req.query.searchTerm as string;
 
+    const orConditions: Prisma.UserWhereInput[] = [
+      searchTerm && {
+        name: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      },
+      searchTerm && {
+        email: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      },
+      !isNaN(Number(searchTerm)) && {
+        id: Number(searchTerm),
+      },
+    ].filter(Boolean) as Prisma.UserWhereInput[];
+
     const users = await prisma.user.findMany({
       where: {
-        OR: [
-          {
-            name: {
-              contains: searchTerm,
-            },
-          },
-          {
-            email: {
-              contains: searchTerm,
-            },
-          },
-          !isNaN(parseInt(searchTerm, 10)) && {
-            id: parseInt(searchTerm, 10),
-          },
-        ].filter(Boolean) as any[],
+        OR: orConditions,
       },
       include: {
         Comments: true,
       },
-      take: 20,
+      take: 20, // Максимум 20 пользователей
     });
 
     return res

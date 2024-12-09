@@ -1,6 +1,5 @@
 "use client";
-import React, { useState, useContext, useEffect, ReactNode } from "react";
-import * as api from "@/app/api";
+import React, { useContext, ReactNode } from "react";
 
 const StuffContext = React.createContext<Record<string, unknown> | undefined>(
   undefined

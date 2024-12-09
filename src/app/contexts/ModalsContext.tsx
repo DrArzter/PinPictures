@@ -1,4 +1,3 @@
-// ./src/app/contexts/ModalsContext.tsx
 "use client";
 import React, { createContext, useState, ReactNode } from "react";
 
@@ -10,11 +9,13 @@ interface ModalPropsMap {
   CREATE_CHAT: { onClose: () => void };
 }
 
-type ModalProps<T extends ModalType> = T extends keyof ModalPropsMap ? ModalPropsMap[T] : {};
+type ModalProps<T extends ModalType> = T extends keyof ModalPropsMap
+  ? ModalPropsMap[T]
+  : Record<string, unknown>;
 
 interface ModalsContextType {
   modalType: ModalType;
-  modalProps: ModalProps<ModalType>;
+  modalProps: Record<string, unknown>;
   openModal: <T extends ModalType>(type: T, props?: ModalProps<T>) => void;
   closeModal: () => void;
 }
@@ -32,7 +33,7 @@ interface ModalsProviderProps {
 
 export const ModalsProvider: React.FC<ModalsProviderProps> = ({ children }) => {
   const [modalType, setModalType] = useState<ModalType>(null);
-  const [modalProps, setModalProps] = useState<ModalProps<ModalType>>({});
+  const [modalProps, setModalProps] = useState<Record<string, unknown>>({});
 
   const openModal = <T extends ModalType>(type: T, props?: ModalProps<T>) => {
     setModalType(type);
@@ -45,7 +46,9 @@ export const ModalsProvider: React.FC<ModalsProviderProps> = ({ children }) => {
   };
 
   return (
-    <ModalsContext.Provider value={{ modalType, modalProps, openModal, closeModal }}>
+    <ModalsContext.Provider
+      value={{ modalType, modalProps, openModal, closeModal }}
+    >
       {children}
     </ModalsContext.Provider>
   );

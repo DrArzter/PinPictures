@@ -1,9 +1,6 @@
-// src/app/types/global.d.ts
-import { NextApiRequest } from "next";
-
 declare module "next" {
   interface NextApiRequest {
-    user: clientSelfUser | null;
+    user: ClientSelfUser | null;
     notifications: Notification;
   }
 }
@@ -19,7 +16,7 @@ export interface Notification {
   id: string;
   message: string;
   status: "info" | "success" | "warning" | "error";
-  time: number;
+  time?: number;
   clickable: boolean;
   sound?: string;
   soundRequired?: boolean;
@@ -32,6 +29,12 @@ export interface ShortUser {
   avatar: string;
 }
 
+export interface AdminShortUser extends ShortUser {
+  email: string;
+  banned: boolean;
+  bananaLevel: number;
+}
+
 export interface Image {
   id: number;
   picpath: string;
@@ -40,6 +43,12 @@ export interface Image {
 export interface PostCounts {
   Comments: number;
   Likes: number;
+}
+
+export interface Like {
+  id: number;
+  userId: number;
+  postId: number;
 }
 
 export interface Post {
@@ -51,11 +60,11 @@ export interface Post {
   likesCount: number;
   User: ShortUser;
   ImageInPost: Image[];
-  Likes: any;
+  Likes: Like[];
   _count: PostCounts;
 }
 
-export interface friends {
+export interface Friends {
   friend: ShortUser;
   status: "confirmed" | "pending" | "blocked";
 }
@@ -66,7 +75,7 @@ export interface Friend {
   status: "confirmed" | "pending" | "blocked";
 }
 
-export interface clientSelfUser {
+export interface ClientSelfUser {
   id: number;
   name: string;
   description: string | null;
@@ -78,36 +87,70 @@ export interface clientSelfUser {
   lastLoginAt: Date;
   banned: boolean;
   background: string;
-  settings: any;
+  settings: Record<string, unknown>;
   uiBackground: string;
-  Friendships_Friendships_user1IdToUser: any[];
-  Friendships_Friendships_user2IdToUser: any[];
+  friends: Friends[];
+  Friendships_Friendships_user1IdToUser: Array<{
+    status: "confirmed" | "pending" | "blocked";
+    User_Friendships_user2IdToUser: ShortUser;
+  }>;
+  Friendships_Friendships_user2IdToUser: Array<{
+    status: "confirmed" | "pending" | "blocked";
+    User_Friendships_user1IdToUser: ShortUser;
+  }>;
 }
 
-export interface clientSelfUserContextType {
-  user: clientSelfUser | undefined;
-  setUser: (user: clientSelfUser | undefined) => void;
+export interface ClientSelfUserContextType {
+  user: ClientSelfUser | undefined;
+  setUser: (user: ClientSelfUser | undefined) => void;
   fetchUser: () => Promise<void>;
   userLoading: boolean;
   setUserLoading: (loading: boolean) => void;
 }
 
-export interface FullChat {}
+export interface AdminChat {
+  id: number;
+  name: string;
+  createdAt: string;
+  avatar: string;
+  lastMessage: MessageInChat;
+  picpath: string;
+  chatType: string;
+  usersInChats: UserInChat[];
+}
 
-export interface UserInChat {}
+export interface FullChat extends AdminChat {
+  messagesInChat: MessageInChat[];
+}
 
-export interface Message {}
+export interface UserInChat {
+  id: number;
+  userId: number;
+  chatId: number;
+  joinedAt: string;
+  User: ShortUser;
+}
+
+export interface MessageInChat {
+  id: number;
+  chatId: number;
+  message: string;
+  createdAt: string;
+  User: ShortUser;
+  imagesInMessages: Image[];
+}
+
 export interface Socket {
-  on(event: string, callback: (...args: any[]) => void): void;
-  emit(event: string, ...args: any[]): void;
+  on(event: string, callback: (...args: unknown[]) => void): void;
+  emit(event: string, ...args: unknown[]): void;
   off(event: string): void;
 }
 
-interface FullPost extends Post {
-  Comments: Comment[];
+export interface FullPost extends Post {
+  comments: Comment[];
 }
 
-interface NewPost {
+export interface NewPost {
   name: string;
   description: string;
   images: string[];

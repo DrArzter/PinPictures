@@ -1,11 +1,9 @@
-// ./src/app/components/Notifications.tsx
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { Notification } from "@/app/types/global";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRef } from "react";
 import {
   FaTimes,
   FaCheckCircle,
@@ -17,7 +15,7 @@ import {
 export default function NotificationComponent() {
   const { notifications, removeNotification } = useNotificationContext();
   const router = useRouter();
-  const audioRef = useRef(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null); // ✅ Исправлено
 
   const playSound = (notification: Notification) => {
     const link = notification?.sound;
@@ -25,9 +23,9 @@ export default function NotificationComponent() {
     if (audioRef.current && notification.soundRequired) {
       notification.soundRequired = false;
       if (link) {
-        audioRef.current.src = link; //TODO ROMA FIX
+        audioRef.current.src = link; // ✅ У audio есть свойство src
       }
-      audioRef.current.play();
+      audioRef.current.play(); // ✅ У audio есть метод play
     }
   };
 
@@ -35,19 +33,19 @@ export default function NotificationComponent() {
     notifications.forEach((notification) => {
       playSound(notification);
     });
+
     const timers = notifications.map((notification) =>
       setTimeout(
         () => {
-          removeNotification(notification.id);
+          removeNotification(notification.id); // ✅ Уведомление имеет id
         },
-        notification.time ? notification.time : 3000
+        notification.time ? notification.time : 3000 // ✅ У уведомления есть time
       )
     );
 
     return () => timers.forEach(clearTimeout);
   }, [notifications, removeNotification]);
 
-  // Функция для получения класса уведомления в зависимости от статуса и кликабельности
   const getNotificationClassName = (
     status: Notification["status"],
     clickable: boolean
@@ -64,7 +62,6 @@ export default function NotificationComponent() {
         : "bg-yellow-500 dark:bg-yellow-500"
     } text-white flex items-center relative`;
 
-  // Функция для получения иконки уведомления в зависимости от статуса
   const getNotificationIcon = (status: Notification["status"]) => {
     switch (status) {
       case "success":
@@ -96,7 +93,7 @@ export default function NotificationComponent() {
       <AnimatePresence>
         {notifications.slice(0, 6).map((notification) => (
           <motion.div
-            key={notification.id} // Уникальный ключ
+            key={notification.id}
             initial="hidden"
             animate="visible"
             exit="exit"
@@ -109,42 +106,31 @@ export default function NotificationComponent() {
               preload="auto"
             />
             <div
-              className={`${getNotificationClassName(
+              className={getNotificationClassName(
                 notification.status,
                 notification.clickable
-              )}`}
+              )}
               onClick={
                 notification.clickable && notification.link_to
                   ? () => {
                       if (notification.link_to) {
-                        router.push(notification?.link_to);
+                        router.push(notification.link_to);
                         removeNotification(notification.id);
                       }
                     }
-                  : undefined
-              }
+                  : undefined}
               role="alert"
               tabIndex={0}
-              onKeyDown={(e) => {
-                if (
-                  notification.clickable &&
-                  notification.link_to &&
-                  (e.key === "Enter" || e.key === " ")
-                ) {
-                  router.push(notification.link_to);
-                  removeNotification(notification.id);
-                }
-              }}
             >
               {getNotificationIcon(notification.status)}
               <span className="flex-1">{notification.message}</span>
               <button
-                className="ml-4 text-white focus:outline-none absolute top-2 right-2"
+                className="ml-4 text-white absolute top-2 right-2"
                 onClick={(e) => {
                   e.stopPropagation();
                   removeNotification(notification.id);
                 }}
-                aria-label="Закрыть уведомление"
+                aria-label="Close notification"
               >
                 <FaTimes className="w-5 h-5" />
               </button>

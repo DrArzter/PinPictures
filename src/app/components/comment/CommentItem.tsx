@@ -1,8 +1,9 @@
 // CommentItem.tsx
 import React from "react";
+import { Comment } from "@/app/types/global";
 
 interface CommentItemProps {
-  comment: any;
+  comment: Comment;
 }
 
 export default function CommentItem({ comment }: CommentItemProps) {

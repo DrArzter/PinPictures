@@ -5,7 +5,7 @@ import React, { createContext, useState, ReactNode } from "react";
 type MenuType = "DROPDOWN_MENU" | "RIGHT_HAND_MENU" | null;
 
 interface MenuProps {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface MenuContextType {

@@ -1,16 +1,20 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-// Универсальная функция для выполнения middleware
-export function runMiddleware(
+// Определяем тип для middleware функции
+type Middleware = (req: NextApiRequest, res: NextApiResponse, next: (err?: Error | null) => void) => void;
+
+// Универсальная функция для выполнения массива middleware
+export async function runMiddleware(
   req: NextApiRequest,
   res: NextApiResponse,
-  middlewares: Function[]
-) {
-  if (middlewares.length === 0) {
-    return Promise.resolve();
+  middlewares: Middleware[]
+): Promise<void> {
+  for (const middleware of middlewares) {
+    await new Promise<void>((resolve, reject) => {
+      middleware(req, res, (err?: Error | null) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
   }
-  return middlewares.reduce(
-    (next, middleware) => () => middleware(req, res, next),
-    () => Promise.resolve()
-  )();
 }

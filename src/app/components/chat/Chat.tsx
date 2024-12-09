@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { User, FullChat, Message } from "@/app/types/global";
+import { clientSelfUser, FullChat, MessageInChat } from "@/app/types/global";
 import LoadingIndicator from "../common/LoadingIndicator";
 import { Socket } from "socket.io-client";
 import { FaRegFileImage } from "react-icons/fa6";
@@ -11,7 +11,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import Image from "next/image";
 
 interface ChatProps {
-  user: User;
+  user: clientSelfUser;
   chat: FullChat | undefined;
   isActiveChatLoading: boolean;
   socket: Socket | undefined;
@@ -29,14 +29,14 @@ export default function Chat({
 }: ChatProps) {
   const [newMessage, setNewMessage] = useState<string>("");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageInChat[]>([]);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const scrollableDivRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (currentChat && currentChat.MessagesInChats) {
-      const initialMessages = [...currentChat.MessagesInChats];
+    if (currentChat && currentChat.messagesInChat) {
+      const initialMessages = [...currentChat.messagesInChat];
       setMessages(initialMessages);
 
       // Если сообщений меньше чем MESSAGES_PER_PAGE, значит грузить нечего
@@ -53,14 +53,14 @@ export default function Chat({
 
     socket.emit("joinChat", currentChat.id);
 
-    socket.on("newMessage", (newMsg: Message) => {
+    socket.on("newMessage", (newMsg: MessageInChat) => {
       if (newMsg.chatId === currentChat.id) {
         setMessages((prev) => [...prev, newMsg]);
         scrollToBottom();
       }
     });
 
-    socket.on("chatMessages", (fetchedMessages: Message[]) => {
+    socket.on("chatMessages", (fetchedMessages: MessageInChat[]) => {
       if (fetchedMessages.length === 0) {
         setHasMore(false);
       } else {
@@ -195,9 +195,9 @@ export default function Chat({
   let chatName = currentChat.name;
   let chatAvatar = currentChat.picpath;
 
-  if (currentChat.ChatType === "private") {
+  if (currentChat.chatType === "private") {
     // Найдем собеседника
-    const otherParticipant = currentChat.UsersInChats.find(uic => uic.userId !== user.id);
+    const otherParticipant = currentChat.usersInChats.find(uic => uic.userId !== user.id);
     if (otherParticipant && otherParticipant.User) {
       chatName = otherParticipant.User.name;
       chatAvatar = otherParticipant.User.avatar;
@@ -271,9 +271,9 @@ export default function Chat({
                     }`}
                   >
                     <p>{message.message}</p>
-                    {message.ImagesInMessages &&
-                      message.ImagesInMessages.length > 0 &&
-                      message.ImagesInMessages.map((image, imgIndex) => (
+                    {message.imagesInMessages &&
+                      message.imagesInMessages.length > 0 &&
+                      message.imagesInMessages.map((image, imgIndex) => (
                         <div key={imgIndex} className="h-40 w-40 mt-2">
                           <Image
                             key={imgIndex}

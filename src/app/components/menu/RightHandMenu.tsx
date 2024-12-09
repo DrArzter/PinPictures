@@ -1,18 +1,14 @@
-// ./src/app/components/menus/RightHandMenu.tsx
 "use client";
 
 import React, { useEffect, useRef, useContext, useState } from "react";
 import IconList from "../common/IconList";
-
 import { useRouter } from "next/navigation";
-
 import { FaBell } from "react-icons/fa";
 import { CiSquarePlus } from "react-icons/ci";
 import { AiOutlineMessage } from "react-icons/ai";
 import { RiLoginBoxFill } from "react-icons/ri";
 import { SlMagnifier } from "react-icons/sl";
 import { BsFillFileEarmarkPostFill } from "react-icons/bs";
-
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useUserContext } from "@/app/contexts/UserContext";
 import { LogoIcon } from "../../resources/LogoIcon";
@@ -42,7 +38,6 @@ export default function RightHandMenu({ closeMenu }: RightHandMenuProps) {
 
   useEffect(() => {
     setIsVisible(true);
-
     document.addEventListener("mousedown", handleClickOutside);
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -82,9 +77,7 @@ export default function RightHandMenu({ closeMenu }: RightHandMenuProps) {
       icon: (
         <BsFillFileEarmarkPostFill
           title="Posts"
-          onClick={() => {
-            router.push("/posts");
-          }}
+          onClick={() => router.push("/posts")}
         />
       ),
     },
@@ -106,13 +99,7 @@ export default function RightHandMenu({ closeMenu }: RightHandMenuProps) {
     },
     {
       name: "Message",
-      icon: (
-        <AiOutlineMessage
-          onClick={() => {
-            router.push("/chats");
-          }}
-        />
-      ),
+      icon: <AiOutlineMessage onClick={() => router.push("/chats")} />,
     },
     !user && {
       name: "Authentication",
@@ -125,15 +112,16 @@ export default function RightHandMenu({ closeMenu }: RightHandMenuProps) {
     },
     {
       name: "Search",
-      icon: <SlMagnifier title="Search"
-      onClick={() => router.push("/search")} />,
+      icon: (
+        <SlMagnifier title="Search" onClick={() => router.push("/search")} />
+      ),
     },
   ].filter((icon): icon is { name: string; icon: JSX.Element } =>
     Boolean(icon)
   );
 
   const sidebarClassName = `fixed z-[999] top-0 pt-4 right-0 h-full dark:bg-darkModeSecondaryBackground bg-lightModeSecondaryBackground shadow-lg transform transition-transform duration-300 ease-in-out ${
-    isVisible ? "translate-x-0" : "translate-x-full"
+    isVisible ? "translate-x-0" : "translate-x-[100%]"
   }`;
 
   return (

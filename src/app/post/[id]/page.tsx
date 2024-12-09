@@ -23,11 +23,12 @@ import LikeButton from "@/app/components/post/LikeButton";
 import CommentSection from "@/app/components/post/CommentSection";
 
 export default function PostPage() {
-  const { addNotification } = useNotificationContext() as any;
+  const { addNotification } = useNotificationContext();
+
   const { user } = useUserContext();
   const params = useParams();
   const postId = useMemo(
-    () => (params.id ? parseInt(params.id, 10) : null),
+    () => (params.id ? parseInt(params.id as string, 10) : null),
     [params.id]
   );
 
@@ -56,42 +57,45 @@ export default function PostPage() {
         if (fetchedPost) {
           setPost({
             ...fetchedPost,
-            Comments: fetchedPost.Comments || [],
+            comments: fetchedPost.comments || [],
           });
           setLikeCount(fetchedPost._count?.Likes ?? fetchedPost.Likes.length);
-          setComments(fetchedPost.Comments || []);
+          setComments(fetchedPost.comments || []);
           if (
             user &&
-            fetchedPost.Likes.some((like) => like.userId === user.id)
+            fetchedPost.Likes.some(
+              (like: { userId: number }) => like.userId === user.id
+            )
           ) {
             setIsLiked(true);
           }
         }
-      } catch (error) {
-        console.error("Error fetching post:", error);
+      } catch {
         addNotification({
-          type: "error",
+          status: "error",
           message: "Could not fetch post.",
+          time: 5000,
+          clickable: false,
         });
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchPostData();
   }, [postId, user, addNotification]);
-  
 
   const handleLikeClick = useCallback(
-    async (e: React.MouseEvent) => {
-      e.stopPropagation();
+    async (e?: React.MouseEvent) => {
+      if (e) e.stopPropagation();
 
       if (!user) {
         addNotification({
           status: "error",
-          message: "Необходимо войти в систему, чтобы ставить лайки.",
+          message: "You have to be logged in to like posts.",
           clickable: true,
           link_to: "/authentication",
+          time: 5000,
         });
         return;
       }
@@ -115,12 +119,14 @@ export default function PostPage() {
         if (response.status !== "success") {
           throw new Error(response.message || "Failed to update like.");
         }
-      } catch (error) {
+      } catch {
         setIsLiked(previousLikedState);
         setLikeCount(previousLikeCount);
         addNotification({
           status: "error",
           message: "Could not update like.",
+          time: 5000,
+          clickable: false
         });
       } finally {
         setTormoz(false);
@@ -133,6 +139,7 @@ export default function PostPage() {
     if (post && post.ImageInPost.length > 0) {
       openModal("FULL_SCREEN_IMAGE", {
         imageUrl: post.ImageInPost[currentImage].picpath,
+        onClose: () => {},
       });
     }
   }, [post, currentImage, openModal]);
@@ -175,6 +182,8 @@ export default function PostPage() {
         addNotification({
           status: "error",
           message: "Please enter a comment first.",
+          time: 5000,
+          clickable: false
         });
         return;
       }
@@ -184,7 +193,7 @@ export default function PostPage() {
       const tempId = Date.now();
 
       try {
-        const addedComment: Comment = {
+        const addedComment = {
           id: tempId,
           User: {
             name: user.name,
@@ -192,7 +201,7 @@ export default function PostPage() {
           },
           comment: commentText.trim(),
           createdAt: new Date().toISOString(),
-        };
+        } as Comment;
 
         setComments((prev) => [...prev, addedComment]);
 
@@ -202,6 +211,8 @@ export default function PostPage() {
           addNotification({
             status: "success",
             message: response.message,
+            time: 5000,
+            clickable: false
           });
 
           setComments((prev) =>
@@ -214,14 +225,13 @@ export default function PostPage() {
         } else {
           throw new Error(response.message || "Unknown error");
         }
-      } catch (error) {
-        console.error("Error adding comment:", error);
-
+      } catch {
         setComments((prev) => prev.filter((comment) => comment.id !== tempId));
 
         addNotification({
           status: "error",
           message: "Failed to add comment.",
+          clickable: false
         });
       }
     },

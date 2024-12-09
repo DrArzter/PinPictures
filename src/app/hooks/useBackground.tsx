@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { User } from "@/app/types/global";
+import { clientSelfUser } from "@/app/types/global";
 
-export function useBackground(user: User | null, userLoading: boolean) {
+export function useBackground(user: clientSelfUser | null, userLoading: boolean) {
   const [loading, setLoading] = useState<boolean>(true);
   const [bgImage, setBgImage] = useState<string>("");
 

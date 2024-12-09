@@ -5,31 +5,23 @@ import React, { useEffect, useRef, useState } from "react";
 import { FaGear } from "react-icons/fa6";
 import { CiBookmarkPlus } from "react-icons/ci";
 import { RiLogoutBoxFill } from "react-icons/ri";
-
 import { useRouter } from "next/navigation";
-
 import Image from "next/image";
-
 import { useUserContext } from "@/app/contexts/UserContext";
 import * as api from "@/app/api";
-import { clientSelfUser } from "@/app/types/global";
+import { ClientSelfUser } from "@/app/types/global";
 
 interface DropdownMenuProps {
   closeMenu: () => void;
 }
 
-{
-  /* TODO: Add gay sex */
-}
-
 export default function DropdownMenu({ closeMenu }: DropdownMenuProps) {
   const { user, setUser } = useUserContext() as {
-    user: clientSelfUser | null;
-    setUser: React.Dispatch<React.SetStateAction<clientSelfUser | null>>;
+    user: ClientSelfUser | null;
+    setUser: React.Dispatch<React.SetStateAction<ClientSelfUser | null>>;
   };
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
-
   const router = useRouter();
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -101,7 +93,7 @@ export default function DropdownMenu({ closeMenu }: DropdownMenuProps) {
       <div className={menuItemsClassName}>
         <div
           className="flex items-center gap-2 w-full justify-center cursor-pointer"
-          onClick={(e) => router.push("settings")}
+          onClick={() => router.push("settings")}
         >
           <FaGear className={iconClassName} />
           <span>Settings</span>

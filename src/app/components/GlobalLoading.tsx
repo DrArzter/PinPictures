@@ -5,9 +5,8 @@ import { useLoadingContext } from "../contexts/LoadingContext";
 import { useUserContext } from "../contexts/UserContext";
 import LoadingIndicator from "./common/LoadingIndicator";
 import Artoria from "../resources/Artoria";
-import { clientSelfUser } from "../types/global";
+import { ClientSelfUser } from "../types/global";
 import { LuBanana } from "react-icons/lu";
-import { motion } from "framer-motion";
 
 export default function GlobalLoading({
   children,
@@ -20,7 +19,7 @@ export default function GlobalLoading({
 
   const { isLoading } = useLoadingContext();
   const { user, userLoading } = useUserContext() as {
-    user: clientSelfUser | null;
+    user: ClientSelfUser | null;
     userLoading: boolean;
   };
 

@@ -1,10 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
 import { SlMagnifier } from "react-icons/sl";
 
-export default function SearchBar({searchTerm, setSearchTerm}: any) {
+interface SearchBarProps {
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+}
 
+export default function SearchBar({
+  searchTerm,
+  setSearchTerm,
+}: SearchBarProps) {
   const handleSearch = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     searchTerm: string

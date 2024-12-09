@@ -2,23 +2,18 @@
 "use client";
 
 import React, { useContext } from "react";
-import { RxAvatar } from "react-icons/rx";
-import { AiOutlineMenu } from "react-icons/ai";
 import { RiLoginBoxLine } from "react-icons/ri";
-
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 import { useUserContext } from "@/app/contexts/UserContext";
 import MenuContext from "@/app/contexts/MenuContext";
-import { useNotificationContext } from "@/app/contexts/NotificationContext";
 
 export default function UserCard() {
   const { user } = useUserContext();
   const router = useRouter();
   const { menuType, openMenu, closeMenu } = useContext(MenuContext);
-  const { addNotification } = useNotificationContext();
 
   const toggleDropdown = () => {
     if (!user) {
@@ -56,7 +51,7 @@ export default function UserCard() {
             </p>
           </>
         ) : (
-          <RiLoginBoxLine 
+          <RiLoginBoxLine
             title="Profile"
             onClick={(e) => {
               e.preventDefault();

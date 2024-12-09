@@ -1,4 +1,3 @@
-// ./src/app/contexts/NotificationContext.tsx
 "use client";
 import React, { useState, useContext, ReactNode, useCallback } from "react";
 import { Notification } from "@/app/types/global";

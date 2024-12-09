@@ -1,8 +1,9 @@
 import React from "react";
 import CommentItem from "./CommentItem";
+import { Comment } from "@/app/types/global";
 
 interface CommentListProps {
-  comments: any[];
+  comments: Comment[];
 }
 
 export default function CommentList({ comments }: CommentListProps) {

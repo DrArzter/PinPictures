@@ -7,13 +7,12 @@ import { useUserContext } from "@/app/contexts/UserContext";
 import LoadingIndicator from "@/app/components/common/LoadingIndicator";
 import Chat from "@/app/components/chat/Chat";
 import { FullChat } from "@/app/types/global";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 
 export default function PrivateChatPage() {
   const { socket } = useSocketContext();
   const { user } = useUserContext();
   const { userId } = useParams() as { userId: string };
-  const router = useRouter();
   const [chat, setChat] = useState<FullChat | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -31,15 +30,14 @@ export default function PrivateChatPage() {
     socket.emit("getOrCreatePrivateChat", otherUserId);
 
     socket.on("chat", (chatData: FullChat) => {
-      if (chatData && !chatData.error) {
+      if (chatData) {
         setChat(chatData);
         socket.emit("getUserChats");
       }
       setIsLoading(false);
     });
-
     socket.on("newChat", (newChatData: FullChat) => {
-      if (newChatData.UsersInChats.some(uic => uic.userId === user.id)) {
+      if (newChatData.usersInChats.some((user: { id: number }) => user.id === user.id)) {
         setChat(newChatData);
       }
     });
@@ -71,8 +69,8 @@ export default function PrivateChatPage() {
       user={user!}
       chat={chat}
       isActiveChatLoading={false}
-      socket={socket}
-      otherUserId={Number(userId)} // для создания чата при первом сообщении
+      socket={socket || undefined}
+      otherUserId={Number(userId)}
     />
   );
 }

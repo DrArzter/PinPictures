@@ -20,8 +20,8 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
 }) => {
   const hasMultipleImages = images.length > 1;
 
-  const [_, setIsImageLoaded] = useState<boolean>(false);
-  const [__, setIsImageError] = useState<boolean>(false);
+  const [, setIsImageLoaded] = useState<boolean>(false);
+  const [, setIsImageError] = useState<boolean>(false);
 
   return (
     <div className="w-full h-full relative flex items-center justify-center overflow-hidden rounded-lg">

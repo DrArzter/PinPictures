@@ -1,7 +1,7 @@
 import { NextApiResponse } from "next";
 import { z } from "zod";
 
-export const handleError = (res: NextApiResponse, error: any) => {
+export const handleError = (res: NextApiResponse, error: unknown) => {
   console.error(error);
 
   let errorMessage = "An unknown error occurred.";
@@ -9,7 +9,7 @@ export const handleError = (res: NextApiResponse, error: any) => {
   if (error instanceof z.ZodError) {
     const issue = error.issues[0];
     errorMessage = issue.message;
-  } else if (error.message) {
+  } else if (error instanceof Error && error.message) {
     errorMessage = error.message;
   }
 

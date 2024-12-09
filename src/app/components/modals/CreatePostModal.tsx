@@ -279,4 +279,6 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
   );
 });
 
+CreatePostModal.displayName = "CreatePostModal";
+
 export default CreatePostModal;

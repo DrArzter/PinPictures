@@ -5,23 +5,23 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import * as api from "@/app/api";
 import {
-  FaUserShield,
   FaBan,
   FaCrown,
   FaUserNinja,
   FaTimes,
 } from "react-icons/fa";
 import { useRef } from "react";
+import { AdminShortUser } from "@/app/types/global";
 
 export default function Users() {
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState<AdminShortUser | null>(null);
+  const [users, setUsers] = useState<AdminShortUser[]>([]);
   const router = useRouter();
-  const audioRef = useRef(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   // Открытие модального окна
-  const handleUserClick = (user) => {
+  const handleUserClick = (user: AdminShortUser) => {
     setSelectedUser(user);
   };
 
@@ -38,22 +38,23 @@ export default function Users() {
     }
   }, [searchTerm]);
 
-
   const playSound = () => {
     if (audioRef.current) {
       audioRef.current.play();
     }
   };
-  
+
   const toggleBan = () => {
+    if (!selectedUser) return;
+
     playSound();
     api.banUser(selectedUser.id).then((data) => {
       setSelectedUser(data.data);
-    })
+    });
   };
 
-  const changebananaLevel = (level) => {
-    setSelectedUser((prev) => ({ ...prev, bananaLevel: level }));
+  const changebananaLevel = (level: number) => {
+    setSelectedUser((prev) => (prev ? { ...prev, bananaLevel: level } : null));
   };
 
   return (
@@ -135,7 +136,11 @@ export default function Users() {
               {selectedUser.banned ? <FaBan /> : <FaCrown />}
               {selectedUser.banned ? "Unban" : "Ban"}
             </motion.button>
-            <audio ref={audioRef} src="https://storage.yandexcloud.net/pinpictures/sounds/banned.mp3" preload="auto" />
+            <audio
+              ref={audioRef}
+              src="https://storage.yandexcloud.net/pinpictures/sounds/banned.mp3"
+              preload="auto"
+            />
 
             {/* Admin Level Selector */}
             <div className="flex flex-col items-center mt-6 space-y-4">

@@ -1,5 +1,5 @@
 import * as api from "@/app/api";
-import { NewPost, Post as PostType } from "@/app/types/global";
+import { NewPost, FullPost as PostType } from "@/app/types/global";
 
 export const fetchPosts = async (page: number): Promise<PostType[]> => {
   try {
