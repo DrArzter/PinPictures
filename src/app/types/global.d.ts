@@ -177,9 +177,17 @@ export interface Comment {
 }
 
 import { Server } from "socket.io";
+import { Socket } from 'net';
+import { Server as NetServer } from 'http';
 
 declare global {
   var io: Server;
+}
+
+declare module 'next/dist/server/api' {
+  interface Socket extends NodeJS.Socket {
+    server: NetServer;
+  }
 }
 
 export {};

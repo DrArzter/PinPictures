@@ -40,7 +40,10 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const { addNotification } = useNotificationContext(); // Достаем функцию addNotification
 
   useEffect(() => {
-    const socketIo = io("/");
+    const socketIo = io("/", {
+      path: "/api/socket",
+      withCredentials: true,
+    });
 
     socketIo.on("connect", () => {
       console.log("Successfully connected to server Socket.IO");
