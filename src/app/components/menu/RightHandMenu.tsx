@@ -3,13 +3,11 @@
 import React, { useEffect, useRef, useContext, useState } from "react";
 import IconList from "../common/IconList";
 import { useRouter } from "next/navigation";
-import { FaBell } from "react-icons/fa";
 import { CiSquarePlus } from "react-icons/ci";
 import { AiOutlineMessage } from "react-icons/ai";
 import { RiLoginBoxFill } from "react-icons/ri";
 import { SlMagnifier } from "react-icons/sl";
 import { BsFillFileEarmarkPostFill } from "react-icons/bs";
-import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useUserContext } from "@/app/contexts/UserContext";
 import { LogoIcon } from "../../resources/LogoIcon";
 import ModalsContext from "@/app/contexts/ModalsContext";
@@ -20,7 +18,6 @@ interface RightHandMenuProps {
 
 export default function RightHandMenu({ closeMenu }: RightHandMenuProps) {
   const { user } = useUserContext();
-  const { addNotification } = useNotificationContext();
   const router = useRouter();
   const { openModal } = useContext(ModalsContext);
   const sideBarRef = useRef<HTMLDivElement>(null);
@@ -58,18 +55,6 @@ export default function RightHandMenu({ closeMenu }: RightHandMenuProps) {
     }, 300);
   };
 
-  const handleNotificationClick = () => {
-    addNotification({
-      message: `WIP`,
-      status: "info",
-      time: 5000,
-      clickable: true,
-      link_to: "/authentication",
-      soundRequired: true,
-      sound: "https://meowpad.pw/cdn/meowpad/sounds/2363e8c0-trenbolon.mp3",
-    });
-  };
-
   const orientation = "col";
   const iconList = [
     {
@@ -80,10 +65,6 @@ export default function RightHandMenu({ closeMenu }: RightHandMenuProps) {
           onClick={() => router.push("/posts")}
         />
       ),
-    },
-    {
-      name: "Bell",
-      icon: <FaBell title="Notifications" onClick={handleNotificationClick} />,
     },
     user && {
       name: "Add",

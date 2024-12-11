@@ -11,10 +11,10 @@ export { default as createPost } from "./createPost";
 export { default as likePost } from "./likePost";
 export { default as uploadComment } from "./uploadComment";
 
-export { default as search } from "./search";
 export { default as addFriend } from "./addFriend";
 
 export { default as getSummary } from "./getSummary";
 export { default as getAUsers } from "./getAUsers";
 export { default as getAUserChats } from "./getAUserChats";
 export { default as banUser } from "./banUser";
+export { default as deleteAPost } from "./deleteAPost";

@@ -8,6 +8,7 @@ import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { createPost } from "@/app/api";
 import { motion } from "framer-motion";
 import { AxiosResponse } from "axios";
+import Image from "next/image";
 import { ApiResponse } from "@/app/types/global";
 
 interface CreatePostModalProps {
@@ -18,7 +19,9 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [images, setImages] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<(string | ArrayBuffer | null)[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<
+    (string | ArrayBuffer | null)[]
+  >([]);
   const { addNotification } = useNotificationContext();
   const [loading, setLoading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -37,21 +40,15 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
         addNotification({
           status: "error",
           message: "An error occurred",
-          time: 5000,
-          clickable: false,
         });
       } finally {
         setLoading(false);
         if (response) {
-          // response.data.data должен быть строкой (id нового поста)
           console.log(response.data.data);
-          // Поскольку status в ApiResponse<string> это "success" | "error", он совместим с типом Notification.status
           addNotification({
             status: response.data.status,
             message: response.data.message,
             link_to: `/post/${response.data.data}`,
-            time: 5000,
-            clickable: true,
           });
           if (response.data.status === "success") {
             setName("");
@@ -73,8 +70,6 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
         addNotification({
           status: "error",
           message: "You can upload a maximum of 10 images",
-          time: 2000,
-          clickable: false,
         });
         return;
       }
@@ -85,8 +80,6 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
           addNotification({
             status: "error",
             message: "Only JPEG and PNG images are allowed",
-            time: 2000,
-            clickable: false,
           });
           return false;
         }
@@ -110,7 +103,9 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
     (index: number, e: React.MouseEvent) => {
       e.stopPropagation();
       setImages((prevImages) => prevImages.filter((_, i) => i !== index));
-      setImagePreviews((prevPreviews) => prevPreviews.filter((_, i) => i !== index));
+      setImagePreviews((prevPreviews) =>
+        prevPreviews.filter((_, i) => i !== index)
+      );
     },
     []
   );
@@ -130,8 +125,6 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
         addNotification({
           status: "error",
           message: "You can upload a maximum of 10 images",
-          time: 2000,
-          clickable: false,
         });
         return;
       }
@@ -149,11 +142,12 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
     [images, addNotification]
   );
 
-  const isSubmitDisabled = !name || !description || images.length === 0 || loading;
+  const isSubmitDisabled =
+    !name || !description || images.length === 0 || loading;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-lightModeBackground dark:bg-darkModeBackground rounded-3xl p-6 relative w-11/12 max-w-3xl overflow-y-auto scrollbar-hidden">
+    <div className="fixed inset-[-10vh] md:inset-0 bg-[#333333] md:bg-black/50 flex items-center justify-center p-[10vh] md:p-0">
+      <div className="bg-lightModeBackground dark:bg-darkModeBackground md:rounded-3xl p-6 relative w-full h-full md:h-auto md:w-11/12 md:max-w-xl overflow-y-auto scrollbar-hidden">
         <button
           onClick={onClose}
           className="absolute z-[999] top-4 right-4 text-darkModeText dark:text-darkModeSecondaryText hover:text-darkModeSecondaryText"
@@ -161,18 +155,11 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
         >
           <MdClose size={34} />
         </button>
-        <motion.h1
-          className="text-4xl font-extrabold text-center mb-8 light:lightModeText dark:darkModeText drop-shadow-lg"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          Create Post
-        </motion.h1>
+
         <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
           <div>
             <label className="block text-lg font-medium mb-2 light:lightModeText dark:darkModeText">
-              Post title
+              Title
             </label>
             <motion.input
               type="text"
@@ -186,31 +173,39 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
           </div>
           <div>
             <label className="block text-lg font-medium mb-2 light:lightModeText dark:darkModeText">
-              Post description
+              Description
             </label>
             <motion.textarea
               placeholder="Enter post description..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full p-4 border border-lightModeBorder dark:border-darkModeBorder rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-300"
+              className="w-full p-4 border border-lightModeBorder dark:border-darkModeBorder rounded-xl md:resize-none focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-300"
               whileFocus={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             />
           </div>
           <div>
             <div
-              className="w-full p-6 border-4 border-dashed border-lightModeBorder dark:border-darkModeBorder rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-lightModeSecondaryBackground dark:hover:bg-darkModeSecondaryBackground transition duration-300"
+              className="w-full h-[50vh] min-h-[200px] md:h-[300px] border-2 border-dashed border-lightModeBorder dark:border-darkModeBorder rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-lightModeSecondaryBackground dark:hover:bg-darkModeSecondaryBackground transition duration-300"
               onClick={handleFileInputClick}
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
             >
-              <AiOutlineCloudUpload className="text-lightModeText dark:text-darkModeText text-6xl mb-4" />
-              <p className="text-lightModeText dark:text-darkModeText">
-                Drag and drop images here or click to select files
-              </p>
-              <p className="text-sm text-lightModeSecondaryText dark:text-darkModeSecondaryText mt-2">
-                ({images.length}/10)
-              </p>
+              {imagePreviews.length === 0 && (
+                <div className="flex flex-col items-center justify-center p-4">
+                  <AiOutlineCloudUpload className="text-lightModeText dark:text-darkModeText text-6xl" />
+                  <p className="text-lightModeText dark:text-darkModeText text-center">
+                    Drag and drop images here or click to select files
+                  </p>
+                </div>
+              )}
+
+              {images.length < 10 && (
+                <p className="text-sm text-lightModeSecondaryText dark:text-darkModeSecondaryText mt-2">
+                  ({images.length}/10)
+                </p>
+              )}
+
               <input
                 ref={fileInputRef}
                 type="file"
@@ -220,7 +215,7 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
                 onChange={handleImageChange}
               />
               {imagePreviews.length > 0 && (
-                <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 overflow-y-auto scrollbar-hidden">
                   {imagePreviews.map((preview, index) => (
                     <motion.div
                       key={index}
@@ -230,8 +225,12 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <img
+                      <Image
                         src={preview as string}
+                        width={0}
+                        height={0}
+                        sizes="100vw"
+                        quality={100}
                         alt={`Preview ${index}`}
                         className="w-32 h-32 object-cover rounded-xl transform group-hover:scale-105 transition duration-300"
                       />

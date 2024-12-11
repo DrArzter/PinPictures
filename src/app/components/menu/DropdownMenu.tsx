@@ -57,7 +57,7 @@ export default function DropdownMenu({ closeMenu }: DropdownMenuProps) {
     }, 300);
   };
 
-  const dropdownClassName = `absolute top-24 right-4 z-[999] md:right-72 w-56 rounded-md shadow-lg transform transition-all duration-300 ease-in-out 
+  const dropdownClassName = `absolute top-24 left-4 md:left-auto md:right-32 lg:right-40 xl:right-52 3xl:right-62 4xl:right-64 5xl:right-72 z-[999]  w-56 rounded-md shadow-lg transform transition-all duration-300 ease-in-out 
         ${isVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"} 
         dark:bg-darkModeBackground bg-lightModeBackground`;
 
@@ -68,7 +68,12 @@ export default function DropdownMenu({ closeMenu }: DropdownMenuProps) {
 
   const handleLogout = () => {
     handleClose();
-    api.logout(setUser);
+    api.logout().then((response) => {
+      if (response.data.status === "success") {
+        setUser(null);
+        router.push("/");
+      }
+    });
   };
 
   return (

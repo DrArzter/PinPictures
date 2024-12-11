@@ -4,12 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import * as api from "@/app/api";
-import {
-  FaBan,
-  FaCrown,
-  FaUserNinja,
-  FaTimes,
-} from "react-icons/fa";
+import { FaBan, FaCrown, FaUserNinja, FaTimes } from "react-icons/fa";
 import { useRef } from "react";
 import { AdminShortUser } from "@/app/types/global";
 
@@ -33,7 +28,7 @@ export default function Users() {
   useEffect(() => {
     if (searchTerm.length >= 1) {
       api.getAUsers(searchTerm).then((data) => {
-        setUsers(data.data);
+        setUsers(data.data.data);
       });
     }
   }, [searchTerm]);
@@ -49,7 +44,7 @@ export default function Users() {
 
     playSound();
     api.banUser(selectedUser.id).then((data) => {
-      setSelectedUser(data.data);
+      setSelectedUser(data.data.data);
     });
   };
 

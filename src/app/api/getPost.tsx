@@ -1,11 +1,11 @@
-import api from "./axiosApi";
+// src/app/api/getPost.ts
 
-export default async function getPost(id: number) {
-  try {
-    const response = await api.get(`/post/id/${id}`);
-    return response.data.post;
-  } catch (error: unknown) {
-    console.error("Error fetching posts:", error);
-    throw error;
-  }
+import api from "./axiosApi";
+import { AxiosResponse } from "axios";
+import { ApiResponse, FullPost } from "@/app/types/global";
+
+export default function getPost(
+  id: number
+): Promise<AxiosResponse<ApiResponse<FullPost>>> {
+  return api.get<ApiResponse<FullPost>>(`/post/id/${id}`);
 }

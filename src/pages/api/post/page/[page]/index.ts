@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { handleError } from "@/utils/errorHandler";
+import { authMiddleware } from "@/middlewares/authMiddleware";
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,18 +13,32 @@ export default async function handler(
       .json({ status: "error", message: "Unsupported method" });
   }
 
+  await authMiddleware(req, res);
+  const authenticatedUser = req.user;
+
   const { page } = req.query;
   const pageNumber = parseInt(page as string, 10) || 1;
   const limit = 20;
   const offset = (pageNumber - 1) * limit;
 
   try {
+    const likedPostIds = authenticatedUser 
+      ? await prisma.likes.findMany({
+          where: { userId: authenticatedUser.id },
+          select: { postId: true }
+        }).then((likes: { postId: number }[]) => likes.map((like: { postId: number }) => like.postId))
+      : [];
+
     const posts = await prisma.post.findMany({
       skip: offset,
       take: limit,
       where: { User: { banned: false } },
       orderBy: { createdAt: "desc" },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        createdAt: true,
         User: {
           select: {
             id: true,
@@ -37,13 +52,6 @@ export default async function handler(
             picpath: true,
           },
         },
-
-        //TODO: Вместо возврата всех пользователей, вернуть только нашего, если он авторизован
-        Likes: {
-          select: {
-            userId: true,
-          },
-        },
         _count: {
           select: {
             Comments: true,
@@ -52,18 +60,14 @@ export default async function handler(
         },
       },
     });
-    
 
-    const totalPosts = await prisma.post.count();
+    const formattedPosts = posts.map(post => ({
+      ...post,
+      isLiked: authenticatedUser ? likedPostIds.includes(post.id) : false,
+    }));
 
     return res.status(200).json({
-      posts,
-      meta: {
-        page: pageNumber,
-        limit,
-        totalPosts,
-        totalPages: Math.ceil(totalPosts / limit),
-      },
+      data: formattedPosts,
       status: "success",
       message: "Posts retrieved successfully",
     });

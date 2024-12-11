@@ -18,13 +18,13 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const fetchUser = async () => {
     try {
       setUserLoading(true);
-      const response = await api.getUser();
-      if (response) {
-        console.log("Fetched user:", response);
-        setUser(response);
-      } else {
-        console.warn("No response from API.");
-      }
+      api.getUser().then((response) => {
+        if (response.data.data) {
+          setUser(response.data.data);
+        } else {
+          setUser(undefined);
+        }
+      });
     } catch (error) {
       console.error("Error fetching user:", error);
     } finally {

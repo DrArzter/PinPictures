@@ -1,11 +1,11 @@
 import api from "./axiosApi";
+import { AxiosResponse } from "axios";
+import { ApiResponse, Friend } from "@/app/types/global";
 
-export default async function getFriends(name: string) {
-    try {
-        const response = await api.get(`/friends/${name}`);
-        return response.data.friends;
-    } catch (error) {
-        console.error("Error fetching posts:", error);
-        throw error;
-    }
+export default function getFriends(
+  name: string
+): Promise<AxiosResponse<ApiResponse<Friend[]>>> {
+  return api.get<ApiResponse<Friend[]>>(
+    `/friends/${encodeURIComponent(name)}`
+  );
 }

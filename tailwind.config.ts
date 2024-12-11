@@ -2,6 +2,7 @@
 module.exports = {
   darkMode: "class", // Укажите "class" для поддержки темного режима с помощью next-themes
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
+  future: { hoverOnlyWhenSupported: true },
   theme: {
     extend: {
       fontSize: {

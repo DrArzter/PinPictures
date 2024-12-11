@@ -1,16 +1,11 @@
 import api from "./axiosApi";
+import { AxiosResponse } from "axios";
+import { ApiResponse, SummaryData } from "@/app/types/global";
 
-export default async function getAllUsers() {
-  try {
-    const response = await api.get(
-      `/admin/summary`,
-      {
-        withCredentials: true,
-      }
-    );
-    return response?.data;
-  } catch (error) {
-    console.error('Error fetching chats:', error);
-    return null;
-  }
+export default function getAllUsers(): Promise<
+  AxiosResponse<ApiResponse<SummaryData>>
+> {
+  return api.get<ApiResponse<SummaryData>>(`/admin/summary`, {
+    withCredentials: true,
+  });
 }

@@ -1,11 +1,9 @@
-import api from "./axiosApi";
+// src/app/api/getPosts.ts
 
-export default async function getPosts(page: number) {
-  try {
-    const response = await api.get(`/post/page/${page}`);
-    return response.data.posts;
-  } catch (error) {
-    console.error("Error fetching posts:", error);
-    throw error;
-  }
+import api from "./axiosApi";
+import { AxiosResponse } from "axios";
+import { ApiResponse, Post as PostType } from "@/app/types/global";
+
+export default function getPosts(page: number): Promise<AxiosResponse<ApiResponse<PostType[]>>> {
+  return api.get<ApiResponse<PostType[]>>(`/post/page/${page}`);
 }

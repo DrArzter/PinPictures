@@ -1,19 +1,13 @@
 import api from "./axiosApi";
+import { AxiosResponse } from "axios";
+import { ApiResponse, Like } from "@/app/types/global";
 
-export default async function likePost(id: number) {
-  try {
-    const response = await api.post(
-      `/like/${id}`,
-      {
-        id: id,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error during login:", error);
-    throw error;
-  }
+export default function likePost(
+  id: number
+): Promise<AxiosResponse<ApiResponse<Like>>> {
+  return api.post<ApiResponse<Like>>(
+    `/like/${id}`,
+    { id },
+    { withCredentials: true }
+  );
 }

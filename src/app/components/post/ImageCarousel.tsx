@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 
@@ -20,21 +20,16 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
 }) => {
   const hasMultipleImages = images.length > 1;
 
-  const [, setIsImageLoaded] = useState<boolean>(false);
-  const [, setIsImageError] = useState<boolean>(false);
-
   return (
     <div className="w-full h-full relative flex items-center justify-center overflow-hidden rounded-lg">
       <div className="w-full h-full flex items-center justify-center">
         <Image
           src={images[currentIndex].picpath}
-          alt="Post Image"
+          alt={`Image ${currentIndex}`}
           width={0}
           height={0}
           sizes="100vw"
           className="cursor-pointer w-full h-full object-cover"
-          onLoad={() => setIsImageLoaded(true)}
-          onError={() => setIsImageError(true)}
           onClick={onImageClick}
         />
       </div>

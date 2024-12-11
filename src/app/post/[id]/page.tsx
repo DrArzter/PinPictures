@@ -13,7 +13,12 @@ import { fetchPost } from "@/app/utils/postUtils";
 import { BsChatDots } from "react-icons/bs";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import * as api from "@/app/api";
-import { FullPost as PostType, Comment } from "@/app/types/global";
+import {
+  FullPost as PostType,
+  Comment,
+  ClientSelfUser,
+  ApiResponse,
+} from "@/app/types/global";
 import { useUserContext } from "@/app/contexts/UserContext";
 import ModalsContext from "@/app/contexts/ModalsContext";
 
@@ -21,11 +26,13 @@ import AuthorInfo from "@/app/components/post/AuthorInfo";
 import ImageCarousel from "@/app/components/post/ImageCarousel";
 import LikeButton from "@/app/components/post/LikeButton";
 import CommentSection from "@/app/components/post/CommentSection";
+import { ImBin2 } from "react-icons/im";
+import { AxiosResponse } from "axios";
 
 export default function PostPage() {
   const { addNotification } = useNotificationContext();
 
-  const { user } = useUserContext();
+  const { user } = useUserContext() as { user: ClientSelfUser };
   const params = useParams();
   const postId = useMemo(
     () => (params.id ? parseInt(params.id as string, 10) : null),
@@ -46,6 +53,27 @@ export default function PostPage() {
 
   const { openModal } = useContext(ModalsContext);
 
+  function handleDeletePost() {
+    if (!post) return;
+
+    api
+      .deleteAPost(post.id)
+      .then((response: AxiosResponse<ApiResponse<void>>) => {
+        if (response.data.status === "success") {
+          addNotification({
+            status: "success",
+            message: "Post deleted successfully.",
+          });
+        }
+      })
+      .catch(() => {
+        addNotification({
+          status: "error",
+          message: "Failed to delete post.",
+        });
+      });
+  }
+
   useEffect(() => {
     const fetchPostData = async () => {
       if (!postId) {
@@ -55,12 +83,9 @@ export default function PostPage() {
       try {
         const fetchedPost = await fetchPost(postId);
         if (fetchedPost) {
-          setPost({
-            ...fetchedPost,
-            comments: fetchedPost.comments || [],
-          });
+          setPost(fetchedPost);
           setLikeCount(fetchedPost._count?.Likes ?? fetchedPost.Likes.length);
-          setComments(fetchedPost.comments || []);
+          setComments(fetchedPost.Comments);
           if (
             user &&
             fetchedPost.Likes.some(
@@ -74,8 +99,6 @@ export default function PostPage() {
         addNotification({
           status: "error",
           message: "Could not fetch post.",
-          time: 5000,
-          clickable: false,
         });
       } finally {
         setLoading(false);
@@ -93,9 +116,7 @@ export default function PostPage() {
         addNotification({
           status: "error",
           message: "You have to be logged in to like posts.",
-          clickable: true,
           link_to: "/authentication",
-          time: 5000,
         });
         return;
       }
@@ -116,8 +137,8 @@ export default function PostPage() {
 
       try {
         const response = await api.likePost(post.id);
-        if (response.status !== "success") {
-          throw new Error(response.message || "Failed to update like.");
+        if (response.data.status !== "success") {
+          throw new Error(response.data.message || "Failed to update like.");
         }
       } catch {
         setIsLiked(previousLikedState);
@@ -125,8 +146,6 @@ export default function PostPage() {
         addNotification({
           status: "error",
           message: "Could not update like.",
-          time: 5000,
-          clickable: false
         });
       } finally {
         setTormoz(false);
@@ -159,20 +178,20 @@ export default function PostPage() {
     (e: React.MouseEvent) => {
       e.stopPropagation();
       if (!post) return;
-      setCurrentImage((prev) =>
-        prev === post.ImageInPost.length - 1 ? 0 : prev + 1
-      );
+      setCurrentImage((prev) => {
+        const nextIndex = (prev + 1) % post.ImageInPost.length;
+        return nextIndex;
+      });
     },
     [post]
   );
 
   const handleAddComment = useCallback(
-    async (commentText: string) => {
+    (commentText: string) => {
       if (!user) {
         addNotification({
           status: "error",
           message: "Please log in to add a comment.",
-          clickable: true,
           link_to: "/authentication",
         });
         return;
@@ -182,8 +201,6 @@ export default function PostPage() {
         addNotification({
           status: "error",
           message: "Please enter a comment first.",
-          time: 5000,
-          clickable: false
         });
         return;
       }
@@ -192,48 +209,48 @@ export default function PostPage() {
 
       const tempId = Date.now();
 
-      try {
-        const addedComment = {
-          id: tempId,
-          User: {
-            name: user.name,
-            avatar: user.avatar,
-          },
-          comment: commentText.trim(),
-          createdAt: new Date().toISOString(),
-        } as Comment;
+      const addedComment: Comment = {
+        id: tempId,
+        userId: user.id,
+        postId: post.id,
+        comment: commentText.trim(),
+        picpath: null,
+        createdAt: new Date().toISOString(),
+        User: {
+          id: user.id,
+          name: user.name,
+          avatar: user.avatar,
+        },
+      };
 
-        setComments((prev) => [...prev, addedComment]);
+      setComments((prev) => [...prev, addedComment]);
 
-        const response = await api.uploadComment(post.id, commentText.trim());
+      api
+        .uploadComment(post.id, commentText.trim())
+        .then((response) => {
+          if (response.data.status === "success") {
+            addNotification({
+              status: "success",
+              message: response.data.message,
+            });
 
-        if (response.status === "success") {
-          addNotification({
-            status: "success",
-            message: response.message,
-            time: 5000,
-            clickable: false
-          });
-
+            setComments((prev) =>
+              (prev as Comment[]).filter((comment) => comment.id !== undefined)
+            );
+          } else {
+            throw new Error(response.data.message || "Unknown error");
+          }
+        })
+        .catch(() => {
           setComments((prev) =>
-            prev.map((comment) =>
-              comment.id === tempId
-                ? { ...comment, id: response.data.commentId }
-                : comment
-            )
+            prev.filter((comment) => comment.id !== tempId)
           );
-        } else {
-          throw new Error(response.message || "Unknown error");
-        }
-      } catch {
-        setComments((prev) => prev.filter((comment) => comment.id !== tempId));
 
-        addNotification({
-          status: "error",
-          message: "Failed to add comment.",
-          clickable: false
+          addNotification({
+            status: "error",
+            message: "Failed to add comment.",
+          });
         });
-      }
     },
     [user, post, addNotification]
   );
@@ -261,7 +278,7 @@ export default function PostPage() {
         {/* Вкладки */}
         <div className="flex justify-around w-full border-b">
           <button
-            className={`py-2 px-4 ${
+            className={`px-4 ${
               activeTab === "image"
                 ? "border-b-2 border-yellow-500 text-yellow-500"
                 : ""
@@ -271,7 +288,7 @@ export default function PostPage() {
             Image
           </button>
           <button
-            className={`py-2 px-4 ${
+            className={`px-4 ${
               activeTab === "details"
                 ? "border-b-2 border-yellow-500 text-yellow-500"
                 : ""
@@ -281,7 +298,7 @@ export default function PostPage() {
             Details
           </button>
           <button
-            className={`py-2 px-4 ${
+            className={`px-4 ${
               activeTab === "comments"
                 ? "border-b-2 border-yellow-500 text-yellow-500"
                 : ""
@@ -306,7 +323,7 @@ export default function PostPage() {
             </div>
           )}
           {activeTab === "details" && (
-            <div className="p-6">
+            <div className="">
               <AuthorInfo user={post.User} createdAt={post.createdAt} />
               {/* Заголовок и описание */}
               <div className="mt-4">
@@ -336,7 +353,7 @@ export default function PostPage() {
             </div>
           )}
           {activeTab === "comments" && (
-            <div className="p-6 h-full flex flex-col">
+            <div className="h-full flex flex-col">
               <CommentSection
                 comments={comments}
                 onAddComment={handleAddComment}
@@ -366,9 +383,19 @@ export default function PostPage() {
 
           {/* Заголовок и описание */}
           <div className="mt-4">
-            <h1 className="font-bold text-3xl mb-4 text-yellow-500">
-              {post.name}
-            </h1>
+            <div className="flex flex-row items-center justify-between">
+              <h1 className="font-bold text-3xl mb-4 text-yellow-500">
+                {post.name}
+              </h1>
+
+              {user?.bananaLevel > 0 && (
+                <ImBin2
+                  size={20}
+                  onClick={handleDeletePost}
+                  className="cursor-pointer"
+                />
+              )}
+            </div>
             <p className="text-gray-700 dark:text-gray-300">
               {post.description}
             </p>

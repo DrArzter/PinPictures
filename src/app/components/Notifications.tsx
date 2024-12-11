@@ -15,7 +15,7 @@ import {
 export default function NotificationComponent() {
   const { notifications, removeNotification } = useNotificationContext();
   const router = useRouter();
-  const audioRef = useRef<HTMLAudioElement | null>(null); // ✅ Исправлено
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const playSound = (notification: Notification) => {
     const link = notification?.sound;
@@ -23,9 +23,9 @@ export default function NotificationComponent() {
     if (audioRef.current && notification.soundRequired) {
       notification.soundRequired = false;
       if (link) {
-        audioRef.current.src = link; // ✅ У audio есть свойство src
+        audioRef.current.src = link;
       }
-      audioRef.current.play(); // ✅ У audio есть метод play
+      audioRef.current.play();
     }
   };
 
@@ -37,9 +37,9 @@ export default function NotificationComponent() {
     const timers = notifications.map((notification) =>
       setTimeout(
         () => {
-          removeNotification(notification.id); // ✅ Уведомление имеет id
+          removeNotification(notification.id);
         },
-        notification.time ? notification.time : 3000 // ✅ У уведомления есть time
+        notification.time ? notification.time : 3000
       )
     );
 
@@ -48,11 +48,9 @@ export default function NotificationComponent() {
 
   const getNotificationClassName = (
     status: Notification["status"],
-    clickable: boolean
+    hasLink: boolean
   ) =>
-    `notification p-4 rounded-lg shadow-md ${
-      clickable ? "cursor-pointer" : ""
-    } ${
+    `notification p-4 rounded-lg shadow-md ${hasLink ? "cursor-pointer" : ""} ${
       status === "success"
         ? "bg-green-500 dark:bg-green-500"
         : status === "error"
@@ -108,17 +106,16 @@ export default function NotificationComponent() {
             <div
               className={getNotificationClassName(
                 notification.status,
-                notification.clickable
+                Boolean(notification.link_to) // Check if link_to exists to apply cursor-pointer
               )}
               onClick={
-                notification.clickable && notification.link_to
+                notification.link_to
                   ? () => {
-                      if (notification.link_to) {
-                        router.push(notification.link_to);
-                        removeNotification(notification.id);
-                      }
+                      router.push(notification.link_to ?? "#");
+                      removeNotification(notification.id);
                     }
-                  : undefined}
+                  : undefined
+              }
               role="alert"
               tabIndex={0}
             >

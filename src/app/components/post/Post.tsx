@@ -21,11 +21,7 @@ export default function Post({ post }: PostProps) {
   const router = useRouter();
 
   useEffect(() => {
-    if (
-      user &&
-      post.Likes &&
-      post.Likes.some((like) => like.userId === user.id)
-    ) {
+    if (post.isLiked === true) {
       setIsLiked(true);
     }
   }, [post.Likes, user]);
@@ -46,25 +42,22 @@ export default function Post({ post }: PostProps) {
       addNotification({
         status: "error",
         message: "You must be logged in to like posts.",
-        time: 5000,
-        clickable: true,
       });
       return;
     }
 
     try {
-      const response = await api.likePost(post.id);
-      if (response.status === "success") {
-        const newLikeState = !isLiked;
-        setIsLiked(newLikeState);
-        setLikeCount((prevCount) => prevCount + (newLikeState ? 1 : -1));
-      }
+      api.likePost(post.id).then((response) => {
+        if (response.data.status === "success") {
+          const newLikeState = !isLiked;
+          setIsLiked(newLikeState);
+          setLikeCount((prevCount) => prevCount + (newLikeState ? 1 : -1));
+        }
+      });
     } catch {
       addNotification({
         status: "error",
         message: "Failed to update like.",
-        time: 5000,
-        clickable: false,
       });
     }
   };
@@ -98,15 +91,17 @@ export default function Post({ post }: PostProps) {
               />
             )}
 
-            <Image
-              src={post.ImageInPost[0].picpath}
-              alt={post.name}
-              title={post.name}
-              width={0}
-              height={0}
-              sizes="100vw"
-              className="cursor-pointer w-full h-full object-cover"
-            />
+            {post.ImageInPost[0] && (
+              <Image
+                src={post.ImageInPost[0]?.picpath}
+                alt={post.name}
+                title={post.name}
+                width={0}
+                height={0}
+                sizes="100vw"
+                className="cursor-pointer w-full h-full object-cover"
+              />
+            )}
 
             <div className="absolute top-0 left-0 right-0 flex justify-between items-center p-4 bg-gradient-to-b from-black/70 to-transparent">
               <p className="text-lg font-semibold text-white">{post.name}</p>

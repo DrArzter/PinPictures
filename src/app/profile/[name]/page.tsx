@@ -11,7 +11,7 @@ import LoadingIndicator from "@/app/components/common/LoadingIndicator";
 import * as api from "@/app/api";
 import PostList from "@/app/components/post/PostList";
 
-import { Post as PostType} from "@/app/types/global";
+import { Post as PostType, ProfileData} from "@/app/types/global";
 
 import { motion } from "framer-motion";
 import {
@@ -21,31 +21,6 @@ import {
 } from "react-icons/ai";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
 
-interface Friend {
-  friend: {
-    id: number;
-    name: string;
-    avatar?: string;
-  };
-  status: string;
-}
-
-interface Post {
-  id: string;
-  title: string;
-  content: string;
-}
-
-interface ProfileData {
-  id: number;
-  name: string;
-  background?: string;
-  avatar?: string;
-  description?: string;
-  friends?: Friend[];
-  Post?: Post[];
-}
-
 export default function Profile() {
   const params = useParams();
   const addNotification = useNotificationContext().addNotification;
@@ -54,7 +29,7 @@ export default function Profile() {
     [params.name]
   );
   const { user } = useUserContext();
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [profile, setProfile] = useState<ProfileData>();
   const isMyProfile = useMemo(
     () => profileName === user?.name,
     [profileName, user]
@@ -104,8 +79,9 @@ export default function Profile() {
 
       try {
         setLoading(true);
-        const response = await api.getProfile(profileName);
-        setProfile(response);
+        api.getProfile(profileName).then((response) => {
+          setProfile(response.data.data);
+        })
       } catch (error) {
         console.error("Error fetching profile:", error);
       } finally {
@@ -136,8 +112,12 @@ export default function Profile() {
 
   const handleAddFriendClick = async () => {
     try {
-      await api.addFriend(profile.id, profile.name);
-      console.log("Friend request sent!");
+      api.addFriend(profile.id, profile.name).then(() => {
+        addNotification({
+          message: "Friend request sent",
+          status: "success",
+        });
+      })
     } catch (error) {
       console.error("Error sending friend request:", error);
     }
@@ -147,10 +127,6 @@ export default function Profile() {
     addNotification({
       message: "This feature is not implemented yet",
       status: "info",
-      soundRequired: true,
-      clickable: false,
-      sound: "https://storage.yandexcloud.net/pinpictures/sounds/nuhuh.mp3",
-      time: 6000,
     });
   };
 

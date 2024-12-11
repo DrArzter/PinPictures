@@ -25,7 +25,7 @@ export default function Chats() {
   useEffect(() => {
     if (searchTerm.length >= 1) {
       api.getAUserChats(searchTerm).then((data) => {
-        setChats(data.data);
+        setChats(data.data.data);
       });
     }
   }, [searchTerm]);

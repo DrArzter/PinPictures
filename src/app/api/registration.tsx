@@ -1,26 +1,15 @@
 import api from "./axiosApi";
+import { AxiosResponse } from "axios";
+import { ApiResponse, Registration } from "@/app/types/global";
 
-export default async function registration(
+export default function registration(
   username: string,
   email: string,
   password: string
-) {
-  try {
-    const response = await api.post(
-      `/user/registration`,
-      {
-        name: username,
-        email: email,
-        password: password,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error during registration:", error);
-    alert("Error during registration. Please try again.");
-    throw error;
-  }
+): Promise<AxiosResponse<ApiResponse<Registration>>> {
+  return api.post<ApiResponse<Registration>>(
+    `/user/registration`,
+    { name: username, email, password },
+    { withCredentials: true }
+  );
 }

@@ -6,12 +6,12 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import LoadingIndicator from "../components/common/LoadingIndicator";
 import NoPostsFound from "../components/post/NoPostsFound";
 import * as postUtils from "../utils/postUtils";
-import { FullPost } from "@/app/types/global";
+import { Post } from "@/app/types/global";
 
 export default function Posts() {
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
-  const [posts, setPosts] = useState<FullPost[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 

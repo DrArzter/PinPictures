@@ -1,9 +1,12 @@
 import api from "./axiosApi";
+import { AxiosResponse } from "axios";
+import { ApiResponse, AdminShortUser } from "@/app/types/global";
 
-export default async function getAUsers(searchTerm: string) {
-    const response = await api.get(`/admin/users/${searchTerm}`,
-         {
-        withCredentials: true
-    });
-    return response.data;
-};
+export default function getAUsers(
+  searchTerm: string
+): Promise<AxiosResponse<ApiResponse<AdminShortUser[]>>> {
+  return api.get<ApiResponse<AdminShortUser[]>>(
+    `/admin/users/${encodeURIComponent(searchTerm)}`,
+    { withCredentials: true }
+  );
+}

@@ -19,10 +19,19 @@ const FullScreenImage: React.FC<FullScreenImageProps> = ({
       }
     };
 
+    const handlePopState = () => {
+      onClose();
+    };
+
     document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("popstate", handlePopState);
+
+    // Добавляем в историю новый элемент, чтобы отловить действие "назад"
+    window.history.pushState(null, "", window.location.href);
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("popstate", handlePopState);
     };
   }, [onClose]);
 

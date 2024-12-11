@@ -3,7 +3,10 @@
 import { prisma } from "../src/utils/prisma";
 import { Chats_ChatType } from "@prisma/client";
 
-export async function getOrCreatePrivateChat(currentUserId: number, otherUserId: number) {
+export async function getOrCreatePrivateChat(
+  currentUserId: number,
+  otherUserId: number
+) {
   if (currentUserId === otherUserId) {
     return null;
   }
@@ -33,29 +36,50 @@ export async function getOrCreatePrivateChat(currentUserId: number, otherUserId:
     return existingChat;
   }
 
-  // Заглушка
+  // Получаем информацию о пользователях currentUser и otherUser
+  const currentUser = await prisma.user.findUnique({
+    where: { id: currentUserId },
+    select: { id: true, name: true, avatar: true },
+  });
+
+  const otherUser = await prisma.user.findUnique({
+    where: { id: otherUserId },
+    select: { id: true, name: true, avatar: true },
+  });
+
+  if (!otherUser) {
+    throw new Error(`User with id ${otherUserId} not found`);
+  }
+
   return {
     id: -1,
     ChatType: "private" as Chats_ChatType,
-    name: "",
-    picpath: "",
+    name: otherUser.name,
+    picpath: otherUser.avatar,
     UsersInChats: [
       {
         userId: currentUserId,
-        User: await prisma.user.findUnique({ where: { id: currentUserId } }),
+        User: currentUser,
       },
       {
         userId: otherUserId,
-        User: await prisma.user.findUnique({ where: { id: otherUserId } }),
+        User: otherUser,
       },
     ],
     MessagesInChats: [],
   };
 }
 
-export async function createPrivateChat(currentUserId: number, otherUserId: number) {
-  const otherUser = await prisma.user.findUnique({ where: { id: otherUserId } });
-  const currentUser = await prisma.user.findUnique({ where: { id: currentUserId } });
+export async function createPrivateChat(
+  currentUserId: number,
+  otherUserId: number
+) {
+  const otherUser = await prisma.user.findUnique({
+    where: { id: otherUserId },
+  });
+  const currentUser = await prisma.user.findUnique({
+    where: { id: currentUserId },
+  });
   if (!otherUser || !currentUser) throw new Error("User not found");
 
   const chat = await prisma.chats.create({
@@ -63,10 +87,7 @@ export async function createPrivateChat(currentUserId: number, otherUserId: numb
       ChatType: "private",
       name: "Private Chat",
       UsersInChats: {
-        create: [
-          { userId: currentUserId },
-          { userId: otherUserId },
-        ],
+        create: [{ userId: currentUserId }, { userId: otherUserId }],
       },
     },
     include: {
@@ -86,7 +107,12 @@ async function someUploadFunction(base64img: string) {
   return { picpath: "uploads/messages/test.jpg", bucketkey: "someKey" };
 }
 
-export async function addMessageToChat(chatId: number, userId: number, message: string, imagesBase64: string[] = []) {
+export async function addMessageToChat(
+  chatId: number,
+  userId: number,
+  message: string,
+  imagesBase64: string[] = []
+) {
   const newMessage = await prisma.messagesInChats.create({
     data: {
       userId,
@@ -120,7 +146,11 @@ export async function addMessageToChat(chatId: number, userId: number, message: 
   return updatedChat;
 }
 
-export async function getPaginatedMessages(chatId: number, page: number, limit: number) {
+export async function getPaginatedMessages(
+  chatId: number,
+  page: number,
+  limit: number
+) {
   const messages = await prisma.messagesInChats.findMany({
     where: { chatId },
     orderBy: { createdAt: "desc" },

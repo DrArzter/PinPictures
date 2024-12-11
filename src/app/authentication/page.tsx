@@ -25,56 +25,78 @@ export default function Authentication({}) {
 
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setUserLoading(true);
 
-    try {
-      let response;
-
-      if (isRegistration) {
-        response = await api.registration(username, email, password);
-        if (response && response.status === "success") {
-          const userData = await api.getUser();
-          setIsRegistration(false);
-          setUser(userData);
-          router.push("/posts");
-        }
-        setUserLoading(false);
-      } else if (isForgotPassword) {
-        response = await api.forgotPassword(email);
-        if (response && response.status === "success") {
-          setIsForgotPassword(false);
-        }
-      } else {
-        setUserLoading(true);
-        response = await api.login(username, password);
-        if (response && response.status === "success") {
-          const userData = await api.getUser();
-          setUser(userData);
-          router.push("/posts");
-        }
-        setUserLoading(false);
-      }
-
-      if (response && response.status === "success") {
-        const socketIo = io("http://localhost:3000");
-        setSocket(socketIo);
-
-        addNotification({
-          status: response.status,
-          message: response.message,
-          time: 5000,
-          clickable: false,
-        });
-      }
-    } catch (error) {
-      console.error("Error during authentication:", error);
-      addNotification({
-        status: "error",
-        message: "An error occurred during authentication.",
-        time: 5000,
-        clickable: false,
-      });
+    if (isRegistration) {
+      api
+        .registration(username, email, password)
+        .then((response) => {
+          if (response?.data?.status === "success") {
+            setIsRegistration(false);
+            return api.getUser();
+          }
+        })
+        .then((response) => {
+          if (response?.data?.status === "success") {
+            setUser(response.data.data);
+            const socketIo = io("/", {
+              path: "/api/socket",
+              withCredentials: true,
+            });
+            setSocket(socketIo);
+            router.push("/posts");
+          }
+        })
+        .catch(() => {
+          addNotification({
+            status: "error",
+            message: "An error occurred during authentication.",
+          });
+        })
+        .finally(() => setUserLoading(false));
+    } else if (isForgotPassword) {
+      api
+        .forgotPassword(email)
+        .then((response) => {
+          if (response?.data?.status === "success") {
+            setIsForgotPassword(false);
+          }
+        })
+        .catch(() => {
+          addNotification({
+            status: "error",
+            message: "An error occurred during authentication.",
+          });
+        })
+        .finally(() => setUserLoading(false));
+    } else {
+      api
+        .login(username, password)
+        .then((response) => {
+          if (response?.data?.status === "success") {
+            return api.getUser();
+          }
+        })
+        .then((response) => {
+          if (response?.data?.status === "success") {
+            setUser(response.data.data);
+            const socketIo = io("/", {
+              path: "/api/socket",
+              withCredentials: true,
+            });
+            setSocket(socketIo);
+            router.push("/posts");
+          }
+        })
+        .catch(() => {
+          addNotification({
+            status: "error",
+            message: "An error occurred during authentication.",
+          });
+        })
+        .finally(() => setUserLoading(false));
     }
   };
 
@@ -93,7 +115,7 @@ export default function Authentication({}) {
   };
 
   const containerClassName =
-    "mx-auto flex flex-col items-center justify-center h-[90vh]";
+    "mx-auto flex flex-col items-center justify-center h-[85vh] md:h-[90vh]";
   return (
     <div className={containerClassName}>
       {isRegistration ? (

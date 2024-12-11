@@ -13,7 +13,7 @@ const Header: React.FC = () => {
         <div className="hidden md:flex items-center gap-6">
           <Logo />
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 ml-4">
           <UserCard />
           <ChangeTheme />
         </div>

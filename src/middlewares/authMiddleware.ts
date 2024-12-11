@@ -25,7 +25,7 @@ export async function authMiddleware(
 
     if (!token) {
       res.status(401).json({ status: "error", message: "No token provided" });
-      return reject(new Error("No token provided"));
+      return reject();
     }
 
     try {
@@ -33,7 +33,7 @@ export async function authMiddleware(
 
       if (Date.now() >= decoded.exp * 1000) {
         res.status(401).json({ status: "error", message: "Token expired" });
-        return reject(new Error("Token expired"));
+        return reject();
       }
 
       const userId = decoded.userId;
@@ -43,8 +43,8 @@ export async function authMiddleware(
       });
 
       if (!user) {
-        res.status(404).json({ status: "error", message: "User not found" });
-        return reject(new Error("User not found"));
+        res.status(200).json({ status: "error", message: "User not found" });
+        return reject();
       }
 
       const { ...userWithoutSensitiveInfo } = user;

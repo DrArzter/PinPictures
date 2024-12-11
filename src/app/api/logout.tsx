@@ -1,19 +1,11 @@
 import api from "./axiosApi";
-import { ClientSelfUser } from "@/app/types/global"; // Предполагается, что интерфейс User определен здесь
-import { Dispatch, SetStateAction } from "react";
+import { AxiosResponse } from "axios";
+import { ApiResponse } from "@/app/types/global";
 
-export default async function logout(setUser: Dispatch<SetStateAction<ClientSelfUser | null>>) {
-  try {
-    const response = await api.post(
-      "/user/logout",
-      {},
-      {
-        withCredentials: true,
-      }
-    );
-    setUser(null);
-    return response.data;
-  } catch (error) {
-    console.error("Error during logout:", error);
-  }
+export default function logout(): Promise<AxiosResponse<ApiResponse<void>>> {
+  return api.post<ApiResponse<void>>(
+    "/user/logout",
+    {},
+    { withCredentials: true }
+  );
 }

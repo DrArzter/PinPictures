@@ -1,22 +1,14 @@
 import api from "./axiosApi";
+import { AxiosResponse } from "axios";
+import { ApiResponse } from "@/app/types/global";
 
-export default async function uploadComment(
-    id: number,
-    comment: string
-) {
-    try {
-        const response = await api.post(
-            `/comment/${id}`,
-            {
-                comment: comment,
-            },
-            {
-                withCredentials: true,
-            }
-        );
-        return response.data;
-    } catch (error) {
-        console.error("Error uploading comment:", error);
-        throw error;
-    }
+export default function uploadComment(
+  id: number, 
+  comment: string
+): Promise<AxiosResponse<ApiResponse<Comment>>> {
+  return api.post<ApiResponse<Comment>>(
+    `/comment/${id}`,
+    { comment },
+    { withCredentials: true }
+  );
 }

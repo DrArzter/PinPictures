@@ -8,7 +8,7 @@ interface CommentListProps {
 
 export default function CommentList({ comments }: CommentListProps) {
   return (
-    <div className="flex-grow overflow-y-auto border-t mt-4 pt-4">
+    <div className="flex-grow overflow-y-auto md:border-t md:mt-4 pt-4">
       {comments.length > 0 ? (
         comments.map((comment) => (
           <CommentItem key={String(comment.id)} comment={comment} />

@@ -1,21 +1,14 @@
 import api from "./axiosApi";
+import { AxiosResponse } from "axios";
+import { ApiResponse, Login } from "@/app/types/global";
 
-export default async function login(username: string, password: string) {
-  try {
-    const response = await api.post(
-      `/user/login`,
-      {
-        email: username,
-        password: password,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error during login:", error);
-    alert("Error during login. Please try again.");
-    throw error;
-  }
+export default function login(
+  username: string,
+  password: string
+): Promise<AxiosResponse<ApiResponse<Login>>> {
+  return api.post<ApiResponse<Login>>(
+    `/user/login`,
+    { email: username, password },
+    { withCredentials: true }
+  );
 }

@@ -10,7 +10,6 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    // Проверка поддерживаемых методов
     if (!["GET", "DELETE"].includes(req.method || "")) {
       return res
         .status(405)
@@ -118,7 +117,7 @@ export default async function handler(
     return res.status(200).json({
       status: "success",
       message: "Post retrieved successfully",
-      post,
+      data: post,
     });
   } catch (error) {
     console.error("Error handling post:", error);

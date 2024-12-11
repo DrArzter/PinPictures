@@ -86,21 +86,33 @@ export default function AdminSummary() {
   useEffect(() => {
     api
       .getSummary()
+      .then((response) => response.data.data)
       .then((data) => {
-        data = data.data;
         setStats((prevStats) => ({
           ...prevStats,
-          users: { ...prevStats.users, value: data.usersCount },
-          posts: { ...prevStats.posts, value: data.postsCount },
-          comments: { ...prevStats.comments, value: data.commentsCount },
-          likes: { ...prevStats.likes, value: data.likesCount },
-          messages: { ...prevStats.messages, value: data.messagesCount },
-          chats: { ...prevStats.chats, value: data.chatsCount },
-          newUsers: { ...prevStats.newUsers, value: data.newUsersCount },
-          newPosts: { ...prevStats.newPosts, value: data.newPostsCount },
+          users: { ...prevStats.users, value: data.usersCount.toString() },
+          posts: { ...prevStats.posts, value: data.postsCount.toString() },
+          comments: {
+            ...prevStats.comments,
+            value: data.commentsCount.toString(),
+          },
+          likes: { ...prevStats.likes, value: data.likesCount.toString() },
+          messages: {
+            ...prevStats.messages,
+            value: data.messagesCount.toString(),
+          },
+          chats: { ...prevStats.chats, value: data.chatsCount.toString() },
+          newUsers: {
+            ...prevStats.newUsers,
+            value: data.newUsersCount.toString(),
+          },
+          newPosts: {
+            ...prevStats.newPosts,
+            value: data.newPostsCount.toString(),
+          },
           newComments: {
             ...prevStats.newComments,
-            value: data.newCommentsCount,
+            value: data.newCommentsCount.toString(),
           },
         }));
       })
@@ -135,7 +147,7 @@ export default function AdminSummary() {
             className={`bg-gray-800 shadow-md rounded-lg p-6 flex items-center space-x-4 hover:bg-gray-700 ${
               stat.link ? "cursor-pointer" : ""
             }`}
-            onClick={() => stat.link && (router.push(stat.link))}
+            onClick={() => stat.link && router.push(stat.link)}
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
           >

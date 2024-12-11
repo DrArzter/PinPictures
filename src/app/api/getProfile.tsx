@@ -1,18 +1,10 @@
 import api from "./axiosApi";
+import { AxiosResponse } from "axios";
+import { ApiResponse, ProfileData } from "@/app/types/global";
 
-export default async function getProfile(name: string) {
-  try {
-    const response = await api.get(`/profile/${name}`, {
-      withCredentials: true,
-    });
-    return response.data.data;
-  } catch (error: unknown) {
-    if (error instanceof Error && "response" in error) {
-      console.log("User is not found");
-      return null;
-    } else {
-      console.error("Error fetching user:", error);
-      return null;
-    }
-  }
+export default function getProfile(name: string): Promise<AxiosResponse<ApiResponse<ProfileData>>> {
+  return api.get<ApiResponse<ProfileData>>(
+    `/profile/${encodeURIComponent(name)}`,
+    { withCredentials: true }
+  );
 }

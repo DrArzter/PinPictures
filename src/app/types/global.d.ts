@@ -13,13 +13,11 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-// Notification Interfaces
 export interface Notification {
   id: string;
   message: string;
   status: "info" | "success" | "warning" | "error";
   time?: number;
-  clickable: boolean;
   sound?: string;
   soundRequired?: boolean;
   link_to?: string;
@@ -64,6 +62,7 @@ export interface Post {
   ImageInPost: Image[];
   Likes: Like[];
   _count: PostCounts;
+  isLiked: boolean;
 }
 
 export interface Friends {
@@ -105,6 +104,28 @@ export interface ClientSelfUser {
     status: "confirmed" | "pending" | "blocked";
     User_Friendships_user1IdToUser: ShortUser;
   }>;
+}
+
+export interface SummaryData {
+  usersCount: number;
+  postsCount: number;
+  commentsCount: number;
+  likesCount: number;
+  messagesCount: number;
+  chatsCount: number;
+  newUsersCount: number;
+  newPostsCount: number;
+  newCommentsCount: number;
+}
+
+export interface ProfileData {
+  id: number;
+  name: string;
+  background?: string;
+  avatar?: string;
+  description?: string;
+  friends?: Friend[];
+  Post?: Post[];
 }
 
 export interface ClientSelfUserContextType {
@@ -154,7 +175,7 @@ export interface Socket {
 }
 
 export interface FullPost extends Post {
-  comments: Comment[];
+  Comments: Comment[];
 }
 
 export interface NewPost {
@@ -169,22 +190,57 @@ export interface NewPostRequest {
   images: File[]; // На запрос мы отправляем файлы
 }
 
+export interface Login {
+  username: string;
+  password: string;
+}
+
+export interface Registration {
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface LoginProps {
+  username: string;
+  setUsername: (value: string) => void;
+  password: string;
+  setPassword: (value: string) => void;
+  handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  toggleRegistration: () => void;
+  toggleForgotPassword: () => void;
+}
+
+export interface RegistrationProps {
+  username: string;
+  setUsername: (value: string) => void;
+  email: string;
+  setEmail: (value: string) => void;
+  password: string;
+  setPassword: (value: string) => void;
+  handleSubmit: (event: React.FormEvent) => void;
+  toggleRegistration: () => void;
+}
+
 export interface Comment {
   id: number;
+  userId: number;
+  postId: number;
   comment: string;
+  picpath: string | null;
   createdAt: string;
   User: ShortUser;
 }
 
 import { Server } from "socket.io";
-import { Socket } from 'net';
-import { Server as NetServer } from 'http';
+import { Socket } from "net";
+import { Server as NetServer } from "http";
 
 declare global {
   var io: Server;
 }
 
-declare module 'next/dist/server/api' {
+declare module "next/dist/server/api" {
   interface Socket extends NodeJS.Socket {
     server: NetServer;
   }

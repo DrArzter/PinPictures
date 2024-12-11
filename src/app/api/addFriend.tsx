@@ -1,17 +1,16 @@
 import api from "./axiosApi";
+import { AxiosResponse } from "axios";
+import { ApiResponse } from "@/app/types/global";
 
-export default async function addFriend(friendId: number, friendName: string) {
-  try {
-    const response = await api.post(
-      `/friend/${encodeURIComponent(friendId)}`,
-      { friendId, friendName },
-      {
-        withCredentials: true,
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error sending friend request:", error);
-    throw error;
-  }
+export default function addFriend(
+  friendId: number,
+  friendName: string
+): Promise<AxiosResponse<ApiResponse<string>>> {
+  return api.post<ApiResponse<string>>(
+    `/friend/${encodeURIComponent(friendId)}`,
+    { friendId, friendName },
+    {
+      withCredentials: true,
+    }
+  );
 }
