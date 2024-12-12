@@ -1,16 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
-import { parse } from "cookie";
 import { handleError } from "@/utils/errorHandler";
-import { verifyToken } from "@/utils/jwt";
 
 import { Friend } from "@/app/types/global";
-
-interface DecodedToken
- {
-  userId: number;
-  exp: number;
-}
+import { userMiddleware } from "@/middlewares/userMiddleware";
 
 interface ProfileWithFriends {
   id: number;
@@ -24,10 +17,10 @@ interface ProfileWithFriends {
     name: string;
     description: string;
     createdAt: Date;
-    Likes: { userId: number; }[];
-    _count: { Comments: number; Likes: number; };
-    ImageInPost: { id: number; picpath: string; }[];
-    User: { name: string; avatar: string; };
+    Likes: { userId: number }[];
+    _count: { Comments: number; Likes: number };
+    ImageInPost: { id: number; picpath: string }[];
+    User: { name: string; avatar: string };
   }[];
   friends: {
     friend: Friend;
@@ -53,24 +46,8 @@ export default async function handler(
       .json({ status: "error", message: "Profile name is required" });
   }
 
-  const cookieStore = req.cookies || parse(req.headers.cookie || "");
-  const token = cookieStore.token;
-
-  let authenticatedUserId: number | null = null;
-
-  if (token) {
-    try {
-      const decoded = verifyToken(token) as DecodedToken;
-
-      if (Date.now() >= decoded.exp * 1000) {
-        authenticatedUserId = null;
-      } else {
-        authenticatedUserId = decoded.userId;
-      }
-    } catch {
-      authenticatedUserId = null;
-    }
-  }
+  await userMiddleware(req);
+  const authenticatedUserId = req.user?.id;
 
   try {
     const profile = await prisma.user.findUnique({
@@ -167,25 +144,24 @@ export default async function handler(
     }
 
     const friendsAsUser1 =
-    profile.Friendships_Friendships_user1IdToUser?.map((friendship) => ({
+      profile.Friendships_Friendships_user1IdToUser?.map((friendship) => ({
         friend: {
-            id: friendship.User_Friendships_user2IdToUser.id,
-            name: friendship.User_Friendships_user2IdToUser.name,
-            avatar: friendship.User_Friendships_user2IdToUser.avatar,
+          id: friendship.User_Friendships_user2IdToUser.id,
+          name: friendship.User_Friendships_user2IdToUser.name,
+          avatar: friendship.User_Friendships_user2IdToUser.avatar,
         } as unknown as Friend,
         status: friendship.status as unknown as string, // Force cast if necessary
-    })) || [];
+      })) || [];
 
-const friendsAsUser2 =
-    profile.Friendships_Friendships_user2IdToUser?.map((friendship) => ({
+    const friendsAsUser2 =
+      profile.Friendships_Friendships_user2IdToUser?.map((friendship) => ({
         friend: {
-            id: friendship.User_Friendships_user1IdToUser.id,
-            name: friendship.User_Friendships_user1IdToUser.name,
-            avatar: friendship.User_Friendships_user1IdToUser.avatar,
+          id: friendship.User_Friendships_user1IdToUser.id,
+          name: friendship.User_Friendships_user1IdToUser.name,
+          avatar: friendship.User_Friendships_user1IdToUser.avatar,
         } as unknown as Friend,
         status: String(friendship.status), // Cast to string
-    })) || [];
-
+      })) || [];
 
     const allFriends = [...friendsAsUser1, ...friendsAsUser2];
 

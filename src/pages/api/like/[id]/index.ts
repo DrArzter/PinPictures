@@ -3,19 +3,12 @@ import { prisma } from "@/utils/prisma";
 import { authMiddleware } from "@/middlewares/authMiddleware";
 import { handleError } from "@/utils/errorHandler";
 import { z } from "zod";
-import { RateLimiterMemory } from "rate-limiter-flexible";
 
 export const config = {
   api: {
     bodyParser: true,
   },
 };
-
-// Настройка рейтлимитера
-const rateLimiter = new RateLimiterMemory({
-  points: 2,
-  duration: 5,
-});
 
 const likeSchema = z.object({
   id: z.string().regex(/^\d+$/, "Invalid post ID"),
@@ -32,7 +25,6 @@ export default async function handler(
   }
 
   try {
-
     await authMiddleware(req, res);
 
     const { id } = likeSchema.parse(req.query);
@@ -52,15 +44,6 @@ export default async function handler(
         .json({ status: "error", message: "User not authenticated" });
     }
 
-    try {
-      await rateLimiter.consume(user.id.toString()); // Проверка лимита по user.id
-    } catch {
-      return res
-        .status(429)
-        .json({ status: "error", message: "Too many requests. Please wait." });
-    }
-
-    // Лайк или удаление лайка
     const post = await prisma.post.findUnique({
       where: { id: postId },
       include: { Likes: true },
@@ -95,11 +78,6 @@ export default async function handler(
       message: "Like updated successfully",
     });
   } catch (error) {
-    if (error instanceof RateLimiterMemory) {
-      return res
-        .status(429)
-        .json({ status: "error", message: "Too many requests" });
-    }
     return handleError(res, error);
   }
 }

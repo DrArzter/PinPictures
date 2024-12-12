@@ -11,7 +11,7 @@ import LoadingIndicator from "@/app/components/common/LoadingIndicator";
 import * as api from "@/app/api";
 import PostList from "@/app/components/post/PostList";
 
-import { Post as PostType, ProfileData} from "@/app/types/global";
+import { Post as PostType, ProfileData } from "@/app/types/global";
 
 import { motion } from "framer-motion";
 import {
@@ -81,7 +81,7 @@ export default function Profile() {
         setLoading(true);
         api.getProfile(profileName).then((response) => {
           setProfile(response.data.data);
-        })
+        });
       } catch (error) {
         console.error("Error fetching profile:", error);
       } finally {
@@ -112,15 +112,8 @@ export default function Profile() {
 
   const handleAddFriendClick = async () => {
     try {
-      api.addFriend(profile.id, profile.name).then(() => {
-        addNotification({
-          message: "Friend request sent",
-          status: "success",
-        });
-      })
-    } catch (error) {
-      console.error("Error sending friend request:", error);
-    }
+      api.addFriend(profile.id, profile.name).then(() => {});
+    } catch {}
   };
 
   const handleDeleteFriendClick = async () => {
@@ -271,7 +264,10 @@ export default function Profile() {
 
         <motion.div className="mt-10" variants={itemVariants}>
           {profile.Post && profile.Post.length > 0 ? (
-            <PostList posts={profile.Post as unknown as PostType[]} columns={columns} />
+            <PostList
+              posts={profile.Post as unknown as PostType[]}
+              columns={columns}
+            />
           ) : (
             <p className="">{profile?.name} does not have any posts.</p>
           )}

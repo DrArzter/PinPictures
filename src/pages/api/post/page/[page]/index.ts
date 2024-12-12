@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { handleError } from "@/utils/errorHandler";
-import { authMiddleware } from "@/middlewares/authMiddleware";
+import { userMiddleware } from "@/middlewares/userMiddleware";
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,7 +13,7 @@ export default async function handler(
       .json({ status: "error", message: "Unsupported method" });
   }
 
-  await authMiddleware(req, res);
+  await userMiddleware(req);
   const authenticatedUser = req.user;
 
   const { page } = req.query;
@@ -22,11 +22,15 @@ export default async function handler(
   const offset = (pageNumber - 1) * limit;
 
   try {
-    const likedPostIds = authenticatedUser 
-      ? await prisma.likes.findMany({
-          where: { userId: authenticatedUser.id },
-          select: { postId: true }
-        }).then((likes: { postId: number }[]) => likes.map((like: { postId: number }) => like.postId))
+    const likedPostIds = authenticatedUser
+      ? await prisma.likes
+          .findMany({
+            where: { userId: authenticatedUser.id },
+            select: { postId: true },
+          })
+          .then((likes: { postId: number }[]) =>
+            likes.map((like: { postId: number }) => like.postId)
+          )
       : [];
 
     const posts = await prisma.post.findMany({
@@ -61,7 +65,7 @@ export default async function handler(
       },
     });
 
-    const formattedPosts = posts.map(post => ({
+    const formattedPosts = posts.map((post) => ({
       ...post,
       isLiked: authenticatedUser ? likedPostIds.includes(post.id) : false,
     }));

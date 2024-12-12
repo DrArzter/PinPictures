@@ -5,6 +5,12 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { parse } from "cookie";
 import { ClientSelfUser } from "@/app/types/global";
+import { RateLimiterMemory } from "rate-limiter-flexible";
+
+const rateLimiter = new RateLimiterMemory({
+  points: 2,
+  duration: 10,
+});
 
 interface DecodedToken {
   userId: number;
@@ -24,7 +30,7 @@ export async function authMiddleware(
     const token = cookieStore.token;
 
     if (!token) {
-      res.status(401).json({ status: "error", message: "No token provided" });
+      res.status(401).json({ status: "error", message: "Unauthorized" });
       return reject();
     }
 
@@ -32,7 +38,7 @@ export async function authMiddleware(
       const decoded = verifyToken(token) as DecodedToken;
 
       if (Date.now() >= decoded.exp * 1000) {
-        res.status(401).json({ status: "error", message: "Token expired" });
+        res.status(401).json({ status: "error", message: "Unauthorized" });
         return reject();
       }
 
@@ -43,7 +49,14 @@ export async function authMiddleware(
       });
 
       if (!user) {
-        res.status(200).json({ status: "error", message: "User not found" });
+        res.status(200).json({ status: "error", message: "Unauthorized" });
+        return reject();
+      }
+
+      try {
+        await rateLimiter.consume(user.id.toString());
+      } catch {
+        res.status(429).json({ status: "error", message: "Too many requests" });
         return reject();
       }
 

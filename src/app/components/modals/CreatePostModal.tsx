@@ -44,7 +44,6 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
       } finally {
         setLoading(false);
         if (response) {
-          console.log(response.data.data);
           addNotification({
             status: response.data.status,
             message: response.data.message,

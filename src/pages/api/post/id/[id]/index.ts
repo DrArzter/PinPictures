@@ -120,7 +120,6 @@ export default async function handler(
       data: post,
     });
   } catch (error) {
-    console.error("Error handling post:", error);
     return handleError(res, error);
   }
 }

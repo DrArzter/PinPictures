@@ -28,10 +28,11 @@ import LikeButton from "@/app/components/post/LikeButton";
 import CommentSection from "@/app/components/post/CommentSection";
 import { ImBin2 } from "react-icons/im";
 import { AxiosResponse } from "axios";
+import { useRouter } from "next/navigation";
 
 export default function PostPage() {
   const { addNotification } = useNotificationContext();
-
+  const router = useRouter();
   const { user } = useUserContext() as { user: ClientSelfUser };
   const params = useParams();
   const postId = useMemo(
@@ -60,17 +61,11 @@ export default function PostPage() {
       .deleteAPost(post.id)
       .then((response: AxiosResponse<ApiResponse<void>>) => {
         if (response.data.status === "success") {
-          addNotification({
-            status: "success",
-            message: "Post deleted successfully.",
-          });
+          router.push("/");
         }
       })
       .catch(() => {
-        addNotification({
-          status: "error",
-          message: "Failed to delete post.",
-        });
+        router.push("/");
       });
   }
 
@@ -96,30 +91,17 @@ export default function PostPage() {
           }
         }
       } catch {
-        addNotification({
-          status: "error",
-          message: "Could not fetch post.",
-        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchPostData();
-  }, [postId, user, addNotification]);
+  }, [postId, user]);
 
   const handleLikeClick = useCallback(
     async (e?: React.MouseEvent) => {
       if (e) e.stopPropagation();
-
-      if (!user) {
-        addNotification({
-          status: "error",
-          message: "You have to be logged in to like posts.",
-          link_to: "/authentication",
-        });
-        return;
-      }
 
       if (!post) return;
 
@@ -143,15 +125,11 @@ export default function PostPage() {
       } catch {
         setIsLiked(previousLikedState);
         setLikeCount(previousLikeCount);
-        addNotification({
-          status: "error",
-          message: "Could not update like.",
-        });
       } finally {
         setTormoz(false);
       }
     },
-    [user, post, isLiked, addNotification, tormoz, likeCount]
+    [user, post, isLiked, tormoz, likeCount]
   );
 
   const handleImageClick = useCallback(() => {

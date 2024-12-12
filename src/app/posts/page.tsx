@@ -52,8 +52,7 @@ export default function Posts() {
         setPosts((prevPosts) => [...prevPosts, ...newPosts]);
         setPage((prevPage) => prevPage + 1);
       }
-    } catch (err) {
-      console.error("Error fetching posts:", err);
+    } catch {
       setError("Error fetching posts");
     } finally {
       setLoading(false);

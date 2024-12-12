@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { authMiddleware } from "@/middlewares/authMiddleware";
 import { Friendships_status } from "@prisma/client";
+import { handleError } from "@/utils/errorHandler";
 
 export default async function handler(
   req: NextApiRequest,
@@ -17,7 +18,7 @@ export default async function handler(
   try {
     await authMiddleware(req, res);
     const currentUser = req.user;
-    
+
     if (!currentUser) {
       return res.status(401).json({ success: false, error: "Unauthorized" });
     }
@@ -62,7 +63,7 @@ export default async function handler(
         });
 
         global.io.to(`user_${currentUser?.id}`).emit("notification", {
-          status: "success", 
+          status: "success",
           message: `You are now friends with ${friendName}!`,
           link_to: `/profile/${friendName}`,
           clickable: true,
@@ -82,12 +83,10 @@ export default async function handler(
           .json({ success: true, friendship: updatedFriendship });
       }
 
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "You are already friends or cannot confirm this request.",
-        });
+      return res.status(200).json({
+        success: true,
+        message: "You are already friends or cannot confirm this request.",
+      });
     }
 
     const newFriendship = await prisma.friendships.create({
@@ -108,9 +107,6 @@ export default async function handler(
 
     return res.status(201).json({ success: true, friendship: newFriendship });
   } catch (error) {
-    console.error("Error handling friend request:", error);
-    return res
-      .status(500)
-      .json({ success: false, error: "Internal server error" });
+    return handleError(res, error);
   }
 }

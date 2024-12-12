@@ -1,6 +1,13 @@
 "use client";
-import React, { useState, useContext, ReactNode, useCallback } from "react";
+import React, {
+  useState,
+  useContext,
+  ReactNode,
+  useCallback,
+  useEffect,
+} from "react";
 import { Notification } from "@/app/types/global";
+import { notificationService } from "@/app/utils/NotificationService";
 import { v4 as uuidv4 } from "uuid";
 
 interface NotificationContextType {
@@ -38,6 +45,13 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       prevNotifications.filter((notification) => notification.id !== id)
     );
   }, []);
+
+  useEffect(() => {
+    notificationService.setNotificationCallback(addNotification);
+    return () => {
+      notificationService.setNotificationCallback(() => {});
+    };
+  }, [addNotification]);
 
   return (
     <NotificationContext.Provider

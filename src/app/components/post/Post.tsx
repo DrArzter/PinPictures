@@ -38,14 +38,6 @@ export default function Post({ post }: PostProps) {
   const handleLikeClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (!user) {
-      addNotification({
-        status: "error",
-        message: "You must be logged in to like posts.",
-      });
-      return;
-    }
-
     try {
       api.likePost(post.id).then((response) => {
         if (response.data.status === "success") {
