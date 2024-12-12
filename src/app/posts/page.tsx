@@ -91,13 +91,26 @@ export default function Posts() {
           dataLength={posts.length}
           next={fetchMorePosts}
           hasMore={hasMorePosts}
-          loader={<LoadingIndicator />}
+          loader={
+            loading && hasMorePosts ? (
+              <LoadingIndicator />
+            ) : (
+              <div className="flex justify-center items-center text-center">
+                <p className="text-lg font-semibold text-yellow-400">
+                  That is all for now 😊
+                </p>
+              </div>
+            )
+          }
+          scrollableTarget="posts"
           endMessage={
-            <div className="flex justify-center items-center text-center">
-              <p className="text-lg font-semibold text-yellow-400">
-                That is all for now 😊
-              </p>
-            </div>
+            !hasMorePosts && posts.length > 0 ? (
+              <div className="flex justify-center items-center text-center">
+                <p className="text-lg font-semibold text-yellow-400">
+                  That is all for now 😊
+                </p>
+              </div>
+            ) : null
           }
           style={{ width: "100%" }}
         >
@@ -106,7 +119,7 @@ export default function Posts() {
       ) : (
         !loading && !error && <NoPostsFound />
       )}
-      {loading && page === 1 && (
+      {loading && page === 1 && hasMorePosts && (
         <div className="flex justify-center items-center h-[85vh] md:h-[90vh]">
           <LoadingIndicator />
         </div>

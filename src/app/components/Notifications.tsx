@@ -84,7 +84,7 @@ export default function NotificationComponent() {
   return (
     <div
       id="notification-container"
-      className="fixed bottom-4 right-4 z-72 flex flex-col space-y-2 w-full max-w-sm md:max-w-md"
+      className="fixed bottom-4 right-4 z-[9999] flex flex-col space-y-2 w-[90vw] md:max-w-md"
       aria-live="assertive"
       aria-atomic="true"
     >
@@ -106,7 +106,7 @@ export default function NotificationComponent() {
             <div
               className={getNotificationClassName(
                 notification.status,
-                Boolean(notification.link_to) // Check if link_to exists to apply cursor-pointer
+                Boolean(notification.link_to)
               )}
               onClick={
                 notification.link_to
