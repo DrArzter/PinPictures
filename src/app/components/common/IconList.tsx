@@ -1,9 +1,8 @@
-// ./IconList.tsx
 import React from "react";
 
 interface IconItem {
   name: string;
-  icon: React.ReactElement;
+  icon: React.ReactElement<{ size?: number; className?: string }>; // Указали, что элемент иконки поддерживает size и className
 }
 
 interface IconListProps {
@@ -28,7 +27,8 @@ export default function IconList({
           >
             {React.cloneElement(icon.icon, {
               size: size,
-              className: "transition-colors duration-300 hover:fill-yellow-500 cursor-pointer",
+              className:
+                "transition-colors duration-300 hover:fill-yellow-500 cursor-pointer",
             })}
           </div>
         ))}

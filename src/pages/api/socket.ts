@@ -1,4 +1,5 @@
 // /pages/api/socket.ts
+/* eslint-disable no-var */
 import { NextApiRequest, NextApiResponse } from "next";
 import { Server as NetServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
@@ -29,6 +30,10 @@ interface ResponseWithSocket extends NextApiResponse {
   socket: SocketWithIO;
 }
 
+declare global {
+  var io: SocketIOServer;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: ResponseWithSocket
@@ -38,26 +43,31 @@ export default async function handler(
     return;
   }
 
-  const server = res.socket.server;
-
-  if (!server.io) {
+  // Инициализация глобального сокета, если он еще не создан
+  if (!global.io) {
     console.log("Initializing Socket.io");
 
-    const io = new SocketIOServer(server, {
+    const io = new SocketIOServer(res.socket.server, {
       path: "/api/socket",
       cors: {
-        origin: "*",
+        origin: "*", // В продакшене замените на конкретный домен
         methods: ["GET", "POST"],
         credentials: true,
       },
     });
 
+    // Настройка Redis адаптера (если используется)
     const pubClient = createClient({
       url: process.env.REDIS_URL || "redis://localhost:6379",
     });
     const subClient = pubClient.duplicate();
-    await Promise.all([pubClient.connect(), subClient.connect()]);
-    io.adapter(createAdapter(pubClient, subClient));
+
+    try {
+      await Promise.all([pubClient.connect(), subClient.connect()]);
+      io.adapter(createAdapter(pubClient, subClient));
+    } catch (error) {
+      console.error("Redis connection error:", error);
+    }
 
     io.on("connection", (socket) => {
       console.log("New client connected:", socket.id);
@@ -322,7 +332,7 @@ export default async function handler(
       console.error("Socket.IO error:", error);
     });
 
-    server.io = io;
+    global.io = io;
   } else {
     console.log("Socket.io is already running");
   }

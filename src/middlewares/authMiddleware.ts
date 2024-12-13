@@ -1,24 +1,24 @@
-// middlewares/authMiddleware.ts
-
 import { verifyToken } from "@/utils/jwt";
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { parse } from "cookie";
 import { ClientSelfUser } from "@/app/types/global";
-import { RateLimiterMemory } from "rate-limiter-flexible";
-
-const rateLimiter = new RateLimiterMemory({
-  points: 2,
-  duration: 10,
-});
+import {
+  userRateLimiter,
+  ipRateLimiter,
+  handleRateLimitError,
+} from "@/utils/rateLimiter";
+import { RateLimiterRes } from "rate-limiter-flexible";
 
 interface DecodedToken {
   userId: number;
   iat: number;
   exp: number;
 }
+
 interface CustomNextApiRequest extends NextApiRequest {
   user: ClientSelfUser | null;
+  clientIp?: string;
 }
 
 export async function authMiddleware(
@@ -26,42 +26,64 @@ export async function authMiddleware(
   res: NextApiResponse
 ) {
   return new Promise<void>(async (resolve, reject) => {
+    // Определение IP
+    const clientIp =
+      req.socket.remoteAddress ||
+      (req.headers["x-forwarded-for"] as string) ||
+      "unknown";
+    req.clientIp = clientIp;
+
     const cookieStore = req.cookies || parse(req.headers.cookie || "");
     const token = cookieStore.token;
 
     if (!token) {
-      res.status(401).json({ status: "error", message: "Unauthorized" });
-      return reject();
+      return res.status(401).json({
+        status: "error",
+        message: "Unauthorized",
+      });
     }
 
     try {
       const decoded = verifyToken(token) as DecodedToken;
 
       if (Date.now() >= decoded.exp * 1000) {
-        res.status(401).json({ status: "error", message: "Unauthorized" });
-        return reject();
+        return res.status(401).json({
+          status: "error",
+          message: "Token expired",
+        });
       }
 
       const userId = decoded.userId;
-
       const user = await prisma.user.findUnique({
         where: { id: userId },
       });
 
       if (!user) {
-        res.status(200).json({ status: "error", message: "Unauthorized" });
-        return reject();
+        return res.status(401).json({
+          status: "error",
+          message: "User not found",
+        });
       }
 
       try {
-        await rateLimiter.consume(user.id.toString());
-      } catch {
-        res.status(429).json({ status: "error", message: "Too many requests" });
-        return reject();
+        if (user) {
+          await userRateLimiter.consume(user.id.toString());
+        } else {
+          await ipRateLimiter.consume(clientIp);
+        }
+      } catch (error) {
+        return handleRateLimitError(error as RateLimiterRes, req, res);
+      }
+
+      if (user.banned) {
+        return res.status(444).json({
+          status: "error",
+          message: "User banned",
+          data: user,
+        });
       }
 
       const { ...userWithoutSensitiveInfo } = user;
-
       req.user = {
         ...userWithoutSensitiveInfo,
         settings: userWithoutSensitiveInfo.settings as Record<string, unknown>,
@@ -70,16 +92,13 @@ export async function authMiddleware(
         friends: [],
       };
 
-      if (user.banned) {
-        res
-          .status(444)
-          .json({ status: "error", message: "User banned", data: user });
-        return reject(new Error("User banned"));
-      }
       resolve();
     } catch (err) {
       console.error("Authentication Error:", err);
-      res.status(500).json({ status: "error", message: "Server error" });
+      res.status(500).json({
+        status: "error",
+        message: "Server error",
+      });
       reject(err);
     }
   });

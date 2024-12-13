@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useContext, useState } from "react";
+import React, { JSX, useEffect, useRef, useContext, useState } from "react";
 import IconList from "../common/IconList";
 import { useRouter } from "next/navigation";
 import { CiSquarePlus } from "react-icons/ci";
