@@ -1,6 +1,5 @@
 // ./app/chats/[userId]/page.tsx
 "use client";
-
 import React, { useEffect, useState } from "react";
 import { useSocketContext } from "@/app/contexts/SocketContext";
 import { useUserContext } from "@/app/contexts/UserContext";
@@ -8,13 +7,18 @@ import LoadingIndicator from "@/app/components/common/LoadingIndicator";
 import Chat from "@/app/components/chat/Chat";
 import { FullChat } from "@/app/types/global";
 import { useParams } from "next/navigation";
+import { useSelectedChatStore } from "@/app/useSelectedChatStore";
 
 export default function PrivateChatPage() {
   const { socket } = useSocketContext();
   const { user } = useUserContext();
+  const { selectedChatId, setSelectedChatId } = useSelectedChatStore();
   const { userId } = useParams() as { userId: string };
   const [chat, setChat] = useState<FullChat | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  console.log(setSelectedChatId);
+  console.log(selectedChatId);
 
   useEffect(() => {
     if (!socket || !user) return;
@@ -27,24 +31,25 @@ export default function PrivateChatPage() {
       return;
     }
 
-    socket.emit("getOrCreatePrivateChat", otherUserId);
+    let didRequestChat = false;
 
-    socket.on("chat", (chatData: FullChat) => {
+    const handleChat = (chatData: any) => {
       if (chatData) {
         setChat(chatData);
         socket.emit("getUserChats");
       }
       setIsLoading(false);
-    });
-    socket.on("newChat", (newChatData: FullChat) => {
-      if (newChatData.usersInChats.some((user: { id: number }) => user.id === user.id)) {
-        setChat(newChatData);
-      }
-    });
+    };
+
+    if (!didRequestChat) {
+      socket.emit("getOrCreatePrivateChat", otherUserId);
+      didRequestChat = true;
+    }
+
+    socket.on("chat", handleChat);
 
     return () => {
-      socket.off("chat");
-      socket.off("newChat");
+      socket.off("chat", handleChat);
     };
   }, [socket, user, userId]);
 
@@ -71,6 +76,7 @@ export default function PrivateChatPage() {
       isActiveChatLoading={false}
       socket={socket || undefined}
       otherUserId={Number(userId)}
+      setSelectedChatId={setSelectedChatId}
     />
   );
 }

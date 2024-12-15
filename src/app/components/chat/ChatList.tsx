@@ -9,6 +9,7 @@ import { AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
 import SearchBar from "../common/SearchBar";
 import ModalsContext from "@/app/contexts/ModalsContext";
 import { Socket } from "socket.io-client";
+import ChatListItem from "./ChatListItem";
 
 interface ChatListProps {
   user: ClientSelfUser;
@@ -36,22 +37,20 @@ export default function ChatList({
   const handleChatClick = (chat: AdminChat) => {
     setSelectedChatId(chat.id.toString());
 
-    if (chat.chatType === "private") {
-      const otherUser = chat.usersInChats.find(
+    if (chat.ChatType === "private") {
+      const otherUser = chat.UsersInChats.find(
         (u: { id: number }) => u.id !== user.id
       );
       if (otherUser) {
         router.push(`/chats/${otherUser.id}`);
-      } else {
-        router.push(`/chats/${chat.id}`);
       }
     } else {
-      router.push(`/chats/${chat.id}`);
+      router.push(`/chats/group/${chat.id}`);
     }
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full w-full md:w-auto">
       <div className="flex items-center justify-between mb-4">
         <SearchBar searchTerm={searchQuery} setSearchTerm={setSearchQuery} />
         <button
@@ -66,40 +65,12 @@ export default function ChatList({
       <div className="flex flex-col gap-2 overflow-y-auto">
         {filteredChats.length > 0 ? (
           filteredChats.map((chat: AdminChat) => (
-            <div
+            <ChatListItem
               key={chat.id}
-              onClick={() => handleChatClick(chat)}
-              className={`flex items-center p-3 rounded-lg cursor-pointer hover:bg-yellow-500 transition-colors ${
-                selectedChatId === chat.id.toString()
-                  ? "border-l-4 border-yellow-500"
-                  : ""
-              }`}
-            >
-              <div className="flex-shrink-0">
-                {chat.avatar ? (
-                  <img
-                    className="w-12 h-12 rounded-full object-cover"
-                    src={chat.avatar}
-                    alt={chat.name}
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center">
-                    <span className="text-xl">
-                      {chat.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div className="ml-4 flex-1 flex flex-col justify-center">
-                <span className="text-lg font-semibold">{chat.name}</span>
-                <span className="text-sm">
-                  {chat.lastMessage
-                    ? `${chat.lastMessage.User.name}: ${chat.lastMessage.message}`
-                    : "No messages"}
-                </span>
-              </div>
-            </div>
+              chat={chat}
+              selectedChatId={selectedChatId}
+              handleChatClick={handleChatClick}
+            />
           ))
         ) : (
           <div className="flex flex-col items-center justify-center mt-10">

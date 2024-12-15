@@ -143,12 +143,12 @@ export interface AdminChat {
   avatar: string;
   lastMessage: MessageInChat;
   picpath: string;
-  chatType: string;
-  usersInChats: UserInChat[];
+  ChatType: string;
+  UsersInChats: UserInChat[];
 }
 
 export interface FullChat extends AdminChat {
-  messagesInChat: MessageInChat[];
+  MessagesInChats: MessageInChat[];
 }
 
 export interface UserInChat {

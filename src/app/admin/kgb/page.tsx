@@ -53,14 +53,14 @@ export default function Chats() {
             onClick={() => handleUserClick(chat)}
           >
             <h2 className="text-lg font-semibold">
-              {chat.chatType == "private" ? (
+              {chat.ChatType == "private" ? (
                 <div className="flex flex-row gap-1">
                   <span className="text-red-500">
-                    {chat.usersInChats[0].User.name}
+                    {chat.UsersInChats[0].User.name}
                   </span> 
                   - 
                   <span className="text-red-500">
-                    {chat.usersInChats[1].User.name}
+                    {chat.UsersInChats[1].User.name}
                   </span>
                 </div>
               ) : (
@@ -87,14 +87,14 @@ export default function Chats() {
           >
             <div className="flex flex-row justify-between items-center">
               <h2 className="text-xl font-bold mb-4 cursor-pointer">
-              {selectedChat.chatType == "private" ? (
+              {selectedChat.ChatType == "private" ? (
                 <div className="flex flex-row gap-1">
-                  <span className="text-red-500" onClick={() => router.push(`/profile/${selectedChat.usersInChats[0].User.name}`)}>
-                    {selectedChat.usersInChats[0].User.name}
+                  <span className="text-red-500" onClick={() => router.push(`/profile/${selectedChat.UsersInChats[0].User.name}`)}>
+                    {selectedChat.UsersInChats[0].User.name}
                   </span> 
                   - 
-                  <span className="text-red-500" onClick={() => router.push(`/profile/${selectedChat.usersInChats[1].User.name}`)}>
-                    {selectedChat.usersInChats[1].User.name}
+                  <span className="text-red-500" onClick={() => router.push(`/profile/${selectedChat.UsersInChats[1].User.name}`)}>
+                    {selectedChat.UsersInChats[1].User.name}
                   </span>
                 </div>
               ) : (

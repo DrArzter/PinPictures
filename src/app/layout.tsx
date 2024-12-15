@@ -36,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        
+        <script src="https://unpkg.com/react-scan/dist/auto.global.js" async />
         <link rel="icon" href="https://storage.yandexcloud.net/pinpictures/otherImages/icon.ico" type="image/x-icon" sizes="16x16"/>
         <script
           dangerouslySetInnerHTML={{

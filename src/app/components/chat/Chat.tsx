@@ -3,19 +3,22 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { ClientSelfUser, FullChat, MessageInChat } from "@/app/types/global";
+import { useRouter } from "next/navigation";
 import LoadingIndicator from "../common/LoadingIndicator";
 import { Socket } from "socket.io-client";
 import { FaRegFileImage } from "react-icons/fa6";
 import { MdClose } from "react-icons/md";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Image from "next/image";
+import { IoIosArrowBack } from "react-icons/io";
 
 interface ChatProps {
   user: ClientSelfUser;
   chat: FullChat | undefined;
   isActiveChatLoading: boolean;
   socket: Socket | undefined;
-  otherUserId?: number; // для создания чата при первом сообщении
+  otherUserId?: number;
+  setSelectedChatId: (id: string | undefined) => void;
 }
 
 const MESSAGES_PER_PAGE = 20;
@@ -26,6 +29,7 @@ export default function Chat({
   isActiveChatLoading,
   socket,
   otherUserId,
+  setSelectedChatId
 }: ChatProps) {
   const [newMessage, setNewMessage] = useState<string>("");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -34,27 +38,37 @@ export default function Chat({
   const [hasMore, setHasMore] = useState<boolean>(true);
   const scrollableDivRef = useRef<HTMLDivElement>(null);
 
+  const router = useRouter();
+
   useEffect(() => {
-    if (currentChat && currentChat.messagesInChat) {
-      const initialMessages = [...currentChat.messagesInChat];
+    if (currentChat && currentChat.MessagesInChats) {
+      const initialMessages = currentChat.MessagesInChats;
       setMessages(initialMessages);
 
       // Если сообщений меньше чем MESSAGES_PER_PAGE, значит грузить нечего
       setHasMore(initialMessages.length === MESSAGES_PER_PAGE);
       setTimeout(() => scrollToBottom(), 100);
-    } else if (currentChat && currentChat.id === -1) {
-      setMessages([]);
-      setHasMore(false);
     }
   }, [currentChat]);
 
   useEffect(() => {
-    if (!socket || !currentChat || currentChat.id === -1) return;
+    if (
+      !socket ||
+      !currentChat ||
+      (currentChat.id === -1 &&
+        currentChat.UsersInChats.some(
+          (user: any) => user.userId === otherUserId
+        )) // TODO: исправить
+    )
+      return;
 
     socket.emit("joinChat", currentChat.id);
 
     socket.on("newMessage", (newMsg: MessageInChat) => {
-      if (newMsg.chatId === currentChat.id) {
+      if (
+        newMsg.chatId === currentChat.id &&
+        !messages.some((msg) => msg.id === newMsg.id)
+      ) {
         setMessages((prev) => [...prev, newMsg]);
         scrollToBottom();
       }
@@ -195,9 +209,11 @@ export default function Chat({
   let chatName = currentChat.name;
   let chatAvatar = currentChat.picpath;
 
-  if (currentChat.chatType === "private") {
+  if (currentChat.ChatType === "private") {
     // Найдем собеседника
-    const otherParticipant = currentChat.usersInChats.find(uic => uic.userId !== user.id);
+    const otherParticipant = currentChat.UsersInChats.find(
+      (uic) => uic.userId !== user.id
+    );
     if (otherParticipant && otherParticipant.User) {
       chatName = otherParticipant.User.name;
       chatAvatar = otherParticipant.User.avatar;
@@ -208,6 +224,16 @@ export default function Chat({
     <div className="flex flex-col h-full">
       {/* Заголовок чата */}
       <div className="flex flex-row items-center gap-4 mb-4 border-b pb-4">
+        
+      <button
+            onClick={() => {
+              console.log(setSelectedChatId(undefined));
+            }}
+            className=""
+            aria-label="Close Chat"
+          >
+            <IoIosArrowBack className="w-6 h-6" />
+          </button>
         {chatAvatar && (
           <img
             src={chatAvatar}
@@ -236,13 +262,14 @@ export default function Chat({
             const isCurrentUser = message.User.id === user.id;
             const previousMessage = messages[index - 1];
             const showAuthorInfo =
-              index === 0 ||
-              message.User.name !== previousMessage?.User?.name;
+              index === 0 || message.User.name !== previousMessage?.User?.name;
 
             return (
               <div
                 key={message.id}
-                className={`flex ${isCurrentUser ? "justify-end" : "justify-start"} mb-2`}
+                className={`flex ${
+                  isCurrentUser ? "justify-end" : "justify-start"
+                } mb-2`}
               >
                 <div
                   className={`flex flex-col ${
@@ -259,7 +286,9 @@ export default function Chat({
                         />
                       )}
                       <span className="text-sm font-semibold">
-                        {isCurrentUser ? "You" : message.User?.name || "Unknown"}
+                        {isCurrentUser
+                          ? "You"
+                          : message.User?.name || "Unknown"}
                       </span>
                     </div>
                   )}

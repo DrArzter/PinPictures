@@ -217,28 +217,6 @@ export default async function handler(
         }
       );
 
-      socket.on("getChat", async (chatId: number) => {
-        const currentUserId = socket.data.userId;
-        const chat = await prisma.chats.findUnique({
-          where: { id: chatId },
-          include: {
-            UsersInChats: { include: { User: true } },
-            MessagesInChats: {
-              include: { User: true, ImagesInMessages: true },
-              orderBy: { createdAt: "asc" },
-            },
-          },
-        });
-        if (
-          chat &&
-          chat.UsersInChats.some((uic) => uic.userId === currentUserId)
-        ) {
-          socket.emit("chat", chat);
-        } else {
-          socket.emit("chat", { error: "You are not part of this chat" });
-        }
-      });
-
       socket.on("getChatMessages", async ({ chatId, page, limit }) => {
         const currentUserId = socket.data.userId;
         const isMember = await prisma.usersInChats.findFirst({
@@ -258,7 +236,7 @@ export default async function handler(
 
       socket.on("joinChat", (chatId) => {
         socket.join(`chat_${chatId}`);
-        console.log(`User ${socket.data.userId} joined chat ${chatId}`);
+        console.log(`User ${socket.data.userId} joined chat ${chatId}`);  
       });
 
       socket.on("getUserChats", async () => {
