@@ -8,7 +8,6 @@ export default function login(
 ): Promise<AxiosResponse<ApiResponse<Login>>> {
   return api.post<ApiResponse<Login>>(
     `/user/login`,
-    { email: username, password },
-    { withCredentials: true }
+    { email: username, password }
   );
 }

@@ -6,7 +6,6 @@ export default function getAUserChats(
   searchTerm: string
 ): Promise<AxiosResponse<ApiResponse<AdminChat[]>>> {
   return api.get<ApiResponse<AdminChat[]>>(
-    `/admin/user/chats/${encodeURIComponent(searchTerm)}`,
-    { withCredentials: true }
+    `/admin/user/chats/${encodeURIComponent(searchTerm)}`
   );
 }

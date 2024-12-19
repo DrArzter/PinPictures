@@ -7,7 +7,6 @@ export default function banUser(
 ): Promise<AxiosResponse<ApiResponse<AdminShortUser | null>>> {
   return api.put<ApiResponse<AdminShortUser | null>>(
     `/admin/user/ban/${id}`,
-    {},
-    { withCredentials: true }
+    {}
   );
 }

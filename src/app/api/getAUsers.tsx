@@ -6,7 +6,6 @@ export default function getAUsers(
   searchTerm: string
 ): Promise<AxiosResponse<ApiResponse<AdminShortUser[]>>> {
   return api.get<ApiResponse<AdminShortUser[]>>(
-    `/admin/users/${encodeURIComponent(searchTerm)}`,
-    { withCredentials: true }
+    `/admin/users/${encodeURIComponent(searchTerm)}`
   );
 }

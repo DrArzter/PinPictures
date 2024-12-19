@@ -3,12 +3,8 @@ import { AxiosResponse } from "axios";
 import { ApiResponse } from "@/app/types/global";
 
 export default function uploadComment(
-  id: number, 
+  id: number,
   comment: string
 ): Promise<AxiosResponse<ApiResponse<Comment>>> {
-  return api.post<ApiResponse<Comment>>(
-    `/comment/${id}`,
-    { comment },
-    { withCredentials: true }
-  );
+  return api.post<ApiResponse<Comment>>(`/comment/${id}`, { comment });
 }

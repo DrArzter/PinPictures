@@ -21,7 +21,5 @@ export default async function createPost(
   formData.append("name", post.name);
   formData.append("description", post.description);
 
-  return api.post<ApiResponse<string>>("/post", formData, {
-    withCredentials: true,
-  });
+  return api.post<ApiResponse<string>>("/post", formData);
 }

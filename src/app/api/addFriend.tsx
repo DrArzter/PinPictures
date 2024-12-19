@@ -8,9 +8,6 @@ export default function addFriend(
 ): Promise<AxiosResponse<ApiResponse<string>>> {
   return api.post<ApiResponse<string>>(
     `/friend/${encodeURIComponent(friendId)}`,
-    { friendId, friendName },
-    {
-      withCredentials: true,
-    }
+    { friendId, friendName }
   );
 }

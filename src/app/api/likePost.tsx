@@ -7,7 +7,6 @@ export default function likePost(
 ): Promise<AxiosResponse<ApiResponse<Like>>> {
   return api.post<ApiResponse<Like>>(
     `/like/${id}`,
-    { id },
-    { withCredentials: true }
+    { id }
   );
 }

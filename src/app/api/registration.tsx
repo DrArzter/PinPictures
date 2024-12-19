@@ -7,9 +7,9 @@ export default function registration(
   email: string,
   password: string
 ): Promise<AxiosResponse<ApiResponse<Registration>>> {
-  return api.post<ApiResponse<Registration>>(
-    `/user/registration`,
-    { name: username, email, password },
-    { withCredentials: true }
-  );
+  return api.post<ApiResponse<Registration>>(`/user/registration`, {
+    name: username,
+    email,
+    password,
+  });
 }
