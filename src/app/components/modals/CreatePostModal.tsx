@@ -35,13 +35,6 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
 
       try {
         response = await createPost({ name, description, images });
-      } catch (err) {
-        console.error(err);
-        addNotification({
-          status: "error",
-          message: "An error occurred",
-        });
-      } finally {
         setLoading(false);
         if (response) {
           addNotification({
@@ -57,6 +50,12 @@ const CreatePostModal = React.memo(({ onClose }: CreatePostModalProps) => {
             onClose();
           }
         }
+      } catch (err) {
+        console.error(err);
+        addNotification({
+          status: "error",
+          message: "An error occurred",
+        });
       }
     },
     [name, description, images, addNotification, onClose]

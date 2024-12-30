@@ -1,36 +1,226 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PinPictures
 
-## Getting Started
+[English](README.md) | [Русский](README_RU.md)
 
-First, run the development server:
+PinPictures is a modern photo-sharing social platform built with Next.js and cutting-edge technology stack.
 
+## 🌟 Key Features
+
+- 📸 Photo publishing with multiple image support
+- 💬 Comments and likes for content interaction
+- 👥 User profiles and subscription system
+- 💌 Private messaging and group chats
+- 🌓 Dark and light themes
+- 🔍 Smart content search
+- 👑 Advanced admin panel
+- 🔄 Real-time notifications
+- 📱 Progressive Web App (PWA) support
+
+## 🛠 Tech Stack
+
+- **Frontend**: Next.js, React, TypeScript
+- **Styling**: Tailwind CSS, SCSS modules
+- **Animations**: Framer Motion
+- **Icons**: React Icons
+- **State Management**: React Context
+- **Real-time Features**: Socket.IO
+- **Image Processing**: Sharp, ImageMagick
+- **PWA**: Next-PWA
+- **Analytics**: Vercel Analytics
+- **Testing**: Jest, React Testing Library
+- **CI/CD**: GitHub Actions
+- **Code Quality**: ESLint, Prettier
+- **Performance**: Lighthouse CI
+
+## 💻 System Requirements
+
+- Node.js 18.0 or later
+- npm 9.0 or later
+- Git 2.0 or later
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+
+## 🚀 Getting Started
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone [repository-url]
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Create `.env.local` file and configure required environment variables:
+```env
+# App Configuration
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Authentication
+JWT_SECRET=your_jwt_secret
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your_nextauth_secret
 
-## Learn More
+# Database
+DATABASE_URL=your_database_url
 
-To learn more about Next.js, take a look at the following resources:
+# Storage
+STORAGE_ACCOUNT=your_storage_account
+STORAGE_KEY=your_storage_key
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Email Service
+SMTP_HOST=your_smtp_host
+SMTP_PORT=587
+SMTP_USER=your_smtp_user
+SMTP_PASSWORD=your_smtp_password
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Choose how to run the project:
 
-## Deploy on Vercel
+### Development Mode
+```bash
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Production Build
+```bash
+npm run build
+npm start
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Development Build
+```bash
+npm run build:dev
+npm run start:dev
+```
+
+## 📱 Main Sections
+
+### Posts
+- Create posts with multiple images
+- Likes and comments
+- Detailed post view
+- Hashtags and categories
+- Share to social media
+- Save to collections
+
+### User Profile
+- Personal information
+- Post gallery
+- Settings profile
+- Statistics and insights
+- Customizable portfolio
+
+### Chats
+- Private messages
+- Group chats
+- Real-time updates
+- File sharing
+
+### Admin Panel
+- Platform statistics
+- User management
+- Content moderation
+- Security system (KGB)
+- Performance monitoring
+- Error tracking
+- User feedback system
+
+## 🔐 Authentication
+
+- Email verification registration
+- Email/password login
+- Password recovery
+- Protected routes
+- OAuth providers (Google, GitHub)
+
+## 🎨 User Interface
+
+- Responsive design
+- Dark/light theme support
+- Animated transitions
+- Modern minimalist style
+- Custom keyboard shortcuts
+- Gesture controls
+- Accessibility features
+
+## 👥 User Roles
+
+- Guest
+- Registered user
+- Creator
+- Moderator
+- Administrator
+- Super Administrator
+
+## 🛡 Security
+
+- XSS protection
+- CSRF tokens
+- Secure password storage
+- Rate limiting
+- Input validation
+- SQL injection prevention
+- File upload validation
+- DDOS protection
+- Regular security audits
+
+## 🚀 Performance
+
+- Image optimization
+- Lazy loading
+- Code splitting
+- Caching strategies
+- CDN integration
+- Server-side rendering
+- Static page generation
+
+## 📈 Analytics
+
+- User behavior tracking
+- Performance monitoring
+- Error tracking
+- A/B testing
+- Conversion tracking
+- Custom event tracking
+
+## 📝 License
+
+MIT License
+
+Copyright (c) 2024 PinPictures
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## 📜 Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for details about project updates.
+
+## 🐛 Known Issues
+
+See [ISSUES.md](ISSUES.md) for current known issues and their workarounds.
+
+---
+
+Created with ❤️ by PinPictures team

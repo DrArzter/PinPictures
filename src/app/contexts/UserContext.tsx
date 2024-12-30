@@ -15,20 +15,24 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<ClientSelfUser | undefined>(undefined);
   const [userLoading, setUserLoading] = useState<boolean>(true);
 
+  useEffect(() => {
+    console.log(userLoading);
+  }, [userLoading]);
+
   const fetchUser = async () => {
     try {
       setUserLoading(true);
       api.getUser().then((response) => {
         if (response.data.data) {
           setUser(response.data.data);
+          setUserLoading(false);
         } else {
           setUser(undefined);
+          setUserLoading(false);
         }
       });
     } catch (error) {
       console.error("Error fetching user:", error);
-    } finally {
-      setUserLoading(false);
     }
   };
 

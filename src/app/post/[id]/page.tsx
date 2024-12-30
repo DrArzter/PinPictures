@@ -6,6 +6,7 @@ import React, {
   useContext,
   useCallback,
   useMemo,
+  memo,
 } from "react";
 import { useParams } from "next/navigation";
 import LoadingIndicator from "@/app/components/common/LoadingIndicator";
@@ -29,6 +30,62 @@ import CommentSection from "@/app/components/post/CommentSection";
 import { ImBin2 } from "react-icons/im";
 import { AxiosResponse } from "axios";
 import { useRouter } from "next/navigation";
+
+const LikeSection = memo(
+  ({
+    isLiked,
+    likeCount,
+    onLike,
+    commentsCount,
+    onCommentClick,
+  }: {
+    isLiked: boolean;
+    likeCount: number;
+    onLike: (e?: React.MouseEvent) => void;
+    commentsCount: number;
+    onCommentClick: () => void;
+  }) => {
+    return (
+      <div className="flex items-center gap-6 mt-4">
+        <LikeButton isLiked={isLiked} likeCount={likeCount} onLike={onLike} />
+        <button
+          className="flex items-center gap-1 text-yellow-500 hover:text-yellow-600 transition-colors duration-200"
+          onClick={onCommentClick}
+          aria-label="View Comments"
+        >
+          <BsChatDots size={20} />
+          <span>{commentsCount}</span>
+        </button>
+      </div>
+    );
+  }
+);
+
+const PostDetails = memo(
+  ({
+    post,
+    user,
+    onDelete,
+  }: {
+    post: PostType;
+    user: ClientSelfUser | null;
+    onDelete: () => void;
+  }) => {
+    return (
+      <div className="mt-4">
+        <div className="flex flex-row items-center justify-between">
+          <h1 className="font-bold text-3xl mb-4 text-yellow-500">
+            {post.name}
+          </h1>
+          {user?.bananaLevel && user.bananaLevel > 0 && (
+            <ImBin2 size={20} onClick={onDelete} className="cursor-pointer" />
+          )}
+        </div>
+        <p className="text-gray-700 dark:text-gray-300">{post.description}</p>
+      </div>
+    );
+  }
+);
 
 export default function PostPage() {
   const { addNotification } = useNotificationContext();
@@ -90,10 +147,9 @@ export default function PostPage() {
             setIsLiked(true);
           }
         }
-      } catch {
-      } finally {
+
         setLoading(false);
-      }
+      } catch {}
     };
 
     fetchPostData();
@@ -122,10 +178,10 @@ export default function PostPage() {
         if (response.data.status !== "success") {
           throw new Error(response.data.message || "Failed to update like.");
         }
+        setTormoz(false);
       } catch {
         setIsLiked(previousLikedState);
         setLikeCount(previousLikeCount);
-      } finally {
         setTormoz(false);
       }
     },
@@ -233,6 +289,22 @@ export default function PostPage() {
     [user, post, addNotification]
   );
 
+  const handleCommentClick = useCallback(() => {
+    const commentSection = document.getElementById("comments-section");
+    if (commentSection) {
+      commentSection.scrollIntoView({
+        behavior: "smooth",
+      });
+    }
+  }, []);
+
+  const handleTabChange = useCallback(
+    (tab: "image" | "details" | "comments") => {
+      setActiveTab(tab);
+    },
+    []
+  );
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-[85vh] md:h-[90vh]">
@@ -251,45 +323,28 @@ export default function PostPage() {
 
   return (
     <>
-      {/* Мобильная версия */}
+      {/* Mobile version */}
       <div className="flex flex-col items-center justify-center px-4 py-6 gap-6 h-[85vh] md:hidden">
-        {/* Вкладки */}
         <div className="flex justify-around w-full border-b">
-          <button
-            className={`px-4 ${
-              activeTab === "image"
-                ? "border-b-2 border-yellow-500 text-yellow-500"
-                : ""
-            }`}
-            onClick={() => setActiveTab("image")}
-          >
-            Image
-          </button>
-          <button
-            className={`px-4 ${
-              activeTab === "details"
-                ? "border-b-2 border-yellow-500 text-yellow-500"
-                : ""
-            }`}
-            onClick={() => setActiveTab("details")}
-          >
-            Details
-          </button>
-          <button
-            className={`px-4 ${
-              activeTab === "comments"
-                ? "border-b-2 border-yellow-500 text-yellow-500"
-                : ""
-            }`}
-            onClick={() => setActiveTab("comments")}
-          >
-            Comments
-          </button>
+          {["image", "details", "comments"].map((tab) => (
+            <button
+              key={tab}
+              className={`px-4 ${
+                activeTab === tab
+                  ? "border-b-2 border-yellow-500 text-yellow-500"
+                  : ""
+              }`}
+              onClick={() =>
+                handleTabChange(tab as "image" | "details" | "comments")
+              }
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
 
-        {/* Контент вкладок */}
         <div className="flex-grow w-full overflow-y-auto">
-          {activeTab === "image" && (
+          {activeTab === "image" && post && (
             <div className="h-full">
               <ImageCarousel
                 images={post.ImageInPost}
@@ -300,34 +355,21 @@ export default function PostPage() {
               />
             </div>
           )}
-          {activeTab === "details" && (
+          {activeTab === "details" && post && (
             <div className="">
               <AuthorInfo user={post.User} createdAt={post.createdAt} />
-              {/* Заголовок и описание */}
-              <div className="mt-4">
-                <h1 className="font-bold text-3xl mb-4 text-yellow-500">
-                  {post.name}
-                </h1>
-                <p className="text-gray-700 dark:text-gray-300">
-                  {post.description}
-                </p>
-              </div>
-              {/* Кнопки лайка и комментариев */}
-              <div className="flex items-center gap-6 mt-4">
-                <LikeButton
-                  isLiked={isLiked}
-                  likeCount={likeCount}
-                  onLike={handleLikeClick}
-                />
-                <button
-                  className="flex items-center gap-1 text-yellow-500 hover:text-yellow-600 transition-colors duration-200"
-                  onClick={() => setActiveTab("comments")}
-                  aria-label="View Comments"
-                >
-                  <BsChatDots size={20} />
-                  <span>{comments.length}</span>
-                </button>
-              </div>
+              <PostDetails
+                post={post}
+                user={user}
+                onDelete={handleDeletePost}
+              />
+              <LikeSection
+                isLiked={isLiked}
+                likeCount={likeCount}
+                onLike={handleLikeClick}
+                commentsCount={comments.length}
+                onCommentClick={() => handleTabChange("comments")}
+              />
             </div>
           )}
           {activeTab === "comments" && (
@@ -341,80 +383,46 @@ export default function PostPage() {
         </div>
       </div>
 
-      {/* Десктопная версия */}
+      {/* Desktop version */}
       <div className="hidden md:flex flex-row items-center justify-center px-4 py-6 gap-6 h-[90vh]">
-        {/* Карусель изображений */}
-        <div className="w-1/2 h-full">
-          <ImageCarousel
-            images={post.ImageInPost}
-            currentIndex={currentImage}
-            onPrev={handlePrevImage}
-            onNext={handleNextImage}
-            onImageClick={handleImageClick}
-          />
-        </div>
-
-        {/* Секция контента */}
-        <div className="w-1/2 h-full flex flex-col rounded-lg shadow-2xl p-6 overflow-hidden">
-          {/* Информация об авторе */}
-          <AuthorInfo user={post.User} createdAt={post.createdAt} />
-
-          {/* Заголовок и описание */}
-          <div className="mt-4">
-            <div className="flex flex-row items-center justify-between">
-              <h1 className="font-bold text-3xl mb-4 text-yellow-500">
-                {post.name}
-              </h1>
-
-              {user?.bananaLevel > 0 && (
-                <ImBin2
-                  size={20}
-                  onClick={handleDeletePost}
-                  className="cursor-pointer"
-                />
-              )}
+        {post && (
+          <>
+            <div className="w-1/2 h-full">
+              <ImageCarousel
+                images={post.ImageInPost}
+                currentIndex={currentImage}
+                onPrev={handlePrevImage}
+                onNext={handleNextImage}
+                onImageClick={handleImageClick}
+              />
             </div>
-            <p className="text-gray-700 dark:text-gray-300">
-              {post.description}
-            </p>
-          </div>
 
-          {/* Кнопки лайка и комментариев */}
-          <div className="flex items-center gap-6 mt-4">
-            <LikeButton
-              isLiked={isLiked}
-              likeCount={likeCount}
-              onLike={handleLikeClick}
-            />
-            <button
-              className="flex items-center gap-1 text-yellow-500 hover:text-yellow-600 transition-colors duration-200"
-              onClick={() => {
-                const commentSection =
-                  document.getElementById("comments-section");
-                if (commentSection) {
-                  commentSection.scrollIntoView({
-                    behavior: "smooth",
-                  });
-                }
-              }}
-              aria-label="View Comments"
-            >
-              <BsChatDots size={20} />
-              <span>{comments.length}</span>
-            </button>
-          </div>
-
-          {/* Секция комментариев */}
-          <div
-            className="flex-grow flex flex-col overflow-hidden"
-            id="comments-section"
-          >
-            <CommentSection
-              comments={comments}
-              onAddComment={handleAddComment}
-            />
-          </div>
-        </div>
+            <div className="w-1/2 h-full flex flex-col rounded-lg shadow-2xl p-6 overflow-hidden">
+              <AuthorInfo user={post.User} createdAt={post.createdAt} />
+              <PostDetails
+                post={post}
+                user={user}
+                onDelete={handleDeletePost}
+              />
+              <LikeSection
+                isLiked={isLiked}
+                likeCount={likeCount}
+                onLike={handleLikeClick}
+                commentsCount={comments.length}
+                onCommentClick={handleCommentClick}
+              />
+              <div
+                className="flex-grow flex flex-col overflow-hidden"
+                id="comments-section"
+              >
+                <CommentSection
+                  comments={comments}
+                  onAddComment={handleAddComment}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   );

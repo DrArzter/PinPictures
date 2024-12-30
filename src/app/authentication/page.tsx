@@ -10,6 +10,7 @@ import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useUserContext } from "@/app/contexts/UserContext";
 import { useSocketContext } from "@/app/contexts/SocketContext";
 import { io } from "socket.io-client";
+import { set } from "zod";
 
 export default function Authentication({}) {
   const [isRegistration, setIsRegistration] = useState<boolean>(true);
@@ -47,6 +48,7 @@ export default function Authentication({}) {
             });
             setSocket(socketIo);
             router.push("/posts");
+            setUserLoading(false);
           }
         })
         .catch(() => {
@@ -54,8 +56,8 @@ export default function Authentication({}) {
             status: "error",
             message: "An error occurred during authentication.",
           });
+          setUserLoading(false);
         })
-        .finally(() => setUserLoading(false));
     } else if (isForgotPassword) {
       api
         .forgotPassword(email)
@@ -63,14 +65,15 @@ export default function Authentication({}) {
           if (response?.data?.status === "success") {
             setIsForgotPassword(false);
           }
+          setUserLoading(false);
         })
         .catch(() => {
           addNotification({
             status: "error",
             message: "An error occurred during authentication.",
           });
+          setUserLoading(false);
         })
-        .finally(() => setUserLoading(false));
     } else {
       api
         .login(username, password)
@@ -88,6 +91,7 @@ export default function Authentication({}) {
             });
             setSocket(socketIo);
             router.push("/posts");
+            setUserLoading(false);
           }
         })
         .catch(() => {
@@ -95,8 +99,8 @@ export default function Authentication({}) {
             status: "error",
             message: "An error occurred during authentication.",
           });
-        })
-        .finally(() => setUserLoading(false));
+          setUserLoading(false);
+        });
     }
   };
 

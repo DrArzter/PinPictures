@@ -115,11 +115,10 @@ export default function AdminSummary() {
             value: data.newCommentsCount.toString(),
           },
         }));
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Failed to fetch summary:", error);
-      })
-      .finally(() => {
         setLoading(false);
       });
   }, []);

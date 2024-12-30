@@ -1,12 +1,12 @@
-import React from "react";
+import { memo } from 'react';
 import CommentItem from "./CommentItem";
-import { Comment } from "@/app/types/global";
+import { Comment } from '@/app/types/global';
 
 interface CommentListProps {
   comments: Comment[];
 }
 
-export default function CommentList({ comments }: CommentListProps) {
+const CommentList = memo(({ comments }: CommentListProps) => {
   return (
     <div className="flex-grow overflow-y-auto md:border-t md:mt-4 pt-4">
       {comments.length > 0 ? (
@@ -20,4 +20,8 @@ export default function CommentList({ comments }: CommentListProps) {
       )}
     </div>
   );
-}
+});
+
+CommentList.displayName = 'CommentList';
+
+export default CommentList;

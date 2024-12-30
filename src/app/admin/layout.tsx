@@ -22,7 +22,7 @@ export default function AdminLayout({
   const { user } = useUserContext();
 
   useEffect(() => {
-    if (!user || user?.bananaLevel === 0) {
+    if (!user || user.bananaLevel === undefined || user.bananaLevel === 0) {
       Router.push("/posts");
     }
   }, [user, Router]);
