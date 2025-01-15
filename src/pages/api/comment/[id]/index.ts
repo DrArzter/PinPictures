@@ -5,15 +5,15 @@ import { handleError } from "@/utils/errorHandler";
 import { z } from "zod";
 import { RateLimiterMemory } from "rate-limiter-flexible";
 
-// Схема валидации комментария
+// Comment validation schema
 const commentSchema = z.object({
   comment: z.string().min(1, "Comment is required"),
 });
 
-// Инициализация rate-limiter
+// Rate-limiter initialization
 const rateLimiter = new RateLimiterMemory({
-  points: 1, // 1 запрос
-  duration: 5, // каждые 5 секунд
+  points: 1, // 1 request
+  duration: 5, // every 5 seconds
 });
 
 export default async function handler(

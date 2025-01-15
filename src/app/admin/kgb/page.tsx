@@ -12,12 +12,12 @@ export default function Chats() {
   const [chats, setChats] = useState<Array<AdminChat>>([]);
   const router = useRouter();
 
-  // Открытие модального окна
+  // Opening modal window
   const handleUserClick = (chat: AdminChat) => {
     setSelectedChat(chat);
   };
 
-  // Закрытие модального окна
+  // Closing modal window
   const handleCloseModal = () => {
     setSelectedChat(null);
   };
@@ -34,7 +34,7 @@ export default function Chats() {
     <div className="container mx-auto py-10 text-gray-100">
       <h1 className="text-2xl font-bold mb-4">User List</h1>
 
-      {/* Поле поиска */}
+      {/* Search field */}
       <input
         type="text"
         placeholder="Search by name, email, or ID"
@@ -43,7 +43,7 @@ export default function Chats() {
         className="p-2 w-full border rounded-md shadow-sm mb-4"
       />
 
-      {/* Список пользователей */}
+      {/* User list */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {chats.map((chat) => (
           <motion.div
@@ -71,7 +71,7 @@ export default function Chats() {
         ))}
       </div>
 
-      {/* Модальное окно */}
+      {/* Modal window */}
       {selectedChat && (
         <motion.div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"

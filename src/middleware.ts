@@ -6,7 +6,7 @@ export function middleware(req: NextRequest) {
   const { pathname, origin } = req.nextUrl;
   const res = NextResponse.next();
 
-  // Настройка CORS заголовков
+  // Setting up CORS headers
   res.headers.set("Access-Control-Allow-Origin", "*");
   res.headers.set("Access-Control-Allow-Credentials", "true");
   res.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
@@ -15,7 +15,7 @@ export function middleware(req: NextRequest) {
     "Content-Type, Authorization"
   );
 
-  // Обработка OPTIONS запроса для CORS
+  // Handling OPTIONS request for CORS
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 200,

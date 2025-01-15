@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   title: "PinPictures",
   description: "PinPictures - The best place to share your photos",
   icons: {
-    icon: "https://storage.yandexcloud.net/pinpictures/otherImages/icon.ico", // Указываем URL для favicon
+    icon: "https://storage.yandexcloud.net/pinpictures/otherImages/icon.ico", // Specify URL for favicon
   },
 };
 

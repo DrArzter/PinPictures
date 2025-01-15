@@ -45,7 +45,7 @@ export default function Chat({
       const initialMessages = currentChat.MessagesInChats;
       setMessages(initialMessages);
 
-      // Если сообщений меньше чем MESSAGES_PER_PAGE, значит грузить нечего
+      // If there are fewer messages than MESSAGES_PER_PAGE, there's nothing more to load
       setHasMore(initialMessages.length === MESSAGES_PER_PAGE);
       setTimeout(() => scrollToBottom(), 100);
     }
@@ -58,7 +58,7 @@ export default function Chat({
       (currentChat.id === -1 &&
         currentChat.UsersInChats.some(
           (user: any) => user.userId === otherUserId
-        )) // TODO: исправить
+        )) // TODO: fix this
     )
       return;
 
@@ -78,8 +78,8 @@ export default function Chat({
       if (fetchedMessages.length === 0) {
         setHasMore(false);
       } else {
-        // fetchMoreMessages вызывался, значит мы грузим старые сообщения
-        // На сервере они приходят в порядке DESC, развернём их обратно
+        // fetchMoreMessages was called, so we're loading old messages
+        // On the server they come in DESC order, let's reverse them back
         const reversedFetched = [...fetchedMessages].reverse();
         setMessages((prev) => [...reversedFetched, ...prev]);
         setPage((prevPage) => prevPage + 1);
@@ -205,12 +205,12 @@ export default function Chat({
     );
   }
 
-  // Определяем имя и аватар для чата
+  // Determine chat name and avatar
   let chatName = currentChat.name;
   let chatAvatar = currentChat.picpath;
 
   if (currentChat.ChatType === "private") {
-    // Найдем собеседника
+    // Find the other participant
     const otherParticipant = currentChat.UsersInChats.find(
       (uic) => uic.userId !== user.id
     );
@@ -222,7 +222,7 @@ export default function Chat({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Заголовок чата */}
+      {/* Chat Header */}
       <div className="flex flex-row items-center gap-4 mb-4 border-b pb-4">
         
       <button
@@ -244,7 +244,7 @@ export default function Chat({
         <span className="text-xl font-semibold">{chatName}</span>
       </div>
 
-      {/* Список сообщений */}
+      {/* Message List */}
       <div
         id="scrollableChat"
         ref={scrollableDivRef}
@@ -326,7 +326,7 @@ export default function Chat({
         </InfiniteScroll>
       </div>
 
-      {/* Форма отправки сообщения */}
+      {/* Message Send Form */}
       <form onSubmit={handleSendMessage} className="mt-4">
         <div className="flex flex-col gap-2 items-center w-full">
           <div className="flex w-full">

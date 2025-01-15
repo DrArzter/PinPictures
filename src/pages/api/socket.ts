@@ -43,20 +43,20 @@ export default async function handler(
     return;
   }
 
-  // Инициализация глобального сокета, если он еще не создан
+  // Initialize global socket if it hasn't been created yet
   if (!global.io) {
     console.log("Initializing Socket.io");
 
     const io = new SocketIOServer(res.socket.server, {
       path: "/api/socket",
       cors: {
-        origin: "*", // В продакшене замените на конкретный домен
+        origin: "*", // In production, replace with specific domain
         methods: ["GET", "POST"],
         credentials: true,
       },
     });
 
-    // Настройка Redis адаптера (если используется)
+    // Setup Redis adapter (if used)
     const pubClient = createClient({
       url: process.env.REDIS_URL || "redis://localhost:6379",
     });

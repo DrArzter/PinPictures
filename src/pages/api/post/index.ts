@@ -6,16 +6,16 @@ import formidable from "formidable";
 import fs from "fs/promises";
 import { handleError } from "@/utils/errorHandler";
 
-// Карта магических чисел для поддерживаемых форматов
+// Magic numbers map for supported formats
 const magicNumbers: Record<string, string> = {
   jpeg: "ffd8ff",
-  jpg: "ffd8ff", // То же, что и для jpeg
+  jpg: "ffd8ff", // Same as jpeg
   png: "89504e47",
   gif: "47494638",
   webp: "52494646",
 };
 
-// Проверка содержимого файла по магическим числам
+// Checking file content using magic numbers
 async function isValidFileContent(
   buffer: Buffer,
   fileExt: string
@@ -25,7 +25,7 @@ async function isValidFileContent(
   return expectedMagic ? magicHex.startsWith(expectedMagic) : false;
 }
 
-// Отключаем встроенный парсер тела запроса
+// Disable built-in request body parser
 export const config = {
   api: {
     bodyParser: false,
@@ -57,7 +57,7 @@ export default async function handler(
 
     const form = formidable({ multiples: true });
 
-    // Парсинг данных из формы
+    // Parsing form data
     const { fields, files } = await new Promise<{
       fields: formidable.Fields;
       files: formidable.Files;
@@ -80,7 +80,7 @@ export default async function handler(
       });
     }
 
-    // Создание нового поста
+    // Creating a new post
     const newPost = await prisma.post.create({
       data: {
         name,
@@ -91,7 +91,7 @@ export default async function handler(
 
     const newPostId = newPost.id;
 
-    // Подготовка файлов для загрузки
+    // Preparing files for upload
     const filesToUpload: {
       filename: string;
       content: Buffer;
@@ -125,7 +125,7 @@ export default async function handler(
           });
         }
 
-        // Чтение первых байтов файла
+        // Reading first bytes of the file
         const buffer = await fs.readFile(image.filepath);
 
         if (!isValidFileContent(buffer, fileExt)) {
@@ -136,13 +136,13 @@ export default async function handler(
           });
         }
 
-        // Создание уникального пути файла
+        // Creating unique file path
         const tempPath = image.filepath;
         const randomString = Math.random().toString(36).substr(2, 10);
         const newPath = `${tempPath}.${fileExt}`;
 
         try {
-          // Переименование и чтение файла
+          // Renaming and reading file
           await fs.rename(tempPath, newPath);
 
           const fileContent = await fs.readFile(newPath);
@@ -153,7 +153,7 @@ export default async function handler(
             path: newPath,
           });
 
-          // Обновляем путь в списке временных файлов
+          // Updating path in temporary files list
           tempFiles[tempFiles.indexOf(tempPath)] = newPath;
         } catch (error) {
           return handleError(res, error);
@@ -168,13 +168,13 @@ export default async function handler(
       });
     }
 
-    // Загрузка файлов в S3
+    // Uploading files to S3
     const uploadResult = await uploadFiles(filesToUpload);
 
-    // Удаление временных файлов
+    // Removing temporary files
     await cleanupFiles(tempFiles);
 
-    // Сохранение данных о загруженных изображениях в БД
+    // Saving uploaded images data to DB
     for (const result of uploadResult) {
       await prisma.imageInPost.create({
         data: {
@@ -201,7 +201,7 @@ export default async function handler(
   }
 }
 
-// Функция подчистки временных файлов
+// Cleanup function for temporary files
 async function cleanupFiles(filePaths: string[]) {
   for (const filePath of filePaths) {
     try {

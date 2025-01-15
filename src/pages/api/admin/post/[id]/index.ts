@@ -11,7 +11,7 @@ export default async function handler(
   if (req.method !== "DELETE") {
     return res
       .status(405)
-      .json({ status: "error", message: "Метод не поддерживается" });
+      .json({ status: "error", message: "Method not supported" });
   }
 
   try {
@@ -21,13 +21,13 @@ export default async function handler(
     if (!user) {
       return res
         .status(404)
-        .json({ status: "error", message: "Пользователь не найден" });
+        .json({ status: "error", message: "User not found" });
     }
 
     if (user.bananaLevel < 1) {
       return res
         .status(403)
-        .json({ status: "error", message: "Доступ запрещен" });
+        .json({ status: "error", message: "Access denied" });
     }
 
     const postId = parseInt(req.query.id as string);
@@ -35,10 +35,10 @@ export default async function handler(
     if (isNaN(postId)) {
       return res
         .status(400)
-        .json({ status: "error", message: "Неверный ID поста" });
+        .json({ status: "error", message: "Invalid post ID" });
     }
 
-    // Получаем пост и связанные изображения
+    // Get post and related images
     const post = await prisma.post.findUnique({
       where: { id: postId },
       include: {
@@ -49,25 +49,25 @@ export default async function handler(
     if (!post) {
       return res
         .status(404)
-        .json({ status: "error", message: "Пост не найден" });
+        .json({ status: "error", message: "Post not found" });
     }
 
-    // Собираем ключи изображений для удаления из S3
+    // Collect image keys for deletion from S3
     const imageKeys = post.ImageInPost.map(image => image.bucketkey);
 
-    // Удаляем изображения из S3
+    // Delete images from S3
     if (imageKeys.length > 0) {
       await deleteFiles(imageKeys);
     }
 
-    // Удаляем пост (каскадно удалятся все связанные записи благодаря onDelete: Cascade)
+    // Delete post (all related records will be deleted cascadingly thanks to onDelete: Cascade)
     await prisma.post.delete({
       where: { id: postId }
     });
 
     return res
       .status(200)
-      .json({ status: "success", message: "Пост успешно удален" });
+      .json({ status: "success", message: "Post successfully deleted" });
 
   } catch (error) {
     return handleError(res, error);

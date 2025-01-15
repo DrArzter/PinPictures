@@ -41,7 +41,7 @@ export default function AdminLayout({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Дождь из бананов */}
+      {/* Banana rain */}
       <div className="banana-rain">
         {Array.from({ length: 50 }).map((_, index) => (
           <LuBanana
@@ -56,7 +56,7 @@ export default function AdminLayout({
         ))}
       </div>
 
-      {/* Левая колонка */}
+      {/* Left column */}
       <motion.div
         className="w-1/4 h-full p-4 border-r border-gray-700 relative z-10"
         initial={{ x: -50, opacity: 0 }}
