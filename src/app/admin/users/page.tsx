@@ -71,7 +71,7 @@ export default function Users() {
 
       {/* Список пользователей */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {users.map((user) => (
+        {users && users.length > 0 ? users.map((user) => (
           <motion.div
             key={user.id}
             className="bg-gray-800 shadow-md rounded-lg p-6 flex items-center space-x-4 hover:bg-gray-700"
@@ -82,7 +82,7 @@ export default function Users() {
             <FaUserNinja size={40} className="text-yellow-400" />
             <h2 className="text-lg font-semibold">{user.name}</h2>
           </motion.div>
-        ))}
+        )) : <p className="text-gray-500">No users found</p>}
       </div>
 
       {/* Модальное окно */}

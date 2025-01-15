@@ -35,13 +35,11 @@ export default async function handler(
       searchTerm && {
         name: {
           contains: searchTerm,
-          mode: "insensitive",
         },
       },
       searchTerm && {
         email: {
           contains: searchTerm,
-          mode: "insensitive",
         },
       },
       !isNaN(Number(searchTerm)) && {

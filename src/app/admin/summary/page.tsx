@@ -90,29 +90,29 @@ export default function AdminSummary() {
       .then((data) => {
         setStats((prevStats) => ({
           ...prevStats,
-          users: { ...prevStats.users, value: data.usersCount.toString() },
-          posts: { ...prevStats.posts, value: data.postsCount.toString() },
+          users: { ...prevStats.users, value: data?.usersCount?.toString() || '0' },
+          posts: { ...prevStats.posts, value: data?.postsCount?.toString() || '0' },
           comments: {
             ...prevStats.comments,
-            value: data.commentsCount.toString(),
+            value: data?.commentsCount?.toString() || '0',
           },
-          likes: { ...prevStats.likes, value: data.likesCount.toString() },
+          likes: { ...prevStats.likes, value: data?.likesCount?.toString() || '0' },
           messages: {
             ...prevStats.messages,
-            value: data.messagesCount.toString(),
+            value: data?.messagesCount?.toString() || '0',
           },
-          chats: { ...prevStats.chats, value: data.chatsCount.toString() },
+          chats: { ...prevStats.chats, value: data?.chatsCount?.toString() || '0' },
           newUsers: {
             ...prevStats.newUsers,
-            value: data.newUsersCount.toString(),
+            value: data?.newUsersCount?.toString() || '0',
           },
           newPosts: {
             ...prevStats.newPosts,
-            value: data.newPostsCount.toString(),
+            value: data?.newPostsCount?.toString() || '0',
           },
           newComments: {
             ...prevStats.newComments,
-            value: data.newCommentsCount.toString(),
+            value: data?.newCommentsCount?.toString() || '0',
           },
         }));
         setLoading(false);

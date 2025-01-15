@@ -79,12 +79,11 @@ export default function Profile() {
 
       try {
         setLoading(true);
-        api.getProfile(profileName).then((response) => {
-          setProfile(response.data.data);
-        });
+        const response = await api.getProfile(profileName);
+        setProfile(response.data.data);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching profile:", error);
-      } finally {
         setLoading(false);
       }
     };
