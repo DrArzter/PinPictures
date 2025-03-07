@@ -8,6 +8,17 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import * as api from "@/app/api";
 
+// Helper function to get a blurred small version of an image
+const getBlurredImageUrl = (url: string) => {
+  // For images coming from your own domain, you can append query params
+  // This approach works if you have an image optimization service
+  if (url.includes('?')) {
+    return `${url}&quality=10&width=50`;
+  } else {
+    return `${url}?quality=10&width=50`;
+  }
+};
+
 interface PostProps {
   post: PostType;
 }
@@ -84,15 +95,24 @@ export default function Post({ post }: PostProps) {
             )}
 
             {post.ImageInPost[0] && (
-              <Image
-                src={post.ImageInPost[0]?.picpath}
-                alt={post.name}
-                title={post.name}
-                width={0}
-                height={0}
-                sizes="100vw"
-                className="cursor-pointer w-full h-full object-cover"
-              />
+              <div className="w-full relative overflow-hidden">
+                <Image
+                  src={post.ImageInPost[0]?.picpath}
+                  alt={post.name}
+                  title={post.name}
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  style={{ 
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '600px'
+                  }}
+                  placeholder="blur"
+                  blurDataURL={getBlurredImageUrl(post.ImageInPost[0]?.picpath)}
+                  className="cursor-pointer"
+                />
+              </div>
             )}
 
             <div className="absolute top-0 left-0 right-0 flex justify-between items-center p-4 bg-gradient-to-b from-black/70 to-transparent">
