@@ -36,7 +36,9 @@ export default async function handler(
         .json({ status: "error", message: "User not found" });
     }
 
-    // Ограничение частоты запросов на основе user.id
+    // Rate-limiter based on user.id
+    // Turned off
+    /*
     try {
       await rateLimiter.consume(user.id.toString()); // Проверка лимита по user.id
     } catch {
@@ -44,6 +46,7 @@ export default async function handler(
         .status(429)
         .json({ status: "error", message: "Too many requests. Please wait." });
     }
+    */
 
     const postId = parseInt(req.query.id as string, 10);
     if (isNaN(postId)) {

@@ -77,8 +77,8 @@ const PostDetails = memo(
           <h1 className="font-bold text-3xl mb-4 text-yellow-500">
             {post.name}
           </h1>
-          {user?.bananaLevel && user.bananaLevel > 0 && (
-            <ImBin2 size={20} onClick={onDelete} className="cursor-pointer" />
+          {(user?.bananaLevel ?? 0) > 0 && (
+            <ImBin2 size={20} onClick={onDelete} className="cursor-pointer " />
           )}
         </div>
         <p className="text-gray-700 dark:text-gray-300">{post.description}</p>

@@ -65,6 +65,9 @@ export async function authMiddleware(
         });
       }
 
+      // Check rate limits
+      // Turned off
+      /*
       try {
         if (user) {
           await userRateLimiter.consume(user.id.toString());
@@ -74,6 +77,7 @@ export async function authMiddleware(
       } catch (error) {
         return handleRateLimitError(error as RateLimiterRes, req, res);
       }
+      */
 
       if (user.banned) {
         return res.status(444).json({
