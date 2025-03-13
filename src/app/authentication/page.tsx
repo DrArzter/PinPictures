@@ -10,7 +10,6 @@ import { useNotificationContext } from "@/app/contexts/NotificationContext";
 import { useUserContext } from "@/app/contexts/UserContext";
 import { useSocketContext } from "@/app/contexts/SocketContext";
 import { io } from "socket.io-client";
-import { set } from "zod";
 import { LuBanana } from "react-icons/lu";
 
 export default function Authentication({ }) {

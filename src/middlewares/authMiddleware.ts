@@ -3,12 +3,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { parse } from "cookie";
 import { ClientSelfUser } from "@/app/types/global";
-import {
-  userRateLimiter,
-  ipRateLimiter,
-  handleRateLimitError,
-} from "@/utils/rateLimiter";
-import { RateLimiterRes } from "rate-limiter-flexible";
 
 interface DecodedToken {
   userId: number;

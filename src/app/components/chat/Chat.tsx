@@ -3,7 +3,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { ClientSelfUser, FullChat, MessageInChat } from "@/app/types/global";
-import { useRouter } from "next/navigation";
 import LoadingIndicator from "../common/LoadingIndicator";
 import { Socket } from "socket.io-client";
 import { FaRegFileImage } from "react-icons/fa6";
@@ -38,8 +37,6 @@ export default function Chat({
   const [hasMore, setHasMore] = useState<boolean>(true);
   const scrollableDivRef = useRef<HTMLDivElement>(null);
 
-  const router = useRouter();
-
   useEffect(() => {
     if (currentChat && currentChat.MessagesInChats) {
       const initialMessages = currentChat.MessagesInChats;
@@ -57,7 +54,7 @@ export default function Chat({
       !currentChat ||
       (currentChat.id === -1 &&
         currentChat.UsersInChats.some(
-          (user: any) => user.userId === otherUserId
+          (user: { userId: number }) => user.userId === otherUserId
         )) // TODO: fix this
     )
       return;

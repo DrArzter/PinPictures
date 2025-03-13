@@ -6,7 +6,6 @@ import React, {
   useContext,
   useCallback,
   useMemo,
-  memo,
 } from "react";
 import { useParams } from "next/navigation";
 import LoadingIndicator from "@/app/components/common/LoadingIndicator";
@@ -31,61 +30,61 @@ import { ImBin2 } from "react-icons/im";
 import { AxiosResponse } from "axios";
 import { useRouter } from "next/navigation";
 
-const LikeSection = memo(
-  ({
-    isLiked,
-    likeCount,
-    onLike,
-    commentsCount,
-    onCommentClick,
-  }: {
-    isLiked: boolean;
-    likeCount: number;
-    onLike: (e?: React.MouseEvent) => void;
-    commentsCount: number;
-    onCommentClick: () => void;
-  }) => {
-    return (
-      <div className="flex items-center gap-6 mt-4">
-        <LikeButton isLiked={isLiked} likeCount={likeCount} onLike={onLike} />
-        <button
-          className="flex items-center gap-1 text-yellow-500 hover:text-yellow-600 transition-colors duration-200"
-          onClick={onCommentClick}
-          aria-label="View Comments"
-        >
-          <BsChatDots size={20} />
-          <span>{commentsCount}</span>
-        </button>
-      </div>
-    );
-  }
-);
+const LikeSection = ({
+  isLiked,
+  likeCount,
+  onLike,
+  commentsCount,
+  onCommentClick,
+}: {
+  isLiked: boolean;
+  likeCount: number;
+  onLike: (e?: React.MouseEvent) => void;
+  commentsCount: number;
+  onCommentClick: () => void;
+}) => {
+  return (
+    <div className="flex items-center gap-6 mt-4">
+      <LikeButton isLiked={isLiked} likeCount={likeCount} onLike={onLike} />
+      <button
+        className="flex items-center gap-1 text-yellow-500 hover:text-yellow-600 transition-colors duration-200"
+        onClick={onCommentClick}
+        aria-label="View Comments"
+      >
+        <BsChatDots size={20} />
+        <span>{commentsCount}</span>
+      </button>
+    </div>
+  );
+};
 
-const PostDetails = memo(
-  ({
-    post,
-    user,
-    onDelete,
-  }: {
-    post: PostType;
-    user: ClientSelfUser | null;
-    onDelete: () => void;
-  }) => {
-    return (
-      <div className="mt-4">
-        <div className="flex flex-row items-center justify-between">
-          <h1 className="font-bold text-3xl mb-4 text-yellow-500">
-            {post.name}
-          </h1>
-          {(user?.bananaLevel ?? 0) > 0 && (
-            <ImBin2 size={20} onClick={onDelete} className="cursor-pointer " />
-          )}
-        </div>
-        <p className="text-gray-700 dark:text-gray-300">{post.description}</p>
+LikeSection.displayName = "LikeSection";
+
+const PostDetails = ({
+  post,
+  user,
+  onDelete,
+}: {
+  post: PostType;
+  user: ClientSelfUser | null;
+  onDelete: () => void;
+}) => {
+  return (
+    <div className="mt-4">
+      <div className="flex flex-row items-center justify-between">
+        <h1 className="font-bold text-3xl mb-4 text-yellow-500">
+          {post.name}
+        </h1>
+        {(user?.bananaLevel ?? 0) > 0 && (
+          <ImBin2 size={20} onClick={onDelete} className="cursor-pointer " />
+        )}
       </div>
-    );
-  }
-);
+      <p className="text-gray-700 dark:text-gray-300">{post.description}</p>
+    </div>
+  );
+};
+
+PostDetails.displayName = "PostDetails";
 
 export default function PostPage() {
   const { addNotification } = useNotificationContext();
@@ -111,7 +110,7 @@ export default function PostPage() {
 
   const { openModal } = useContext(ModalsContext);
 
-  function handleDeletePost() {
+  const handleDeletePost = useCallback(() => {
     if (!post) return;
 
     api
@@ -124,7 +123,7 @@ export default function PostPage() {
       .catch(() => {
         router.push("/");
       });
-  }
+  }, [post, router]);
 
   useEffect(() => {
     const fetchPostData = async () => {
@@ -185,7 +184,7 @@ export default function PostPage() {
         setTormoz(false);
       }
     },
-    [user, post, isLiked, tormoz, likeCount]
+    [post, isLiked, tormoz, likeCount]
   );
 
   const handleImageClick = useCallback(() => {
@@ -269,7 +268,7 @@ export default function PostPage() {
             });
 
             setComments((prev) =>
-              (prev as Comment[]).filter((comment) => comment.id !== undefined)
+              prev.filter((comment) => comment.id !== tempId)
             );
           } else {
             throw new Error(response.data.message || "Unknown error");
@@ -426,4 +425,4 @@ export default function PostPage() {
       </div>
     </>
   );
-}
+};

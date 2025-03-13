@@ -3,17 +3,10 @@ import { prisma } from "@/utils/prisma";
 import { authMiddleware } from "@/middlewares/authMiddleware";
 import { handleError } from "@/utils/errorHandler";
 import { z } from "zod";
-import { RateLimiterMemory } from "rate-limiter-flexible";
 
 // Comment validation schema
 const commentSchema = z.object({
   comment: z.string().min(1, "Comment is required"),
-});
-
-// Rate-limiter initialization
-const rateLimiter = new RateLimiterMemory({
-  points: 1, // 1 request
-  duration: 5, // every 5 seconds
 });
 
 export default async function handler(
@@ -35,18 +28,6 @@ export default async function handler(
         .status(404)
         .json({ status: "error", message: "User not found" });
     }
-
-    // Rate-limiter based on user.id
-    // Turned off
-    /*
-    try {
-      await rateLimiter.consume(user.id.toString()); // Проверка лимита по user.id
-    } catch {
-      return res
-        .status(429)
-        .json({ status: "error", message: "Too many requests. Please wait." });
-    }
-    */
 
     const postId = parseInt(req.query.id as string, 10);
     if (isNaN(postId)) {

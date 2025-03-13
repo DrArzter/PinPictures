@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import ChatList from "@/app/components/chat/ChatList";
 import { useUserContext } from "@/app/contexts/UserContext";
 import { useSocketContext } from "@/app/contexts/SocketContext";
-import { AdminChat } from "@/app/types/global";
+import { AdminChat, NewMessage } from "@/app/types/global";
 import { Socket } from "socket.io-client";
 import { useSelectedChatStore } from "@/app/useSelectedChatStore";
 
@@ -30,7 +30,7 @@ export default function ChatsLayout({ children }: { children: React.ReactNode })
       setChats([...chatsRef.current]);
     });
 
-    socket.on("newMessage", (message: any) => {
+    socket.on("newMessage", (message: NewMessage) => {
       const chatIndex = chatsRef.current.findIndex((chat) => chat.id === message.chatId);
       if (chatIndex !== -1) {
         chatsRef.current[chatIndex].lastMessage = message;

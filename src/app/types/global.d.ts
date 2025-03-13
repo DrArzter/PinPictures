@@ -168,6 +168,10 @@ export interface MessageInChat {
   imagesInMessages: Image[];
 }
 
+export interface NewMessage extends MessageInChat {
+  userId: number;
+}
+
 export interface Socket {
   on(event: string, callback: (...args: unknown[]) => void): void;
   emit(event: string, ...args: unknown[]): void;

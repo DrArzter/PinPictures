@@ -89,6 +89,7 @@ async function captchaCheck(token: string) {
       return false;
     }
   } catch (error) {
+    console.error("Captcha verification error:", error);
     return false;
   }
 }

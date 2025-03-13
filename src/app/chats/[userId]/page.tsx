@@ -33,7 +33,7 @@ export default function PrivateChatPage() {
 
     let didRequestChat = false;
 
-    const handleChat = (chatData: any) => {
+    const handleChat = (chatData: FullChat) => {
       if (chatData) {
         setChat(chatData);
         socket.emit("getUserChats");

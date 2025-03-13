@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import { useSocketContext } from "@/app/contexts/SocketContext";
 import { useUserContext } from "@/app/contexts/UserContext";
 import LoadingIndicator from "@/app/components/common/LoadingIndicator";
-import Chat from "@/app/components/chat/Chat";
 import { FullChat } from "@/app/types/global";
 import { useParams } from "next/navigation";
 
@@ -49,11 +48,8 @@ export default function GroupChatPage() {
   }
 
   return (
-    <Chat
-      user={user!}
-      chat={chat}
-      isActiveChatLoading={false}
-      socket={socket || undefined}
-    />
+    <div className="flex flex-col items-center justify-center h-full">
+      WIP
+    </div>
   );
 }
