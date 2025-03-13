@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useRef, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { RegistrationProps } from "@/app/types/global";
 
@@ -12,7 +12,10 @@ export default function Registration({
   setPassword,
   handleSubmit,
   toggleRegistration,
+  setRecaptcha
 }: RegistrationProps) {
+
+
   const containerClassName = `
     flex flex-col items-center gap-6 p-6 md:p-12 
     md:border rounded-xl shadow-xl 
@@ -33,7 +36,7 @@ export default function Registration({
   `;
 
   const onCaptchaChange = (value: string | null) => {
-    console.log("Captcha value:", value);
+    setRecaptcha(value);
   };
 
   return (
@@ -93,7 +96,7 @@ export default function Registration({
 
         <div className="w-full">
           <ReCAPTCHA
-            sitekey="your-site-key"
+            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
             onChange={onCaptchaChange}
             className="flex justify-center"
           />

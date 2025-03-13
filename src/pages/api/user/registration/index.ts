@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/utils/prisma";
 import { signToken } from "@/utils/jwt";
+import axios from "axios";
 import { hashPassword } from "@/utils/hashPassword";
 import { handleError } from "@/utils/errorHandler"; // Import the error handler function
 import { z } from "zod";
@@ -9,6 +10,7 @@ const registrationSchema = z.object({
   email: z.string().email("Invalid email format"),
   name: z.string().min(1, "Name is required"),
   password: z.string().min(6, "Password is required"),
+  recaptcha: z.string().min(1, "Captcha is required"),
 });
 
 export default async function handler(
@@ -25,11 +27,20 @@ export default async function handler(
     // Validate request body against the schema
     registrationSchema.parse(req.body);
 
-    const { email, name, password } = req.body as {
+    const { email, name, password, recaptcha } = req.body as {
       email: string;
       name: string;
       password: string;
+      recaptcha: string;
     };
+
+    const isCaptchaValid = await captchaCheck(recaptcha);
+
+    if (!isCaptchaValid) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Captcha verification failed" });
+    }
 
     // Create a new user in the database
     const user = await prisma.user.create({
@@ -55,14 +66,29 @@ export default async function handler(
       };` + (process.env.NODE_ENV === "production" ? " Secure;" : ""),
     ]);
 
-    return res
-      .status(200)
-      .json({
-        status: "success",
-        message: "Registration successful",
-        token: token,
-      });
+    return res.status(200).json({
+      status: "success",
+      message: "Registration successful",
+      token: token,
+    });
   } catch (error) {
     return handleError(res, error); // Handle errors through the shared function
+  }
+}
+
+async function captchaCheck(token: string) {
+  const secretKey: string | undefined = process.env.RECAPTCHA_SECRET_KEY;
+  try {
+    const response = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`
+    );
+
+    if (response.data.success) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    return false;
   }
 }

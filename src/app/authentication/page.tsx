@@ -11,10 +11,13 @@ import { useUserContext } from "@/app/contexts/UserContext";
 import { useSocketContext } from "@/app/contexts/SocketContext";
 import { io } from "socket.io-client";
 import { set } from "zod";
+import { LuBanana } from "react-icons/lu";
 
-export default function Authentication({}) {
+export default function Authentication({ }) {
   const [isRegistration, setIsRegistration] = useState<boolean>(true);
   const [isForgotPassword, setIsForgotPassword] = useState<boolean>(false);
+
+  const [recaptcha, setRecaptcha] = useState<string | null>(null);
 
   const { setUser, setUserLoading } = useUserContext();
   const { addNotification } = useNotificationContext();
@@ -31,13 +34,22 @@ export default function Authentication({}) {
     setUserLoading(true);
 
     if (isRegistration) {
+      if (!recaptcha) {
+        addNotification({
+          status: "error",
+          message: "Please verify that you are not a robot.",
+        });
+        setUserLoading(false);
+        return;
+      }
       api
-        .registration(username, email, password)
+        .registration(username, email, password, recaptcha)
         .then((response) => {
           if (response?.data?.status === "success") {
             setIsRegistration(false);
             return api.getUser();
           }
+          setUserLoading(false);
         })
         .then((response) => {
           if (response?.data?.status === "success") {
@@ -132,26 +144,31 @@ export default function Authentication({}) {
           setPassword={setPassword}
           handleSubmit={handleSubmit}
           toggleRegistration={toggleRegistration}
+          setRecaptcha={setRecaptcha}
         />
       ) : isForgotPassword ? (
-        <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-          <p className="mb-4">Enter your email to reset password</p>
-          <form onSubmit={handleSubmit} className="flex flex-col items-center">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              required
-              className="mb-4 p-2 border rounded w-64"
-            />
-            <button
-              type="submit"
-              className="bg-blue-500 font-semibold py-2 px-4 rounded hover:bg-blue-600"
-            >
-              Reset Password
-            </button>
-          </form>
+        <div className="p-6 rounded-lg text-center">
+          <div className="banana-rain">
+            {Array.from({ length: 50 }).map((_, index) => (
+              <LuBanana
+                key={index}
+                className="banana text-yellow-400 text-4xl"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 2}s`,
+                  animationDuration: `${3 + Math.random() * 2}s`,
+                }}
+              />
+            ))}
+          </div>
+          <p className="mb-4">Анлак</p>
+          <p className="mb-4">Unluck</p>
+          <button
+            onClick={toggleForgotPassword}
+            className="w-full p-3 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition-all duration-300"
+          >
+            Назад
+          </button>
         </div>
       ) : (
         <Login

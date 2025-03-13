@@ -220,6 +220,7 @@ export interface RegistrationProps {
   setPassword: (value: string) => void;
   handleSubmit: (event: React.FormEvent) => void;
   toggleRegistration: () => void;
+  setRecaptcha: (value: string | null) => void;
 }
 
 export interface Comment {
