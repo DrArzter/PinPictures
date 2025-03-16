@@ -36,13 +36,13 @@ export default function Chat({
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const scrollableDivRef = useRef<HTMLDivElement>(null);
+  const messageIdsRef = useRef(new Set<number>());
 
   useEffect(() => {
     if (currentChat && currentChat.MessagesInChats) {
       const initialMessages = currentChat.MessagesInChats;
       setMessages(initialMessages);
-
-      // If there are fewer messages than MESSAGES_PER_PAGE, there's nothing more to load
+      messageIdsRef.current = new Set(initialMessages.map(msg => msg.id));
       setHasMore(initialMessages.length === MESSAGES_PER_PAGE);
       setTimeout(() => scrollToBottom(), 100);
     }
@@ -64,8 +64,9 @@ export default function Chat({
     socket.on("newMessage", (newMsg: MessageInChat) => {
       if (
         newMsg.chatId === currentChat.id &&
-        !messages.some((msg) => msg.id === newMsg.id)
+        !messageIdsRef.current.has(newMsg.id)
       ) {
+        messageIdsRef.current.add(newMsg.id);
         setMessages((prev) => [...prev, newMsg]);
         scrollToBottom();
       }
