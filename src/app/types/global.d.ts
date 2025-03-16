@@ -45,6 +45,11 @@ export interface PostCounts {
   Likes: number;
 }
 
+export interface Search {
+  Users?: ShortUser[];
+  Posts?: Post[];
+}
+
 export interface Like {
   id: number;
   userId: number;

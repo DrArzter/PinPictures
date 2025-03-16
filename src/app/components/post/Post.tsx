@@ -65,7 +65,7 @@ export default function Post({ post }: PostProps) {
     }
   };
 
-  const postContainerClassName = `hover:scale-105 border rounded-xl focus:scale-105 transition-transform duration-300 overflow-hidden`;
+  const postContainerClassName = `border rounded-xl transition-transform duration-300 overflow-hidden`;
   const imageContainerClassName = "w-full overflow-hidden relative";
   const layersIconClassName =
     "absolute bottom-2 right-2 text-2xl text-yellow-500";
@@ -103,15 +103,17 @@ export default function Post({ post }: PostProps) {
                   width={0}
                   height={0}
                   sizes="100vw"
-                  style={{ 
+                  style={{
                     width: '100%',
                     height: 'auto',
-                    maxHeight: '600px'
+                    maxHeight: '600px',
+                    transition: 'filter 0.3s ease',
                   }}
                   placeholder="blur"
                   blurDataURL={getBlurredImageUrl(post.ImageInPost[0]?.picpath)}
-                  className="cursor-pointer"
+                  className="cursor-pointer hover:brightness-75"
                 />
+
               </div>
             )}
 

@@ -16,7 +16,7 @@ export default async function handler(
   const { term } = req.query;
 
   try {
-    const posts = await prisma.post.findMany({
+    const Posts = await prisma.post.findMany({
       where: {
         OR: [
           { name: { contains: term as string } },
@@ -27,6 +27,7 @@ export default async function handler(
       include: {
         User: {
           select: {
+            id: true,
             name: true,
             avatar: true,
           },
@@ -39,22 +40,23 @@ export default async function handler(
       },
     });
 
-    const users = await prisma.user.findMany({
+    const Users = await prisma.user.findMany({
       where: {
         name: {
           contains: term as string,
         },
       },
       select: {
+        id: true,
         name: true,
         avatar: true,
       },
     });
 
     return res.status(200).json({
-      results: {
-        posts,
-        users,
+      data: {
+        Posts,
+        Users,
       },
       status: "success",
       message: "Search successful",
