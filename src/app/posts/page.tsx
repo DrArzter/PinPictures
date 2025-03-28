@@ -6,6 +6,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import LoadingIndicator from "../components/common/LoadingIndicator";
 import NoPostsFound from "../components/post/NoPostsFound";
 import * as postUtils from "../utils/postUtils";
+import { useColumnCount } from "../hooks/useColumnCount";
 import { Post } from "@/app/types/global";
 
 export default function Posts() {
@@ -17,26 +18,7 @@ export default function Posts() {
 
   const minColumnWidth = 300;
   const maxColumns = 4;
-  const [columns, setColumns] = useState<number>(1);
-
-  const calculateColumns = useCallback(() => {
-    if (typeof window !== "undefined") {
-      const windowWidth = window.innerWidth;
-      const newColumns = Math.max(
-        1,
-        Math.min(maxColumns, Math.floor(windowWidth / minColumnWidth))
-      );
-      setColumns(newColumns);
-    }
-  }, []);
-
-  useEffect(() => {
-    calculateColumns();
-    window.addEventListener("resize", calculateColumns);
-    return () => {
-      window.removeEventListener("resize", calculateColumns);
-    };
-  }, [calculateColumns]);
+  const columns = useColumnCount({ minColumnWidth: 300, maxColumns: 4 });
 
   const fetchMorePosts = useCallback(async () => {
     if (loading || !hasMorePosts) return;
