@@ -1,7 +1,7 @@
 // ./src/app/profile/[name]/page.tsx
 "use client";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 
 import { useUserContext } from "@/app/contexts/UserContext";
@@ -23,6 +23,7 @@ import { useNotificationContext } from "@/app/contexts/NotificationContext";
 
 export default function Profile() {
   const params = useParams();
+  const router = useRouter();
   const addNotification = useNotificationContext().addNotification;
   const profileName = useMemo(
     () => (params.name ? params.name : null),
@@ -179,12 +180,11 @@ export default function Profile() {
         </motion.div>
       </motion.div>
 
-      {/* Основная информация профиля */}
       <motion.div
         className="mt-40 px-4 sm:px-6 lg:px-8"
         variants={itemVariants}
       >
-        <div className="text-center">
+        <div className="text-center relative">
           <h1 className="text-3xl font-semibold">{profile.name}</h1>
           {isMyProfile ? (
             <p className="text-sm mt-2">That is your profile</p>
@@ -192,7 +192,7 @@ export default function Profile() {
             <div className="flex justify-center space-x-4 mt-2">
               <AiOutlineMessage
                 className="cursor-pointer"
-                onClick={() => console.log("Send message")}
+                onClick={() => router.push(`/chats/${profile.id}`)}
                 size={24}
                 aria-label="Send Message"
               />
