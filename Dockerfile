@@ -4,22 +4,19 @@ FROM node:20-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Set production environment
-ENV NODE_ENV production
+# Set build environment
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Install dependencies
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 # Copy source
 COPY . .
 
-# Generate Prisma Client
+# Generate Prisma Client and build with increased memory
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN npx prisma generate
-
-# Build production app with reduced memory usage
-ENV NODE_OPTIONS="--max-old-space-size=1536"
 RUN npm run build
 
 # Production image, copy all the files and run next
