@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Set build environment
 ENV NEXT_TELEMETRY_DISABLED 1
+RUN apk add --no-cache openssl1.1-compat
 
 # Install dependencies
 COPY package*.json ./
