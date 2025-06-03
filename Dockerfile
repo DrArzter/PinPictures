@@ -18,6 +18,7 @@ COPY . .
 
 # Generate Prisma Client and build with increased memory
 ENV NODE_OPTIONS="--max-old-space-size=4096"
+RUN npx prisma init --output ../generated/prisma
 RUN npx prisma generate
 RUN npm run build
 
