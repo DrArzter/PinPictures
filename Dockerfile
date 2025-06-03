@@ -6,7 +6,8 @@ WORKDIR /app
 
 # Set build environment
 ENV NEXT_TELEMETRY_DISABLED 1
-RUN apk add --no-cache openssl1.1-compat
+# Install OpenSSL - using the correct package name for current Alpine
+RUN apk add --no-cache openssl
 
 # Install dependencies
 COPY package*.json ./
@@ -31,6 +32,9 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Install OpenSSL in the runner stage
+RUN apk add --no-cache openssl
+
 # Copy necessary files from builder
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/.next ./.next
@@ -49,4 +53,4 @@ USER nextjs
 EXPOSE 3000
 
 # Start the app
-CMD ["npm", "run", "start"] 
+CMD ["npm", "run", "start"]
