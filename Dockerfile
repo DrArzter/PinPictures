@@ -6,7 +6,6 @@ WORKDIR /app
 
 # Set build environment
 ENV NEXT_TELEMETRY_DISABLED 1
-RUN apt update -y && apt install -y openssl
 # Install dependencies
 COPY package*.json ./
 RUN npm ci
@@ -18,8 +17,8 @@ COPY . .
 
 # Generate Prisma Client and build with increased memory
 ENV NODE_OPTIONS="--max-old-space-size=4096"
+RUN rm -rf generated
 RUN npx prisma init --output ../generated/prisma
-RUN npx prisma generate
 RUN npm run build
 
 # Production image, copy all the files and run next
