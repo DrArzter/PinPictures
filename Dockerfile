@@ -10,6 +10,8 @@ ENV NEXT_TELEMETRY_DISABLED 1
 # Install dependencies
 COPY package*.json ./
 RUN npm ci
+# Install required dev dependencies
+RUN npm install --save-dev eslint @types/react-google-recaptcha
 
 # Copy source
 COPY . .
