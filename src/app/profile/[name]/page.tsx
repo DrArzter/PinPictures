@@ -1,6 +1,6 @@
 // ./src/app/profile/[name]/page.tsx
 "use client";
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 

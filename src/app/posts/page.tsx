@@ -16,8 +16,6 @@ export default function Posts() {
   const [hasMorePosts, setHasMorePosts] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const minColumnWidth = 300;
-  const maxColumns = 4;
   const columns = useColumnCount({ minColumnWidth: 300, maxColumns: 4 });
 
   const fetchMorePosts = useCallback(async () => {

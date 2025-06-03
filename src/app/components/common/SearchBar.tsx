@@ -1,7 +1,5 @@
 "use client";
 
-import { SlMagnifier } from "react-icons/sl";
-
 export interface SearchBarProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;

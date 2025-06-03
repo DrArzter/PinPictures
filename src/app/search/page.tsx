@@ -9,7 +9,7 @@ export default function Page() {
     const [searchTerm, setSearchTerm] = React.useState("");
     const [users, setUsers] = React.useState<ShortUser[] | undefined>([]);
     const [posts, setPosts] = React.useState<Post[] | undefined>([]);
-    const [tab, setTab] = React.useState(0);
+    const [tab] = React.useState(0);
 
     useEffect(() => {
         if (searchTerm === "") {

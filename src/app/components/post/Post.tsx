@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FiLayers } from "react-icons/fi";
 import { BsHeart, BsHeartFill, BsChatDots } from "react-icons/bs";
 import { useNotificationContext } from "@/app/contexts/NotificationContext";
-import { useUserContext } from "@/app/contexts/UserContext";
 import type { Post as PostType } from "@/app/types/global";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -20,11 +19,9 @@ interface PostProps {
 
 export default function Post({ post }: PostProps) {
   const { addNotification } = useNotificationContext();
-  const { user } = useUserContext();
+  const router = useRouter();
   const [isLiked, setIsLiked] = useState<boolean>(!!post.isLiked);
   const [likeCount, setLikeCount] = useState<number>(post._count.Likes);
-
-  const router = useRouter();
 
   const handlePostClick = (e: React.MouseEvent) => {
     e.preventDefault();
