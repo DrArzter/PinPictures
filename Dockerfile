@@ -7,9 +7,6 @@ WORKDIR /app
 # Set build environment
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Install OpenSSL for Prisma
-RUN apk add --no-cache openssl
-
 # Install dependencies
 COPY package*.json ./
 RUN npm ci
@@ -21,8 +18,6 @@ COPY . .
 
 # Generate Prisma Client and build with increased memory
 ENV NODE_OPTIONS="--max-old-space-size=4096"
-RUN mkdir -p ../generated/prisma
-ENV PRISMA_CLIENT_OUTPUT="../generated/prisma"
 RUN npx prisma generate
 RUN npm run build
 
@@ -35,7 +30,7 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Copy necessary files 
+# Copy necessary files from builder
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
@@ -53,4 +48,4 @@ USER nextjs
 EXPOSE 3000
 
 # Start the app
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start"] 
