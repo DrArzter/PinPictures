@@ -17,10 +17,20 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== "POST") {
+  if (req.method !== "POST" && req.method !== "GET") {
     return res
       .status(405)
       .json({ status: "error", message: "Unsupported method" });
+  }
+
+  if (req.method === "GET") {
+    return res.status(200).json({
+      status: "success",
+      message: "Captcha public key",
+      data: {
+        sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+      },
+    });
   }
 
   try {

@@ -40,6 +40,13 @@ export async function authMiddleware(
     try {
       const decoded = verifyToken(token) as DecodedToken;
 
+      if (!decoded) {
+        return res.status(401).json({
+          status: "error",
+          message: "Unauthorized",
+        });
+      }
+
       if (Date.now() >= decoded.exp * 1000) {
         return res.status(401).json({
           status: "error",

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import * as api from "@/app/api";
@@ -15,6 +15,7 @@ import { LuBanana } from "react-icons/lu";
 export default function Authentication({ }) {
   const [isRegistration, setIsRegistration] = useState<boolean>(true);
   const [isForgotPassword, setIsForgotPassword] = useState<boolean>(false);
+  const [captchaKey, setCaptchaKey] = useState<string | null>(null);
 
   const [recaptcha, setRecaptcha] = useState<string | null>(null);
 
@@ -27,6 +28,14 @@ export default function Authentication({ }) {
   const [password, setPassword] = useState<string>("");
 
   const router = useRouter();
+
+  useEffect(() => {
+    api.getCaptchaKey().then((response) => {
+      if (response?.data?.status === "success") {
+        setCaptchaKey(response.data.data.sitekey);
+      }
+    });
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,6 +153,7 @@ export default function Authentication({ }) {
           handleSubmit={handleSubmit}
           toggleRegistration={toggleRegistration}
           setRecaptcha={setRecaptcha}
+          captchaKey={captchaKey}
         />
       ) : isForgotPassword ? (
         <div className="p-6 rounded-lg text-center">

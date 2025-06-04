@@ -12,7 +12,8 @@ export default function Registration({
   setPassword,
   handleSubmit,
   toggleRegistration,
-  setRecaptcha
+  setRecaptcha,
+  captchaKey
 }: RegistrationProps) {
 
 
@@ -95,11 +96,13 @@ export default function Registration({
         </div>
 
         <div className="w-full">
-          <ReCAPTCHA
-            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
-            onChange={onCaptchaChange}
-            className="flex justify-center"
-          />
+          {captchaKey && (
+            <ReCAPTCHA
+              sitekey={captchaKey}
+              onChange={onCaptchaChange}
+              className="flex justify-center"
+            />
+          )}
         </div>
 
         <button type="submit" className={buttonClassName}>

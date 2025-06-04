@@ -1,6 +1,7 @@
 export { default as login } from "./login";
 export { default as logout } from "./logout";
 export { default as registration } from "./registration";
+export { default as getCaptchaKey } from "./getCaptchaKey";
 export { default as forgotPassword } from "./forgotPassword";
 export { default as getUser } from "./getUser";
 export { default as getProfile } from "./getProfile";
@@ -17,4 +18,5 @@ export { default as getSummary } from "./getSummary";
 export { default as getAUsers } from "./getAUsers";
 export { default as getAUserChats } from "./getAUserChats";
 export { default as banUser } from "./banUser";
-export { default as deleteAPost } from "./deleteAPost";
+export { default as deletePost } from "./deletePost";
+export { default as deleteComment } from "./deleteComment";

@@ -6,6 +6,8 @@ import { Comment } from "@/app/types/global";
 interface CommentSectionProps {
   comments: Comment[];
   onAddComment: (commentText: string) => void;
+  postId: number;
+  setComments: (comments: Comment[]) => void;
 }
 
 // Выделим форму ввода комментария в отдельный компонент
@@ -45,7 +47,7 @@ const CommentForm = memo(({ onSubmit }: { onSubmit: (text: string) => void }) =>
 
 CommentForm.displayName = 'CommentForm';
 
-const CommentSection = memo(({ comments, onAddComment }: CommentSectionProps) => {
+const CommentSection = memo(({ comments, onAddComment, postId, setComments }: CommentSectionProps) => {
   const handleAddComment = useCallback((text: string) => {
     onAddComment(text);
   }, [onAddComment]);
@@ -55,7 +57,7 @@ const CommentSection = memo(({ comments, onAddComment }: CommentSectionProps) =>
       className="flex flex-col flex-grow overflow-hidden"
       id="comments-section"
     >
-      <CommentList comments={comments} />
+      <CommentList comments={comments} postId={postId} setComments={setComments} />
       <CommentForm onSubmit={handleAddComment} />
     </div>
   );

@@ -53,7 +53,7 @@ export default async function handler(
           .json({ status: "error", message: "Post not found" });
       }
 
-      if (post.authorId !== user.id) {
+      if (post.authorId !== user.id && (typeof user.bananaLevel !== 'number' || user.bananaLevel < 1)) {
         return res
           .status(403)
           .json({ status: "error", message: "Unauthorized" });
@@ -92,6 +92,7 @@ export default async function handler(
             createdAt: true,
             User: {
               select: {
+                id: true,
                 name: true,
                 avatar: true,
               },

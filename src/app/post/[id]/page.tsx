@@ -75,7 +75,7 @@ const PostDetails = ({
         <h1 className="font-bold text-3xl mb-4 text-yellow-500">
           {post.name}
         </h1>
-        {(user?.bananaLevel ?? 0) > 0 && (
+        { ((typeof user?.bananaLevel !== 'number' || user?.bananaLevel >= 1) || user?.id === post.authorId) && (
           <ImBin2 size={20} onClick={onDelete} className="cursor-pointer " />
         )}
       </div>
@@ -114,14 +114,21 @@ export default function PostPage() {
     if (!post) return;
 
     api
-      .deleteAPost(post.id)
+      .deletePost(post.id)
       .then((response: AxiosResponse<ApiResponse<void>>) => {
+        addNotification({
+          status: response.data.status,
+          message: response.data.message,
+        });
         if (response.data.status === "success") {
           router.push("/");
         }
       })
       .catch(() => {
-        router.push("/");
+        addNotification({
+          status: "error",
+          message: "Failed to delete post.",
+        });
       });
   }, [post, router]);
 
@@ -262,14 +269,7 @@ export default function PostPage() {
         .uploadComment(post.id, commentText.trim())
         .then((response) => {
           if (response.data.status === "success") {
-            addNotification({
-              status: "success",
-              message: response.data.message,
-            });
 
-            setComments((prev) =>
-              prev.filter((comment) => comment.id !== tempId)
-            );
           } else {
             throw new Error(response.data.message || "Unknown error");
           }
@@ -416,6 +416,8 @@ export default function PostPage() {
               >
                 <CommentSection
                   comments={comments}
+                  setComments={setComments}
+                  postId={post.id}
                   onAddComment={handleAddComment}
                 />
               </div>
