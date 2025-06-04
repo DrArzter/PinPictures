@@ -1,9 +1,9 @@
 "use client";
 import axios from "axios";
-import {
-  notificationService,
-  createNotification,
-} from "@/app/utils/NotificationService";
+// import {
+//   notificationService,
+//   createNotification,
+// } from "@/app/utils/NotificationService";
 
 const api = axios.create({
   baseURL: `/api`,

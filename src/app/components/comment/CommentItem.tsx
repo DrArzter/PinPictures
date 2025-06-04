@@ -1,5 +1,5 @@
 // CommentItem.tsx
-import React, { useState } from "react";
+import React from "react";
 import { Comment } from "@/app/types/global";
 import { ImBin2 } from "react-icons/im";
 import { useUserContext } from "@/app/contexts/UserContext";
