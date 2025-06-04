@@ -5,7 +5,7 @@ import { Comment } from '@/app/types/global';
 interface CommentListProps {
   comments: Comment[];
   postId: number;
-  setComments: (comments: Comment[]) => void;
+  setComments: (comments: Comment[] | ((prev: Comment[]) => Comment[])) => void;
 }
 
 const CommentList = memo(({ comments, postId, setComments }: CommentListProps) => {

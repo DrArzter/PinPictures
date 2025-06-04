@@ -375,6 +375,8 @@ export default function PostPage() {
             <div className="h-full flex flex-col">
               <CommentSection
                 comments={comments}
+                setComments={setComments}
+                postId={post.id}
                 onAddComment={handleAddComment}
               />
             </div>

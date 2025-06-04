@@ -7,7 +7,7 @@ interface CommentSectionProps {
   comments: Comment[];
   onAddComment: (commentText: string) => void;
   postId: number;
-  setComments: (comments: Comment[]) => void;
+  setComments: (comments: Comment[] | ((prev: Comment[]) => Comment[])) => void;
 }
 
 // Выделим форму ввода комментария в отдельный компонент
