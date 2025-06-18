@@ -27,6 +27,9 @@ export async function authMiddleware(
       "unknown";
     req.clientIp = clientIp;
 
+    // LOG IP, route and method
+    console.log(`IP: ${clientIp}, Route: ${req.url}, Method: ${req.method}`);
+
     const cookieStore = req.cookies || parse(req.headers.cookie || "");
     const token = cookieStore.token;
 

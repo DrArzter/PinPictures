@@ -70,7 +70,6 @@ export default async function handler(
     }
 
     io.on("connection", (socket) => {
-      console.log("New client connected:", socket.id);
 
       const cookies = socket.handshake.headers?.cookie;
       if (!cookies) {
@@ -97,7 +96,6 @@ export default async function handler(
 
         socket.data.userId = decoded.userId;
         socket.join(`user_${socket.data.userId}`);
-        console.log(`User ${socket.data.userId} joined their personal room.`);
       } catch (error) {
         console.error("Token verification error:", error);
         socket.disconnect(true);
@@ -236,7 +234,6 @@ export default async function handler(
 
       socket.on("joinChat", (chatId) => {
         socket.join(`chat_${chatId}`);
-        console.log(`User ${socket.data.userId} joined chat ${chatId}`);  
       });
 
       socket.on("getUserChats", async () => {
