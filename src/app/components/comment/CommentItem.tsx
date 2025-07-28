@@ -36,7 +36,7 @@ export default function CommentItem({ comment, postId, setComments }: CommentIte
         className="w-12 h-12 rounded-full"
       />
       <div className="flex flex-col w-full">
-        {(comment.User.id === user?.id || (typeof user?.bananaLevel !== 'number' || user?.bananaLevel >= 1)) && (
+        { user && (comment.User.id === user?.id || (typeof user?.bananaLevel !== 'number' || user?.bananaLevel >= 1)) && (
           <p className="flex flex-row justify-between w-full font-bold">
             {comment.User.name}
             <button onClick={handleDeleteComment}>

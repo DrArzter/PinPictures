@@ -75,7 +75,7 @@ const PostDetails = ({
         <h1 className="font-bold text-3xl mb-4 text-yellow-500">
           {post.name}
         </h1>
-        { ((typeof user?.bananaLevel !== 'number' || user?.bananaLevel >= 1) || user?.id === post.authorId) && (
+        { ( user && (typeof user?.bananaLevel !== 'number' || user?.bananaLevel >= 1) || user?.id === post.authorId) && (
           <ImBin2 size={20} onClick={onDelete} className="cursor-pointer " />
         )}
       </div>
